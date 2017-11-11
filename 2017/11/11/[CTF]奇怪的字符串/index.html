@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="CTF,密码学,凯撒加密,栅栏加密," />
+  <meta name="keywords" content="CTF,密码学,base64," />
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="题目小明某一天收到一封密信，信中写了几个不同的年份：辛卯，癸巳，丙戌，辛未，庚辰，癸酉，己卯，癸巳。 信的背面还写有“+甲子”，请解出这段密文。 key值：CTF{XXX}">
-<meta name="keywords" content="CTF,密码学,凯撒加密,栅栏加密">
+<meta name="description" content="题目信息保密的需求和实际操作自古有之，与之相应的信息加密与解密也是历史悠久，现有一段经过古典密码理论（不止一种）加密的密文，内容如下：  89 51 82 109 89 50 86 122 97 71 107 61请找出这段密文隐藏的消息明文">
+<meta name="keywords" content="CTF,密码学,base64">
 <meta property="og:type" content="article">
-<meta property="og:title" content="传统知识+古典密码">
-<meta property="og:url" content="http://yoursite.com/2017/11/11/[CTF]传统知识+古典密码/index.html">
+<meta property="og:title" content="奇怪的字符串">
+<meta property="og:url" content="http://yoursite.com/2017/11/11/[CTF]奇怪的字符串/index.html">
 <meta property="og:site_name" content="metang&#39;s blog">
-<meta property="og:description" content="题目小明某一天收到一封密信，信中写了几个不同的年份：辛卯，癸巳，丙戌，辛未，庚辰，癸酉，己卯，癸巳。 信的背面还写有“+甲子”，请解出这段密文。 key值：CTF{XXX}">
+<meta property="og:description" content="题目信息保密的需求和实际操作自古有之，与之相应的信息加密与解密也是历史悠久，现有一段经过古典密码理论（不止一种）加密的密文，内容如下：  89 51 82 109 89 50 86 122 97 71 107 61请找出这段密文隐藏的消息明文">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-11-11T11:06:23.270Z">
+<meta property="og:updated_time" content="2017-11-11T11:31:44.839Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="传统知识+古典密码">
-<meta name="twitter:description" content="题目小明某一天收到一封密信，信中写了几个不同的年份：辛卯，癸巳，丙戌，辛未，庚辰，癸酉，己卯，癸巳。 信的背面还写有“+甲子”，请解出这段密文。 key值：CTF{XXX}">
+<meta name="twitter:title" content="奇怪的字符串">
+<meta name="twitter:description" content="题目信息保密的需求和实际操作自古有之，与之相应的信息加密与解密也是历史悠久，现有一段经过古典密码理论（不止一种）加密的密文，内容如下：  89 51 82 109 89 50 86 122 97 71 107 61请找出这段密文隐藏的消息明文">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/11/11/[CTF]传统知识+古典密码/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/11/11/[CTF]奇怪的字符串/"/>
 
 
 
 
 
-  <title>传统知识+古典密码 | metang's blog</title>
+  <title>奇怪的字符串 | metang's blog</title>
   
 
 
@@ -265,7 +265,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/11/[CTF]传统知识+古典密码/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/11/[CTF]奇怪的字符串/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="metang">
@@ -282,7 +282,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">传统知识+古典密码</h1>
+          <h1 class="post-title" itemprop="name headline">奇怪的字符串</h1>
         
 
         <div class="post-meta">
@@ -361,7 +361,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  280
+                  570
                 </span>
               
 
@@ -386,23 +386,17 @@
       
 
       
-        <h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>小明某一天收到一封密信，信中写了几个不同的年份：辛卯，癸巳，丙戌，辛未，庚辰，癸酉，己卯，癸巳。</p>
-<p>信的背面还写有“+甲子”，请解出这段密文。 key值：CTF{XXX} </p>
+        <h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>信息保密的需求和实际操作自古有之，与之相应的信息加密与解密也是历史悠久，现有一段经过古典密码理论（不止一种）加密的密文，内容如下： </p>
+<p>89 51 82 109 89 50 86 122 97 71 107 61请找出这段密文隐藏的消息明文 </p>
 <a id="more"></a>
-<h2 id="题目链接"><a href="#题目链接" class="headerlink" title="题目链接"></a>题目链接</h2><p><a href="http://www.shiyanbar.com/ctf/1991" target="_blank" rel="external">http://www.shiyanbar.com/ctf/1991</a></p>
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p><strong>甲子 = 60</strong> </p>
-<p>辛卯，为干支之一，顺序为第28个 –&gt; 88 –&gt;  X     （对应的ASCII码）</p>
-<p>癸巳，为干支之一，顺序为第30个 –&gt; 90 –&gt;  Z     </p>
-<p>丙戌，为干支之一，顺序为第23个 –&gt; 93 –&gt;  S     </p>
-<p>辛未，为干支之一，顺序为第8个 –&gt; 68 –&gt;  D </p>
-<p>庚辰，为干支之一，顺序为第17个 –&gt; 77 –&gt;  M </p>
-<p>癸酉，为干支之一,顺序为第10个 –&gt; 70 –&gt;  F </p>
-<p>己卯，为干支之一，顺序为第16个 –&gt; 76 –&gt;  L </p>
-<p>癸巳，为干支之一，顺序为第30个 –&gt; 90 –&gt;  Z</p>
-<p>待解密字符串为： <strong>XZSDMFLZ</strong> ，而古典加密基本的就是移位和替换。</p>
-<p>比如<strong>凯撒</strong>（在线解密：<a href="http://planetcalc.com/1434/）和**栅栏**（在线解密：http://www.qqxiuzi.cn/bianma/zhalanmima.php）。" target="_blank" rel="external">http://planetcalc.com/1434/）和**栅栏**（在线解密：http://www.qqxiuzi.cn/bianma/zhalanmima.php）。</a></p>
-<p>这里的答案是首先用栅栏密码（两栏）解密得到<strong>XMZFSLDZ</strong> </p>
-<p>然后再用凯撒解密得到<strong>SHUANGYU</strong> </p>
+<h2 id="题目链接"><a href="#题目链接" class="headerlink" title="题目链接"></a>题目链接</h2><p><a href="http://www.shiyanbar.com/ctf/1877" target="_blank" rel="external">http://www.shiyanbar.com/ctf/1877</a></p>
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>89 51 82 109 89 50 86 122 97 71 107 61</p>
+<p>看到这些数字你就会想到ascii码，一个个的转换成字符后是一堆大小写字母 数字 还有一个等号，于是一下子想到base64。</p>
+<p>Y3RmY2VzaGk= 用base64解密得到 ctfceshi</p>
+<h3 id="base64"><a href="#base64" class="headerlink" title="base64"></a>base64</h3><p>在<a href="http://www.baike.com/sowiki/email?prd=content_doc_search" target="_blank" rel="external">email</a>传输中，加密是肯定的，但是加密的目的不是让用户发送非常安全的Email。这种加密方式主要就是“<a href="http://www.baike.com/sowiki/%E9%98%B2%E5%90%9B%E5%AD%90%E4%B8%8D%E9%98%B2%E5%B0%8F%E4%BA%BA?prd=content_doc_search" target="_blank" rel="external">防君子不防小人</a>”。即达到一眼望去完全看不出内容即可。基于这个目的加密算法的复杂程度和效率也就不能太大和太低。和上一个理由类似，<a href="http://www.baike.com/sowiki/MIME%E5%8D%8F%E8%AE%AE?prd=content_doc_search" target="_blank" rel="external">MIME协议</a>等用于发送Email的协议解决的是如何收发Email，而并不是如何安全的收发Email。因此<a href="http://www.baike.com/sowiki/%E7%AE%97%E6%B3%95%E5%A4%8D%E6%9D%82%E5%BA%A6?prd=content_doc_search" target="_blank" rel="external">算法复杂度</a>要小，效率要高，否则因为发送Email而大量占用资源，路就有点走歪了。 </p>
+<p> 但是，如果是基于以上两点，那么我们使用最简单的<a href="http://www.baike.com/sowiki/%E6%81%BA%E6%92%92?prd=content_doc_search" target="_blank" rel="external">恺撒</a>法即可，为什么Base64看起来要比恺撒法复杂呢？这是因为在Email的传送过程中，由于历史原因，Email只被允许传送ASCII字符，即一个8位字节的低7位。因此，如果您发送了一封带有非<a href="http://www.baike.com/sowiki/ASCII?prd=content_doc_search" target="_blank" rel="external">ASCII</a>字符（即字节的最高位是1）的Email通过有“历史问题”的网关时就可能会出现问题。网关可能会把最高位置为0！很明显，问题就这样产生了！因此，为了能够正常的传送Email，这个问题就必须考虑！所以，单单靠改变字母的位置的恺撒之类的方案也就不行了。关于这一点可以参考RFC2046。基于以上的一些主要原因产生了Base64编码。</p>
+<p><strong>转换前后对比</strong></p>
+<p>转换前 aaaaaabb ccccdddd eeffffff<br>转换后 00aaaaaa 00bbcccc 00ddddee 00ffffff </p>
 
       
     </div>
@@ -463,9 +457,7 @@
           
             <a href="/tags/密码学/" rel="tag"><i class="fa fa-tag"></i> 密码学</a>
           
-            <a href="/tags/凯撒加密/" rel="tag"><i class="fa fa-tag"></i> 凯撒加密</a>
-          
-            <a href="/tags/栅栏加密/" rel="tag"><i class="fa fa-tag"></i> 栅栏加密</a>
+            <a href="/tags/base64/" rel="tag"><i class="fa fa-tag"></i> base64</a>
           
         </div>
       
@@ -478,8 +470,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/11/11/[CTF]困在栅栏里的凯撒/" rel="next" title="困在栅栏里的凯撒">
-                <i class="fa fa-chevron-left"></i> 困在栅栏里的凯撒
+              <a href="/2017/11/11/[CTF]神秘字母/" rel="next" title="神秘字母">
+                <i class="fa fa-chevron-left"></i> 神秘字母
               </a>
             
           </div>
@@ -488,8 +480,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/11/11/[CTF]The Flash-14/" rel="prev" title="The Flash-14">
-                The Flash-14 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/11/11/[CTF]围在栅栏中的爱/" rel="prev" title="围在栅栏中的爱">
+                围在栅栏中的爱 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -648,7 +640,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目"><span class="nav-number">1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#题目链接"><span class="nav-number">2.</span> <span class="nav-text">题目链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#题解"><span class="nav-number">3.</span> <span class="nav-text">题解</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目"><span class="nav-number">1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#题目链接"><span class="nav-number">2.</span> <span class="nav-text">题目链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#题解"><span class="nav-number">3.</span> <span class="nav-text">题解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#base64"><span class="nav-number">3.1.</span> <span class="nav-text">base64</span></a></li></ol></li></ol></div>
             
 
           </div>
