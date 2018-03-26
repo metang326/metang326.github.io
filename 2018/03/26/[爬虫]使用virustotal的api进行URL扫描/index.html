@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="metang&#39;s blog">
 <meta property="og:description" content="毕设的一部分功能是完成恶意URL的检测，为了获取到带标签的数据，提交URL到virustotal网站上可以获得URL的标签，即它是否是恶意的。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-26T14:44:20.700Z">
+<meta property="og:updated_time" content="2018-03-26T14:47:25.187Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用virustotal的api进行URL扫描">
 <meta name="twitter:description" content="毕设的一部分功能是完成恶意URL的检测，为了获取到带标签的数据，提交URL到virustotal网站上可以获得URL的标签，即它是否是恶意的。">
@@ -441,7 +441,7 @@
       
         <p>毕设的一部分功能是完成恶意URL的检测，为了获取到带标签的数据，提交URL到virustotal网站上可以获得URL的标签，即它是否是恶意的。</p>
 <a id="more"></a>
-<p>首先需要在<a href="https://www.virustotal.com网站上注册，获取自己的apikey" target="_blank" rel="external">https://www.virustotal.com网站上注册，获取自己的apikey</a></p>
+<p>首先需要在<a href="https://www.virustotal.com" target="_blank" rel="external">https://www.virustotal.com</a>    网站上注册，获取自己的apikey</p>
 <p>具体的内容可以通过查阅<a href="https://developers.virustotal.com/v2.0/reference" target="_blank" rel="external">https://developers.virustotal.com/v2.0/reference</a></p>
 <p>这里举例提交一个URL进行检测，并且获取结果的代码实现</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> requests</div><div class="line"></div><div class="line">url = <span class="string">'https://www.virustotal.com/vtapi/v2/url/report'</span></div><div class="line"></div><div class="line">params = &#123;<span class="string">'apikey'</span>: <span class="string">'a2c4c89637e57dc27bdb3048989da16c530c2dfffc4783c62fa95ea936e19d80'</span>, <span class="string">'resource'</span>:<span class="string">'baidu.com'</span>&#125;</div><div class="line"></div><div class="line">response = requests.get(url, params=params)</div><div class="line"></div><div class="line">print(response.json())</div></pre></td></tr></table></figure>
