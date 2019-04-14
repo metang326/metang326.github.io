@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="metang&#39;s blog">
 <meta property="og:description" content="algolia配置好了以后，多上传几个博客之后重新建立index就会出错了。出错内容关键部分为objectID=d8676bd7611266ed2404ee6cee119d4a4a911cb0 is too big size=12920 bytes 解决起来其实很简单，但是不知道为什么在网上搜不到相关的解决方法。难道只有我遇到这个问题了？？">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-14T10:23:24.706Z">
+<meta property="og:updated_time" content="2019-04-14T11:55:01.630Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="algolia搜索too big size报错">
 <meta name="twitter:description" content="algolia配置好了以后，多上传几个博客之后重新建立index就会出错了。出错内容关键部分为objectID=d8676bd7611266ed2404ee6cee119d4a4a911cb0 is too big size=12920 bytes 解决起来其实很简单，但是不知道为什么在网上搜不到相关的解决方法。难道只有我遇到这个问题了？？">
@@ -403,7 +403,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  515
+                  517
                 </span>
               
 
@@ -440,7 +440,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">#添加搜索</div><div class="line">algolia:</div><div class="line">  applicationID: xxx</div><div class="line">  apiKey: xxx</div><div class="line">  adminApiKey: xxx </div><div class="line">  indexName: xxx</div><div class="line">  chunkSize: 5000</div><div class="line">  fields:</div><div class="line">    - title</div><div class="line">    - categories.name</div><div class="line">    - path</div></pre></td></tr></table></figure>
 <p>乱改实在是太辛苦了，所以还是看源码吧。在D:\metang326.github.io\node_modules\hexo-algolia\lib这里发现了一行代码：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">var storedPost = _.pick(data, [&apos;title&apos;, &apos;date&apos;, &apos;slug&apos;, &apos;path&apos;, &apos;content&apos;, &apos;excerpt&apos;, &apos;objectID&apos;]);</div></pre></td></tr></table></figure>
-<p>于是把’content’，再次hexo algolia，终于成功了。</p>
+<p>于是把’content’删掉，再次hexo algolia，终于成功了。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">INFO  Generated: lib/algolia-instant-search/instantsearch.min.js</div><div class="line">INFO  Generated: lib/three/three.min.js</div><div class="line">INFO  Generated: lib/font-awesome/fonts/fontawesome-webfont.eot</div><div class="line">INFO  Generated: lib/font-awesome/fonts/FontAwesome.otf</div><div class="line">INFO  Generated: lib/font-awesome/fonts/fontawesome-webfont.ttf</div><div class="line">INFO  Generated: lib/font-awesome/fonts/fontawesome-webfont.svg</div><div class="line">INFO  Generated: uploads/avatar.JPG</div><div class="line">INFO  196 files generated in 8.06 s</div><div class="line">INFO  [Algolia] Index cleared.</div><div class="line">INFO  [Algolia] Starting indexation...</div><div class="line">INFO  [Algolia] Highlight tag definition success.</div><div class="line">INFO  [Algolia] Import done.</div></pre></td></tr></table></figure>
 <p>没有报错，部署在网页上看了一下，也没有问题了！</p>
 
