@@ -94,18 +94,18 @@
 
 
 
-<meta name="description" content="在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。">
+<meta name="description" content="在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。难点主要在搭建自己的DNS解析服务器以及Telnet登陆到cnc服务器，还有一些小问题就是有些需要传输数据的端口默认是关闭的，需要注意开">
 <meta name="keywords" content="botnet">
 <meta property="og:type" content="article">
 <meta property="og:title" content="开源代码mirai环境初步搭建">
 <meta property="og:url" content="http://yoursite.com/2019/04/14/mirai教程/index.html">
 <meta property="og:site_name" content="metang&#39;s blog">
-<meta property="og:description" content="在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。">
+<meta property="og:description" content="在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。难点主要在搭建自己的DNS解析服务器以及Telnet登陆到cnc服务器，还有一些小问题就是有些需要传输数据的端口默认是关闭的，需要注意开">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-14T09:23:51.473Z">
+<meta property="og:updated_time" content="2019-04-14T09:42:08.539Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="开源代码mirai环境初步搭建">
-<meta name="twitter:description" content="在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。">
+<meta name="twitter:description" content="在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。难点主要在搭建自己的DNS解析服务器以及Telnet登陆到cnc服务器，还有一些小问题就是有些需要传输数据的端口默认是关闭的，需要注意开">
 
 
 
@@ -403,7 +403,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2,577
+                  2,634
                 </span>
               
 
@@ -428,7 +428,7 @@
       
 
       
-        <p>在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。</p>
+        <p>在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。难点主要在搭建自己的DNS解析服务器以及Telnet登陆到cnc服务器，还有一些小问题就是有些需要传输数据的端口默认是关闭的，需要注意开启一下。</p>
 <a id="more"></a>
 <h1 id="github源码"><a href="#github源码" class="headerlink" title="github源码"></a>github源码</h1><p><a href="https://github.com/jgamblin/Mirai-Source-Code/" target="_blank" rel="external">https://github.com/jgamblin/Mirai-Source-Code/</a></p>
 <h1 id="框架介绍"><a href="#框架介绍" class="headerlink" title="框架介绍"></a>框架介绍</h1><h2 id="Requirements（原作者写的）"><a href="#Requirements（原作者写的）" class="headerlink" title="Requirements（原作者写的）"></a>Requirements（原作者写的）</h2><h3 id="Bare-Minimum"><a href="#Bare-Minimum" class="headerlink" title="Bare Minimum"></a>Bare Minimum</h3><p>2 servers: 1 for CNC + mysql, 1 for scan receiver, and 1+ for loading</p>
@@ -449,15 +449,13 @@
 <p>（1）bot的扫描段开启之后暴力扫描机器这部分没有成功破解到的机器；</p>
 <p>（2）loader服务器的配置还不明白；</p>
 <p>（3）bot感染新bot这部分没有做到，我的bot都是自己手动开启的。</p>
-<h1 id="我的服务器架构"><a href="#我的服务器架构" class="headerlink" title="我的服务器架构"></a>我的服务器架构</h1><h2 id="cnc服务器"><a href="#cnc服务器" class="headerlink" title="cnc服务器"></a>cnc服务器</h2><p>把cnc服务器放在公网比较方便的一点是，搭建好了bot环境后，自己随便在哪个机器都可以登录到cnc端，通过用户名和密码的验证之后就可以发攻击命令给bot们了。</p>
-<p>124.193.<strong><strong>. </strong></strong></p>
+<h1 id="我的服务器架构"><a href="#我的服务器架构" class="headerlink" title="我的服务器架构"></a>我的服务器架构</h1><h2 id="cnc服务器（主控服务器）"><a href="#cnc服务器（主控服务器）" class="headerlink" title="cnc服务器（主控服务器）"></a>cnc服务器（主控服务器）</h2><p>把cnc服务器放在公网比较方便的一点是，搭建好了bot环境后，自己随便在哪个机器都可以登录到cnc端，通过用户名和密码的验证之后就可以发攻击命令给bot们了。</p>
+<p>w.x.y.z (为了安全起见，保密)</p>
 <h2 id="DNS解析服务器"><a href="#DNS解析服务器" class="headerlink" title="DNS解析服务器"></a>DNS解析服务器</h2><p>192.168.2.136</p>
 <h2 id="loader服务器-还没有部署"><a href="#loader服务器-还没有部署" class="headerlink" title="loader服务器(还没有部署)"></a>loader服务器(还没有部署)</h2><p>192.168.105.127</p>
 <h2 id="bot需要设置的"><a href="#bot需要设置的" class="headerlink" title="bot需要设置的"></a>bot需要设置的</h2><ul>
 <li>主控服务器域名：<code>www.mytang.com</code></li>
-<li>主控服务器IP：<code>124.193.****.****</code></li>
 <li>Loader服务器域名：<code>www.loader.com</code></li>
-<li>Loader服务器IP：<code>192.168.105.127</code></li>
 </ul>
 <p>在bot的源码中[resolv.c]要修改域名解析服务器为自己搭建的bind9解析服务器所在IP。</p>
 <h2 id="cnc服务器需要设置的"><a href="#cnc服务器需要设置的" class="headerlink" title="cnc服务器需要设置的"></a>cnc服务器需要设置的</h2><p>管理员用户名：mirai-user</p>
@@ -561,8 +559,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/11/20/[爬虫]从在线阅读网站下载小说/" rel="next" title="从在线阅读网站下载小说">
-                <i class="fa fa-chevron-left"></i> 从在线阅读网站下载小说
+              <a href="/2019/04/13/algolia搜索too big size报错的修复/" rel="next" title="algolia搜索too big size报错">
+                <i class="fa fa-chevron-left"></i> algolia搜索too big size报错
               </a>
             
           </div>
@@ -660,7 +658,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">25</span>
+                  <span class="site-state-item-count">26</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -731,7 +729,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#github源码"><span class="nav-number">1.</span> <span class="nav-text">github源码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#框架介绍"><span class="nav-number">2.</span> <span class="nav-text">框架介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Requirements（原作者写的）"><span class="nav-number">2.1.</span> <span class="nav-text">Requirements（原作者写的）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Bare-Minimum"><span class="nav-number">2.1.1.</span> <span class="nav-text">Bare Minimum</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pro-Setup-my-setup"><span class="nav-number">2.1.2.</span> <span class="nav-text">Pro Setup (my setup)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解释"><span class="nav-number">2.2.</span> <span class="nav-text">解释</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#我的服务器架构"><span class="nav-number">3.</span> <span class="nav-text">我的服务器架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#cnc服务器"><span class="nav-number">3.1.</span> <span class="nav-text">cnc服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DNS解析服务器"><span class="nav-number">3.2.</span> <span class="nav-text">DNS解析服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#loader服务器-还没有部署"><span class="nav-number">3.3.</span> <span class="nav-text">loader服务器(还没有部署)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bot需要设置的"><span class="nav-number">3.4.</span> <span class="nav-text">bot需要设置的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cnc服务器需要设置的"><span class="nav-number">3.5.</span> <span class="nav-text">cnc服务器需要设置的</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mirai搭建准备"><span class="nav-number">4.</span> <span class="nav-text">mirai搭建准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置DNS服务器"><span class="nav-number">5.</span> <span class="nav-text">配置DNS服务器</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#github源码"><span class="nav-number">1.</span> <span class="nav-text">github源码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#框架介绍"><span class="nav-number">2.</span> <span class="nav-text">框架介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Requirements（原作者写的）"><span class="nav-number">2.1.</span> <span class="nav-text">Requirements（原作者写的）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Bare-Minimum"><span class="nav-number">2.1.1.</span> <span class="nav-text">Bare Minimum</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pro-Setup-my-setup"><span class="nav-number">2.1.2.</span> <span class="nav-text">Pro Setup (my setup)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解释"><span class="nav-number">2.2.</span> <span class="nav-text">解释</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#我的服务器架构"><span class="nav-number">3.</span> <span class="nav-text">我的服务器架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#cnc服务器（主控服务器）"><span class="nav-number">3.1.</span> <span class="nav-text">cnc服务器（主控服务器）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DNS解析服务器"><span class="nav-number">3.2.</span> <span class="nav-text">DNS解析服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#loader服务器-还没有部署"><span class="nav-number">3.3.</span> <span class="nav-text">loader服务器(还没有部署)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bot需要设置的"><span class="nav-number">3.4.</span> <span class="nav-text">bot需要设置的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cnc服务器需要设置的"><span class="nav-number">3.5.</span> <span class="nav-text">cnc服务器需要设置的</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mirai搭建准备"><span class="nav-number">4.</span> <span class="nav-text">mirai搭建准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置DNS服务器"><span class="nav-number">5.</span> <span class="nav-text">配置DNS服务器</span></a></li></ol></div>
             
 
           </div>
