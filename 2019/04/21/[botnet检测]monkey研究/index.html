@@ -94,18 +94,18 @@
 
 
 
-<meta name="description" content="Infection Monkey是一款由以色列安全公司GuardiCore在2016黑帽大会上发布的数据中心安全检测工具，其主要用于数据中心边界及内部服务器安全性的自动化检测。该工具在架构上，则分为Monkey（扫描及漏洞利用端）以及C&amp;amp;C服务器（相当于reporter，但仅仅只是用于收集monkey探测的信息）">
+<meta name="description" content="Infection Monkey是一款由以色列安全公司GuardiCore在2016黑帽大会上发布的数据中心安全检测工具，其主要用于数据中心边界及内部服务器安全性的自动化检测。该工具在架构上，则分为Monkey（扫描及漏洞利用端）以及C&amp;amp;C服务器（相当于reporter，但仅仅只是用于收集monkey探测的信息） infection Monkey nfection Monkey 对infe">
 <meta name="keywords" content="botnet">
 <meta property="og:type" content="article">
 <meta property="og:title" content="infection monkey源码研究">
 <meta property="og:url" content="http://yoursite.com/2019/04/21/[botnet检测]monkey研究/index.html">
 <meta property="og:site_name" content="metang&#39;s blog">
-<meta property="og:description" content="Infection Monkey是一款由以色列安全公司GuardiCore在2016黑帽大会上发布的数据中心安全检测工具，其主要用于数据中心边界及内部服务器安全性的自动化检测。该工具在架构上，则分为Monkey（扫描及漏洞利用端）以及C&amp;amp;C服务器（相当于reporter，但仅仅只是用于收集monkey探测的信息）">
+<meta property="og:description" content="Infection Monkey是一款由以色列安全公司GuardiCore在2016黑帽大会上发布的数据中心安全检测工具，其主要用于数据中心边界及内部服务器安全性的自动化检测。该工具在架构上，则分为Monkey（扫描及漏洞利用端）以及C&amp;amp;C服务器（相当于reporter，但仅仅只是用于收集monkey探测的信息） infection Monkey nfection Monkey 对infe">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-21T02:42:06.078Z">
+<meta property="og:updated_time" content="2019-04-21T03:20:07.161Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="infection monkey源码研究">
-<meta name="twitter:description" content="Infection Monkey是一款由以色列安全公司GuardiCore在2016黑帽大会上发布的数据中心安全检测工具，其主要用于数据中心边界及内部服务器安全性的自动化检测。该工具在架构上，则分为Monkey（扫描及漏洞利用端）以及C&amp;amp;C服务器（相当于reporter，但仅仅只是用于收集monkey探测的信息）">
+<meta name="twitter:description" content="Infection Monkey是一款由以色列安全公司GuardiCore在2016黑帽大会上发布的数据中心安全检测工具，其主要用于数据中心边界及内部服务器安全性的自动化检测。该工具在架构上，则分为Monkey（扫描及漏洞利用端）以及C&amp;amp;C服务器（相当于reporter，但仅仅只是用于收集monkey探测的信息） infection Monkey nfection Monkey 对infe">
 
 
 
@@ -403,7 +403,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1,351
+                  1,419
                 </span>
               
 
@@ -429,6 +429,9 @@
 
       
         <p>Infection Monkey是一款由以色列安全公司GuardiCore在2016黑帽大会上发布的数据中心安全检测工具，其主要用于数据中心边界及内部服务器安全性的自动化检测。该工具在架构上，则分为Monkey（扫描及漏洞利用端）以及C&amp;C服务器（相当于reporter，但仅仅只是用于收集monkey探测的信息）</p>
+<p>infection Monkey</p>
+<p>nfection Monkey</p>
+<p>对infection Monkey的源码进行了一些调研，主要分为monkey_island和monkey两部分，island的身份是c&amp;c服务器，负责收集monkey传来的数据到数据库里；monkey负责的是感染新monkey，向c&amp;c服务器汇总信息。</p>
 <a id="more"></a>
 <h1 id="monkey-island"><a href="#monkey-island" class="headerlink" title="monkey_island"></a>monkey_island</h1><h2 id="程序流程"><a href="#程序流程" class="headerlink" title="程序流程"></a>程序流程</h2><p>入口：run.sh</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">cd /var/monkey_island/cc</div><div class="line">/var/monkey_island/bin/mongodb/bin/mongod --quiet --dbpath /var/monkey_island/db &amp;</div><div class="line">/var/monkey_island/bin/python/bin/python main.py</div></pre></td></tr></table></figure>
@@ -484,7 +487,8 @@
 <p>不存在的话，就get_target_monkey查找src_path，然后<strong>ftp = ssh.open_sftp()</strong> 把src_path路径的文件传过去：</p>
 <p>with monkeyfs.open(src_path) as file_obj:</p>
 <pre><code>ftp.putfo(file_obj, self._config.dropper_target_path_linux, file_size=monkeyfs.getsize(src_path),
-</code></pre><p>​                          callback=self.log_transfer)<br>​                ftp.chmod(self._config.dropper_target_path_linux, 0o777)</p>
+                  callback=self.log_transfer)
+</code></pre><p>​                ftp.chmod(self._config.dropper_target_path_linux, 0o777)</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">putfo(fl, remotepath, file_size=<span class="number">0</span>, callback=<span class="keyword">None</span>, confirm=<span class="keyword">True</span>)</div><div class="line">Copy the contents of an open file object (fl) to the SFTP server <span class="keyword">as</span> remotepath. Any exception raised by operations will be passed through.</div><div class="line"></div><div class="line">The SFTP operations use pipelining <span class="keyword">for</span> speed.</div><div class="line"></div><div class="line">Parameters:	</div><div class="line">fl – opened file <span class="keyword">or</span> file-like object to copy</div><div class="line">remotepath (str) – the destination path on the SFTP server</div><div class="line">file_size (int) – optional size parameter passed to callback. If none <span class="keyword">is</span> specified, size defaults to <span class="number">0</span></div><div class="line">callback (callable) – optional callback function (form: func(int, int)) that accepts the bytes transferred so far <span class="keyword">and</span> the total bytes to be transferred (since <span class="number">1.7</span><span class="number">.4</span>)</div><div class="line">confirm (bool) – whether to do a stat() on the file afterwards to confirm the file size (since <span class="number">1.7</span><span class="number">.7</span>)</div><div class="line">Returns:	</div><div class="line">an SFTPAttributes object containing attributes about the given file.</div></pre></td></tr></table></figure>
 <p>然后通过ssh.exec_command(cmdline)在被感染机器运行monkey</p>
 
