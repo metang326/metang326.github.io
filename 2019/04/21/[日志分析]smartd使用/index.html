@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #199475; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #0B6E48, 0 0 5px     #0B6E48; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #044D22;    /*上边框颜色*/
+        border-left-color: #044D22;    /*左边框颜色*/
+    }
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/trojan_32px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/trojan_16px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="日志审计," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="smartd是一个守护进程（一个帮助程序），它能监视拥有自我监视，分析和汇报技术(Self-Monitoring, Analysis, and Reporting Technology - SMART)的硬盘。 SMART系统使得硬盘能监视并汇报自己的运行状况。它的一个重要特性是能够预测失败，使得系统管理员能避免数据丢失。">
+<meta name="keywords" content="日志审计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="smartd的安装及使用">
+<meta property="og:url" content="http://yoursite.com/2019/04/21/[日志分析]smartd使用/index.html">
+<meta property="og:site_name" content="metang&#39;s blog">
+<meta property="og:description" content="smartd是一个守护进程（一个帮助程序），它能监视拥有自我监视，分析和汇报技术(Self-Monitoring, Analysis, and Reporting Technology - SMART)的硬盘。 SMART系统使得硬盘能监视并汇报自己的运行状况。它的一个重要特性是能够预测失败，使得系统管理员能避免数据丢失。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-21T02:48:05.294Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="smartd的安装及使用">
+<meta name="twitter:description" content="smartd是一个守护进程（一个帮助程序），它能监视拥有自我监视，分析和汇报技术(Self-Monitoring, Analysis, and Reporting Technology - SMART)的硬盘。 SMART系统使得硬盘能监视并汇报自己的运行状况。它的一个重要特性是能够预测失败，使得系统管理员能避免数据丢失。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'TZVHEBFK02',
+      apiKey: '1ab48ccb78c0b1c98cf0e7935807338f',
+      indexName: 'my_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"输入关键字进行搜索","hits_empty":"找不到关于  ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/21/[日志分析]smartd使用/"/>
+
+
+
+
+
+  <title>smartd的安装及使用 | metang's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/metang326"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">metang's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In case I don't see ya', good afternoon, good evening and goodnight.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/[日志分析]smartd使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="metang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="metang's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">smartd的安装及使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T00:00:00+08:00">
+                2019-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/日志分析/" itemprop="url" rel="index">
+                    <span itemprop="name">日志分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3,252
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>smartd是一个守护进程（一个帮助程序），它能监视拥有自我监视，分析和汇报技术(Self-Monitoring, Analysis, and Reporting Technology - SMART)的硬盘。 SMART系统使得硬盘能监视并汇报自己的运行状况。它的一个重要特性是能够预测失败，使得系统管理员能避免数据丢失。</p>
+<a id="more"></a>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>smartmontools包含 smartctl 和 smartd 两个程序，前者是前台命令行工具、后者是后台运行程序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">apt-get install smartmontools</div></pre></td></tr></table></figure>
+<p>安装好之后先检查一下硬盘是否具有smart特性</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# smartctl -i /dev/sda</div><div class="line">smartctl 6.6 2016-05-31 r4324 [x86_64-linux-4.15.0-39-generic] (local build)</div><div class="line">Copyright (C) 2002-16, Bruce Allen, Christian Franke, www.smartmontools.org</div><div class="line"></div><div class="line">=== <span class="keyword">START</span> <span class="keyword">OF</span> INFORMATION <span class="keyword">SECTION</span> ===</div><div class="line"><span class="keyword">Model</span> Family:     Seagate Barracuda <span class="number">7200.14</span> (AF)</div><div class="line">Device <span class="keyword">Model</span>:     ST1000DM003<span class="number">-1</span>SB102</div><div class="line"><span class="built_in">Serial</span> <span class="built_in">Number</span>:    Z9ARYZYS</div><div class="line">LU WWN Device <span class="keyword">Id</span>: <span class="number">5</span> <span class="number">000</span>c50 <span class="number">0</span>b0cc93ae</div><div class="line">Firmware <span class="keyword">Version</span>: CC63</div><div class="line"><span class="keyword">User</span> <span class="keyword">Capacity</span>:    <span class="number">1</span>,<span class="number">000</span>,<span class="number">204</span>,<span class="number">886</span>,<span class="number">016</span> <span class="keyword">bytes</span> [<span class="number">1.00</span> TB]</div><div class="line">Sector <span class="keyword">Sizes</span>:     <span class="number">512</span> <span class="keyword">bytes</span> <span class="keyword">logical</span>, <span class="number">4096</span> <span class="keyword">bytes</span> <span class="keyword">physical</span></div><div class="line">Rotation Rate:    <span class="number">7200</span> rpm</div><div class="line"><span class="keyword">Form</span> Factor:      <span class="number">3.5</span> inches</div><div class="line">Device <span class="keyword">is</span>:        <span class="keyword">In</span> smartctl <span class="keyword">database</span> [<span class="keyword">for</span> details <span class="keyword">use</span>: -P <span class="keyword">show</span>]</div><div class="line">ATA <span class="keyword">Version</span> <span class="keyword">is</span>:   ACS<span class="number">-2</span>, ACS<span class="number">-3</span> T13/<span class="number">2161</span>-D revision <span class="number">3</span>b</div><div class="line">SATA <span class="keyword">Version</span> <span class="keyword">is</span>:  SATA <span class="number">3.1</span>, <span class="number">6.0</span> Gb/s (<span class="keyword">current</span>: <span class="number">6.0</span> Gb/s)</div><div class="line"><span class="keyword">Local</span> <span class="keyword">Time</span> <span class="keyword">is</span>:    Tue Nov <span class="number">20</span> <span class="number">15</span>:<span class="number">25</span>:<span class="number">54</span> <span class="number">2018</span> CST</div><div class="line">SMART support <span class="keyword">is</span>: Available - device has SMART capability.</div><div class="line">SMART support <span class="keyword">is</span>: Enabled</div></pre></td></tr></table></figure>
+<p>然后检查一下硬盘状况</p>
+<p>如果下面的结果不是 PASSED 的话你需要立刻警觉起来，马上备份所有数据，硬盘随时都可能出问题（不过值得注意的是就算结果是 PASSED 并不意味着硬盘100％就安全，PASS 不能代表没问题，没 PASS 代表一定有问题）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">smartctl -H /dev/sda</div><div class="line"></div><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# smartctl -H /dev/sda</div><div class="line">smartctl 6.6 2016-05-31 r4324 [x86_64-linux-4.15.0-39-generic] (local build)</div><div class="line">Copyright (C) 2002-16, Bruce Allen, Christian Franke, www.smartmontools.org</div><div class="line"></div><div class="line">=== START OF READ SMART DATA SECTION ===</div><div class="line">SMART overall-health self-assessment test result: PASSED</div></pre></td></tr></table></figure>
+<p>可以做一个快速检查</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">smartctl -t short /dev/sda</div><div class="line">smartctl -l selftest /dev/sda     （看进度和结果）</div></pre></td></tr></table></figure>
+<h1 id="smartd使用"><a href="#smartd使用" class="headerlink" title="smartd使用"></a>smartd使用</h1><p>教程 <a href="https://linux.die.net/man/8/smartd" target="_blank" rel="external">https://linux.die.net/man/8/smartd</a></p>
+<p>smartd是一个监视自我监控的守护进程（ a daemon that monitors the Self-Monitoring），通过syslog接口记录SMART的错误和变化，还可以配置成为：如果检测到问题就发电子邮件警告。</p>
+<p>smartd is a daemon that monitors the Self-Monitoring, Analysis and Reporting Technology (SMART) system built into many ATA-3 and later ATA, IDE and SCSI-3 hard drives.</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line">Usage: smartd [options]</div><div class="line"></div><div class="line">  -A PREFIX, <span class="comment">--attributelog=PREFIX</span></div><div class="line">        Log ATA attribute information to &#123;PREFIX&#125;MODEL-SERIAL.ata.csv</div><div class="line">        [default is /var/lib/smartmontools/attrlog.MODEL-SERIAL.ata.csv]</div><div class="line"></div><div class="line">  -B [+]FILE, <span class="comment">--drivedb=[+]FILE</span></div><div class="line">        Read and <span class="keyword">replace</span> [<span class="keyword">add</span>] drive <span class="keyword">database</span> <span class="keyword">from</span> <span class="keyword">FILE</span></div><div class="line">        [<span class="keyword">default</span> <span class="keyword">is</span> +/etc/smart_drivedb.h</div><div class="line">         <span class="keyword">and</span> <span class="keyword">then</span>    /<span class="keyword">var</span>/lib/smartmontools/drivedb/drivedb.h]</div><div class="line"></div><div class="line">  -c <span class="keyword">NAME</span>|-, <span class="comment">--configfile=NAME|-</span></div><div class="line">        <span class="keyword">Read</span> configuration <span class="keyword">file</span> <span class="keyword">NAME</span> <span class="keyword">or</span> stdin</div><div class="line">        [<span class="keyword">default</span> <span class="keyword">is</span> /etc/smartd.conf]</div><div class="line"></div><div class="line">  -C, <span class="comment">--capabilities</span></div><div class="line">        <span class="keyword">Drop</span> unneeded Linux process capabilities.</div><div class="line">        <span class="keyword">Warning</span>: Mail notification does <span class="keyword">not</span> <span class="keyword">work</span> <span class="keyword">when</span> used.</div><div class="line"></div><div class="line">  -d, <span class="comment">--debug</span></div><div class="line">        <span class="keyword">Start</span> smartd <span class="keyword">in</span> debug <span class="keyword">mode</span></div><div class="line"></div><div class="line">  -D, <span class="comment">--showdirectives</span></div><div class="line">        Print the configuration <span class="keyword">file</span> Directives <span class="keyword">and</span> <span class="keyword">exit</span></div><div class="line"></div><div class="line">  -h, <span class="comment">--help, --usage</span></div><div class="line">        Display this <span class="keyword">help</span> <span class="keyword">and</span> <span class="keyword">exit</span></div><div class="line"></div><div class="line">  -i N, <span class="comment">--interval=N</span></div><div class="line">        <span class="keyword">Set</span> <span class="built_in">interval</span> <span class="keyword">between</span> disk checks <span class="keyword">to</span> N seconds, <span class="keyword">where</span> N &gt;= <span class="number">10</span></div><div class="line"></div><div class="line">  -l <span class="keyword">local</span>[<span class="number">0</span><span class="number">-7</span>], <span class="comment">--logfacility=local[0-7]</span></div><div class="line">        <span class="keyword">Use</span> syslog facility local0 - local7 <span class="keyword">or</span> daemon [<span class="keyword">default</span>]</div><div class="line"></div><div class="line">  -n, <span class="comment">--no-fork</span></div><div class="line">        <span class="keyword">Do</span> <span class="keyword">not</span> fork <span class="keyword">into</span> background</div><div class="line"></div><div class="line">  -p <span class="keyword">NAME</span>, <span class="comment">--pidfile=NAME</span></div><div class="line">        Write PID <span class="keyword">file</span> <span class="keyword">NAME</span></div><div class="line"></div><div class="line">  -q <span class="keyword">WHEN</span>, <span class="comment">--quit=WHEN</span></div><div class="line">        Quit <span class="keyword">on</span> one <span class="keyword">of</span>: nodev, <span class="keyword">errors</span>, nodevstartup, <span class="keyword">never</span>, onecheck, showtests</div><div class="line"></div><div class="line">  -r, <span class="comment">--report=TYPE</span></div><div class="line">        Report transactions <span class="keyword">for</span> one <span class="keyword">of</span>: ioctl[,N], ataioctl[,N], scsiioctl[,N], nvmeioctl[,N]</div><div class="line"></div><div class="line">  -s PREFIX, <span class="comment">--savestates=PREFIX</span></div><div class="line">        <span class="keyword">Save</span> disk states <span class="keyword">to</span> &#123;PREFIX&#125;<span class="keyword">MODEL</span>-SERIAL.TYPE.state</div><div class="line">        [<span class="keyword">default</span> <span class="keyword">is</span> /<span class="keyword">var</span>/lib/smartmontools/smartd.MODEL-SERIAL.TYPE.state]</div><div class="line"></div><div class="line">  -w <span class="keyword">NAME</span>, <span class="comment">--warnexec=NAME</span></div><div class="line">        Run executable <span class="keyword">NAME</span> <span class="keyword">on</span> <span class="keyword">warnings</span></div><div class="line">        [<span class="keyword">default</span> <span class="keyword">is</span> /usr/<span class="keyword">share</span>/smartmontools/smartd_warning.sh]</div><div class="line"></div><div class="line">  -V, <span class="comment">--version, --license, --copyright</span></div><div class="line">        Print License, Copyright, <span class="keyword">and</span> <span class="keyword">version</span> information</div></pre></td></tr></table></figure>
+<h2 id="自动报警"><a href="#自动报警" class="headerlink" title="自动报警"></a>自动报警</h2><p>在smartd.conf里面已经配置了很多监视的操作 可以通过取消注释的方式启动它们</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">vi /etc/smartd.conf</div><div class="line">打开后里面大部分都是被注释掉的说明</div><div class="line"># Monitor all attributes except normalized Temperature (usually 194),</div><div class="line"># but track Temperature changes &gt;= 4 Celsius, report Temperatures</div><div class="line"># &gt;= 45 Celsius and changes in Raw value of Reallocated_Sector_Ct (5).</div><div class="line"># Send mail on SMART failures or when Temperature is &gt;= 55 Celsius.</div><div class="line">#/dev/sdc -a -I 194 -W 4,45,55 -R 5 -m admin@example.com</div><div class="line"></div><div class="line"># A very silent check.  Only report SMART health status if it fails</div><div class="line"># But send an email in this case</div><div class="line">#/dev/sdc -H -C 0 -U 0 -m admin@example.com</div></pre></td></tr></table></figure>
+<h2 id="Examples"><a href="#Examples" class="headerlink" title="Examples"></a>Examples</h2><p><strong>smartd</strong><br>Runs the daemon in forked mode. This is the normal way to run <strong>smartd</strong>. Entries are logged to SYSLOG.</p>
+<p><strong>smartd -d -i 30</strong><br>Run in foreground (debug) mode, checking the disk status every 30 seconds.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line">smartd 6.6 2016-05-31 r4324 [x86_64-linux-4.15.0-39-generic] (local build)</div><div class="line">Copyright (C) 2002-16, Bruce Allen, Christian Franke, www.smartmontools.org</div><div class="line"></div><div class="line">Opened configuration file /etc/smartd.conf</div><div class="line">Drive: DEVICESCAN, implied &apos;-a&apos; Directive on line 21 of file /etc/smartd.conf</div><div class="line">Configuration file /etc/smartd.conf was parsed, found DEVICESCAN, scanning devices</div><div class="line">glob(3) found no matches for pattern /dev/hd[a-t]</div><div class="line">glob(3) found no matches for pattern /dev/sd[a-c][a-z]</div><div class="line">Device: /dev/sda, type changed from &apos;scsi&apos; to &apos;sat&apos;</div><div class="line">Device: /dev/sda [SAT], opened</div><div class="line">Device: /dev/sda [SAT], ST1000DM003-1SB102, S/N:Z9ARYZYS, WWN:5-000c50-0b0cc93ae, FW:CC63, 1.00 TB</div><div class="line">Device: /dev/sda [SAT], found in smartd database: Seagate Barracuda 7200.14 (AF)</div><div class="line">Device: /dev/sda [SAT], is SMART capable. Adding to &quot;monitor&quot; list.</div><div class="line">Device: /dev/sda [SAT], state read from /var/lib/smartmontools/smartd.ST1000DM003_1SB102-Z9ARYZYS.ata.state</div><div class="line">Device: /dev/sdb, type changed from &apos;scsi&apos; to &apos;sat&apos;</div><div class="line">Device: /dev/sdb [SAT], opened</div><div class="line">Device: /dev/sdb [SAT], INTEL SSDSC2KW256G8, S/N:PHLA8235067W256CGN, WWN:5-5cd2e4-14f90188b, FW:LHF002C, 256 GB</div><div class="line">Device: /dev/sdb [SAT], not found in smartd database.</div><div class="line">Device: /dev/sdb [SAT], can&apos;t monitor Current_Pending_Sector count - no Attribute 197</div><div class="line">Device: /dev/sdb [SAT], can&apos;t monitor Offline_Uncorrectable count - no Attribute 198</div><div class="line">Device: /dev/sdb [SAT], is SMART capable. Adding to &quot;monitor&quot; list.</div><div class="line">Device: /dev/sdb [SAT], state read from /var/lib/smartmontools/smartd.INTEL_SSDSC2KW256G8-PHLA8235067W256CGN.ata.state</div><div class="line">Monitoring 2 ATA/SATA, 0 SCSI/SAS and 0 NVMe devices</div><div class="line">Device: /dev/sda [SAT], opened ATA device</div><div class="line">Device: /dev/sda [SAT], previous self-test completed without error</div><div class="line">Device: /dev/sdb [SAT], opened ATA device</div><div class="line">Device: /dev/sdb [SAT], previous self-test completed without error</div><div class="line">Device: /dev/sda [SAT], state written to /var/lib/smartmontools/smartd.ST1000DM003_1SB102-Z9ARYZYS.ata.state</div><div class="line">Device: /dev/sdb [SAT], state written to /var/lib/smartmontools/smartd.INTEL_SSDSC2KW256G8-PHLA8235067W256CGN.ata.state</div><div class="line">^CDevice: /dev/sda [SAT], state written to /var/lib/smartmontools/smartd.ST1000DM003_1SB102-Z9ARYZYS.ata.state</div><div class="line">Device: /dev/sdb [SAT], state written to /var/lib/smartmontools/smartd.INTEL_SSDSC2KW256G8-PHLA8235067W256CGN.ata.state</div><div class="line"></div><div class="line">Signal INT - rereading configuration file /etc/smartd.conf (CONTROL-\ quits)</div><div class="line"></div><div class="line">Opened configuration file /etc/smartd.conf</div><div class="line">Drive: DEVICESCAN, implied &apos;-a&apos; Directive on line 21 of file /etc/smartd.conf</div><div class="line">Configuration file /etc/smartd.conf was parsed, found DEVICESCAN, scanning devices</div><div class="line">glob(3) found no matches for pattern /dev/hd[a-t]</div><div class="line">glob(3) found no matches for pattern /dev/sd[a-c][a-z]</div><div class="line">Device: /dev/sda, type changed from &apos;scsi&apos; to &apos;sat&apos;</div><div class="line">Device: /dev/sda [SAT], opened</div><div class="line">Device: /dev/sda [SAT], ST1000DM003-1SB102, S/N:Z9ARYZYS, WWN:5-000c50-0b0cc93ae, FW:CC63, 1.00 TB</div><div class="line">Device: /dev/sda [SAT], found in smartd database: Seagate Barracuda 7200.14 (AF)</div><div class="line">Device: /dev/sda [SAT], is SMART capable. Adding to &quot;monitor&quot; list.</div><div class="line">Device: /dev/sda [SAT], state read from /var/lib/smartmontools/smartd.ST1000DM003_1SB102-Z9ARYZYS.ata.state</div><div class="line">Device: /dev/sdb, type changed from &apos;scsi&apos; to &apos;sat&apos;</div><div class="line">Device: /dev/sdb [SAT], opened</div><div class="line">Device: /dev/sdb [SAT], INTEL SSDSC2KW256G8, S/N:PHLA8235067W256CGN, WWN:5-5cd2e4-14f90188b, FW:LHF002C, 256 GB</div><div class="line">Device: /dev/sdb [SAT], not found in smartd database.</div><div class="line">Device: /dev/sdb [SAT], can&apos;t monitor Current_Pending_Sector count - no Attribute 197</div><div class="line">Device: /dev/sdb [SAT], can&apos;t monitor Offline_Uncorrectable count - no Attribute 198</div><div class="line">Device: /dev/sdb [SAT], is SMART capable. Adding to &quot;monitor&quot; list.</div><div class="line">Device: /dev/sdb [SAT], state read from /var/lib/smartmontools/smartd.INTEL_SSDSC2KW256G8-PHLA8235067W256CGN.ata.state</div><div class="line">Monitoring 2 ATA/SATA, 0 SCSI/SAS and 0 NVMe devices</div><div class="line">Device: /dev/sda [SAT], opened ATA device</div><div class="line">Device: /dev/sdb [SAT], opened ATA device</div><div class="line">Device: /dev/sda [SAT], state written to /var/lib/smartmontools/smartd.ST1000DM003_1SB102-Z9ARYZYS.ata.state</div><div class="line">Device: /dev/sdb [SAT], state written to /var/lib/smartmontools/smartd.INTEL_SSDSC2KW256G8-PHLA8235067W256CGN.ata.state</div></pre></td></tr></table></figure>
+<p><strong>smartd -q onecheck</strong><br>Registers devices, and checks the status of the devices exactly once. The exit status (the bash <strong>$?</strong> variable) will be zero if all went well, and nonzero if no devices were detected or some other problem was encountered.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# smartd -q onecheck</div><div class="line">smartd 6.6 2016-05-31 r4324 [x86_64-linux-4.15.0-39-generic] (local build)</div><div class="line">Copyright (C) 2002-16, Bruce Allen, Christian Franke, www.smartmontools.org</div><div class="line"></div><div class="line">Opened configuration file /etc/smartd.conf</div><div class="line">Drive: DEVICESCAN, implied &apos;-a&apos; Directive on line 21 of file /etc/smartd.conf</div><div class="line">Configuration file /etc/smartd.conf was parsed, found DEVICESCAN, scanning devices</div><div class="line">glob(3) found no matches for pattern /dev/hd[a-t]</div><div class="line">glob(3) found no matches for pattern /dev/sd[a-c][a-z]</div><div class="line">Device: /dev/sda, type changed from &apos;scsi&apos; to &apos;sat&apos;</div><div class="line">Device: /dev/sda [SAT], opened</div><div class="line">Device: /dev/sda [SAT], ST1000DM003-1SB102, S/N:Z9ARYZYS, WWN:5-000c50-0b0cc93ae, FW:CC63, 1.00 TB</div><div class="line">Device: /dev/sda [SAT], found in smartd database: Seagate Barracuda 7200.14 (AF)</div><div class="line">Device: /dev/sda [SAT], is SMART capable. Adding to &quot;monitor&quot; list.</div><div class="line">Device: /dev/sda [SAT], state read from /var/lib/smartmontools/smartd.ST1000DM003_1SB102-Z9ARYZYS.ata.state</div><div class="line">Device: /dev/sdb, type changed from &apos;scsi&apos; to &apos;sat&apos;</div><div class="line">Device: /dev/sdb [SAT], opened</div><div class="line">Device: /dev/sdb [SAT], INTEL SSDSC2KW256G8, S/N:PHLA8235067W256CGN, WWN:5-5cd2e4-14f90188b, FW:LHF002C, 256 GB</div><div class="line">Device: /dev/sdb [SAT], not found in smartd database.</div><div class="line">Device: /dev/sdb [SAT], can&apos;t monitor Current_Pending_Sector count - no Attribute 197</div><div class="line">Device: /dev/sdb [SAT], can&apos;t monitor Offline_Uncorrectable count - no Attribute 198</div><div class="line">Device: /dev/sdb [SAT], is SMART capable. Adding to &quot;monitor&quot; list.</div><div class="line">Device: /dev/sdb [SAT], state read from /var/lib/smartmontools/smartd.INTEL_SSDSC2KW256G8-PHLA8235067W256CGN.ata.state</div><div class="line">Monitoring 2 ATA/SATA, 0 SCSI/SAS and 0 NVMe devices</div><div class="line">Device: /dev/sda [SAT], opened ATA device</div><div class="line">Device: /dev/sda [SAT], previous self-test completed without error</div><div class="line">Device: /dev/sdb [SAT], opened ATA device</div><div class="line">Device: /dev/sdb [SAT], previous self-test completed without error</div><div class="line">Device: /dev/sda [SAT], state written to /var/lib/smartmontools/smartd.ST1000DM003_1SB102-Z9ARYZYS.ata.state</div><div class="line">Device: /dev/sdb [SAT], state written to /var/lib/smartmontools/smartd.INTEL_SSDSC2KW256G8-PHLA8235067W256CGN.ata.state</div><div class="line">Started with &apos;-q onecheck&apos; option. All devices sucessfully checked once.</div><div class="line">smartd is exiting (exit status 0)</div></pre></td></tr></table></figure>
+<h1 id="smartctl使用"><a href="#smartctl使用" class="headerlink" title="smartctl使用"></a>smartctl使用</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div></pre></td><td class="code"><pre><div class="line">Usage: smartctl [options] device</div><div class="line"></div><div class="line">============================================ <span class="keyword">SHOW</span> INFORMATION OPTIONS =====</div><div class="line"></div><div class="line">  -h, <span class="comment">--help, --usage</span></div><div class="line">         Display this <span class="keyword">help</span> <span class="keyword">and</span> <span class="keyword">exit</span></div><div class="line"></div><div class="line">  -V, <span class="comment">--version, --copyright, --license</span></div><div class="line">         Print license, copyright, <span class="keyword">and</span> <span class="keyword">version</span> information <span class="keyword">and</span> <span class="keyword">exit</span></div><div class="line"></div><div class="line">  -i, <span class="comment">--info</span></div><div class="line">         <span class="keyword">Show</span> <span class="keyword">identity</span> information <span class="keyword">for</span> device</div><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# smartctl -i /dev/sdb</div><div class="line">smartctl <span class="number">6.6</span> <span class="number">2016</span><span class="number">-05</span><span class="number">-31</span> r4324 [x86_64-linux<span class="number">-4.15</span><span class="number">.0</span><span class="number">-39</span>-generic] (<span class="keyword">local</span> <span class="keyword">build</span>)</div><div class="line">Copyright (C) <span class="number">2002</span><span class="number">-16</span>, Bruce Allen, Christian Franke, www.smartmontools.org</div><div class="line"></div><div class="line">=== <span class="keyword">START</span> <span class="keyword">OF</span> INFORMATION <span class="keyword">SECTION</span> ===</div><div class="line">Device <span class="keyword">Model</span>:     INTEL SSDSC2KW256G8</div><div class="line"><span class="built_in">Serial</span> <span class="built_in">Number</span>:    PHLA8235067W256CGN</div><div class="line">LU WWN Device <span class="keyword">Id</span>: <span class="number">5</span> <span class="number">5</span>cd2e4 <span class="number">14</span>f90188b</div><div class="line">Firmware <span class="keyword">Version</span>: LHF002C</div><div class="line"><span class="keyword">User</span> <span class="keyword">Capacity</span>:    <span class="number">256</span>,<span class="number">060</span>,<span class="number">514</span>,<span class="number">304</span> <span class="keyword">bytes</span> [<span class="number">256</span> GB]</div><div class="line">Sector <span class="keyword">Size</span>:      <span class="number">512</span> <span class="keyword">bytes</span> <span class="keyword">logical</span>/<span class="keyword">physical</span></div><div class="line">Rotation Rate:    Solid State Device</div><div class="line"><span class="keyword">Form</span> Factor:      <span class="number">2.5</span> inches</div><div class="line">Device <span class="keyword">is</span>:        <span class="keyword">Not</span> <span class="keyword">in</span> smartctl <span class="keyword">database</span> [<span class="keyword">for</span> details <span class="keyword">use</span>: -P showall]</div><div class="line">ATA <span class="keyword">Version</span> <span class="keyword">is</span>:   ACS<span class="number">-3</span> (minor revision <span class="keyword">not</span> indicated)</div><div class="line">SATA <span class="keyword">Version</span> <span class="keyword">is</span>:  SATA <span class="number">3.2</span>, <span class="number">6.0</span> Gb/s (<span class="keyword">current</span>: <span class="number">6.0</span> Gb/s)</div><div class="line"><span class="keyword">Local</span> <span class="keyword">Time</span> <span class="keyword">is</span>:    Tue Nov <span class="number">20</span> <span class="number">16</span>:<span class="number">48</span>:<span class="number">02</span> <span class="number">2018</span> CST</div><div class="line">SMART support <span class="keyword">is</span>: Available - device has SMART capability.</div><div class="line">SMART support <span class="keyword">is</span>: Enabled</div><div class="line"></div><div class="line"></div><div class="line">  <span class="comment">--identify[=[w][nvb]]</span></div><div class="line">         <span class="keyword">Show</span> words <span class="keyword">and</span> bits <span class="keyword">from</span> IDENTIFY DEVICE <span class="keyword">data</span>                (ATA)</div><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# smartctl <span class="comment">--identify /dev/sdb</span></div><div class="line">smartctl <span class="number">6.6</span> <span class="number">2016</span><span class="number">-05</span><span class="number">-31</span> r4324 [x86_64-linux<span class="number">-4.15</span><span class="number">.0</span><span class="number">-39</span>-generic] (<span class="keyword">local</span> <span class="keyword">build</span>)</div><div class="line">Copyright (C) <span class="number">2002</span><span class="number">-16</span>, Bruce Allen, Christian Franke, www.smartmontools.org</div><div class="line"></div><div class="line">=== ATA IDENTIFY <span class="keyword">DATA</span> ===</div><div class="line">Word     <span class="built_in">Bit</span>     <span class="keyword">Value</span>   Description</div><div class="line"></div><div class="line">   <span class="number">0</span>      -     <span class="number">0x0040</span>   <span class="keyword">General</span> configuration</div><div class="line">   <span class="number">0</span>      <span class="number">6</span>          <span class="number">1</span>   <span class="keyword">Not</span> removable controller <span class="keyword">and</span>/<span class="keyword">or</span> device [OBS<span class="number">-6</span>]</div><div class="line"></div><div class="line">   <span class="number">1</span>      -     <span class="number">0x3fff</span>   Cylinders [OBS<span class="number">-6</span>]</div><div class="line"></div><div class="line">   <span class="number">2</span>      -     <span class="number">0xc837</span>   Specific configuration (<span class="number">0x37c8</span>/<span class="number">738</span>c/<span class="number">8</span>c73/c837)</div><div class="line"></div><div class="line">   <span class="number">3</span>      -     <span class="number">0x0010</span>   Heads [OBS<span class="number">-6</span>]</div><div class="line"></div><div class="line">   <span class="number">6</span>      -     <span class="number">0x003f</span>   Sectors per track [OBS<span class="number">-6</span>]</div><div class="line"></div><div class="line">  <span class="number">10</span><span class="number">-19</span>   -     .        <span class="built_in">Serial</span> <span class="built_in">number</span> (<span class="keyword">String</span>)</div><div class="line">  <span class="number">10</span><span class="number">-13</span>   .     <span class="number">0x5048</span>:<span class="number">4</span>c41:<span class="number">3832</span>:<span class="number">3335</span>  <span class="string">"PHLA8235"</span></div><div class="line">  <span class="number">14</span><span class="number">-17</span>   .     <span class="number">0x3036</span>:<span class="number">3757</span>:<span class="number">3235</span>:<span class="number">3643</span>  <span class="string">"067W256C"</span></div><div class="line">  <span class="number">18</span><span class="number">-19</span>   .     <span class="number">0x474e</span>:<span class="number">2020</span>            <span class="string">"GN  "</span></div><div class="line"></div><div class="line">  <span class="number">23</span><span class="number">-26</span>   -     .        Firmware revision (<span class="keyword">String</span>)</div><div class="line">  <span class="number">23</span><span class="number">-26</span>   .     <span class="number">0x204c</span>:<span class="number">4846</span>:<span class="number">3030</span>:<span class="number">3243</span>  <span class="string">" LHF002C"</span></div><div class="line"></div><div class="line">  <span class="number">27</span><span class="number">-46</span>   -     .        <span class="keyword">Model</span> <span class="built_in">number</span> (<span class="keyword">String</span>)</div><div class="line">  <span class="number">27</span><span class="number">-30</span>   .     <span class="number">0x494e</span>:<span class="number">5445</span>:<span class="number">4</span>c20:<span class="number">5353</span>  <span class="string">"INTEL SS"</span></div><div class="line">  <span class="number">31</span><span class="number">-34</span>   .     <span class="number">0x4453</span>:<span class="number">4332</span>:<span class="number">4</span>b57:<span class="number">3235</span>  <span class="string">"DSC2KW25"</span></div><div class="line">  <span class="number">35</span><span class="number">-38</span>   .     <span class="number">0x3647</span>:<span class="number">3820</span>:<span class="number">2020</span>:<span class="number">2020</span>  <span class="string">"6G8     "</span></div><div class="line">  <span class="number">39</span><span class="number">-42</span>   .     <span class="number">0x2020</span>:<span class="number">2020</span>:<span class="number">2020</span>:<span class="number">2020</span>  <span class="string">"        "</span></div><div class="line">  <span class="number">43</span><span class="number">-46</span>   .     <span class="number">0x2020</span>:<span class="number">2020</span>:<span class="number">2020</span>:<span class="number">2020</span>  <span class="string">"        "</span></div><div class="line"></div><div class="line"></div><div class="line">  -g <span class="keyword">NAME</span>, <span class="comment">--get=NAME</span></div><div class="line">        <span class="keyword">Get</span> device setting: all, aam, apm, lookahead, <span class="keyword">security</span>, wcache, rcache, wcreorder</div><div class="line"></div><div class="line">  -a, <span class="comment">--all</span></div><div class="line">         <span class="keyword">Show</span> all SMART information <span class="keyword">for</span> device</div><div class="line"></div><div class="line">  -x, <span class="comment">--xall</span></div><div class="line">         <span class="keyword">Show</span> all information <span class="keyword">for</span> device</div><div class="line">显示信息很多 还包括了温度</div><div class="line">SCT <span class="keyword">Status</span> <span class="keyword">Version</span>:                  <span class="number">3</span></div><div class="line">SCT <span class="keyword">Version</span> (vendor specific):       <span class="number">522</span> (<span class="number">0x020a</span>)</div><div class="line">SCT Support <span class="keyword">Level</span>:                   <span class="number">1</span></div><div class="line">Device State:                        Active (<span class="number">0</span>)</div><div class="line"><span class="keyword">Current</span> Temperature:                    <span class="number">35</span> Celsius</div><div class="line"><span class="keyword">Power</span> <span class="keyword">Cycle</span> <span class="keyword">Min</span>/<span class="keyword">Max</span> Temperature:     <span class="number">24</span>/<span class="number">35</span> Celsius</div><div class="line">Lifetime    <span class="keyword">Min</span>/<span class="keyword">Max</span> Temperature:     <span class="number">22</span>/<span class="number">39</span> Celsius</div><div class="line"><span class="keyword">Under</span>/<span class="keyword">Over</span> Temperature <span class="keyword">Limit</span> <span class="keyword">Count</span>:   <span class="number">0</span>/<span class="number">0</span></div><div class="line"></div><div class="line"></div><div class="line">  <span class="comment">--scan</span></div><div class="line">         <span class="keyword">Scan</span> <span class="keyword">for</span> devices</div><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# smartctl <span class="comment">--scan</span></div><div class="line">/dev/sda -d scsi # /dev/sda, SCSI device</div><div class="line">/dev/sdb -d scsi # /dev/sdb, SCSI device</div><div class="line"></div><div class="line"></div><div class="line">  <span class="comment">--scan-open</span></div><div class="line">         <span class="keyword">Scan</span> <span class="keyword">for</span> devices <span class="keyword">and</span> try <span class="keyword">to</span> <span class="keyword">open</span> <span class="keyword">each</span> device</div><div class="line"></div><div class="line">================================== SMARTCTL RUN-<span class="keyword">TIME</span> BEHAVIOR OPTIONS =====</div><div class="line"></div><div class="line">  -q <span class="keyword">TYPE</span>, <span class="comment">--quietmode=TYPE                                           (ATA)</span></div><div class="line">         <span class="keyword">Set</span> smartctl quiet <span class="keyword">mode</span> <span class="keyword">to</span> one <span class="keyword">of</span>: errorsonly, silent, noserial</div><div class="line"></div><div class="line">  -d <span class="keyword">TYPE</span>, <span class="comment">--device=TYPE</span></div><div class="line">         Specify device <span class="keyword">type</span> <span class="keyword">to</span> one <span class="keyword">of</span>: ata, scsi, nvme[,NSID], sat[,<span class="keyword">auto</span>][,N][+<span class="keyword">TYPE</span>], usbcypress[,X], usbjmicron[,p][,x][,N], usbprolific, usbsunplus, marvell, areca,N/E, <span class="number">3</span>ware,N, hpt,L/M/N, megaraid,N, aacraid,H,L,<span class="keyword">ID</span>, cciss,N, <span class="keyword">auto</span>, <span class="keyword">test</span></div><div class="line"></div><div class="line">  -T <span class="keyword">TYPE</span>, <span class="comment">--tolerance=TYPE                                           (ATA)</span></div><div class="line">         Tolerance: <span class="keyword">normal</span>, conservative, permissive, verypermissive</div><div class="line"></div><div class="line">  -b <span class="keyword">TYPE</span>, <span class="comment">--badsum=TYPE                                              (ATA)</span></div><div class="line">         <span class="keyword">Set</span> <span class="keyword">action</span> <span class="keyword">on</span> bad <span class="keyword">checksum</span> <span class="keyword">to</span> one <span class="keyword">of</span>: warn, <span class="keyword">exit</span>, <span class="keyword">ignore</span></div><div class="line"></div><div class="line">  -r <span class="keyword">TYPE</span>, <span class="comment">--report=TYPE</span></div><div class="line">         Report transactions (see man page)</div><div class="line"></div><div class="line">  -n <span class="keyword">MODE</span>, <span class="comment">--nocheck=MODE                                             (ATA)</span></div><div class="line">         <span class="keyword">No</span> <span class="keyword">check</span> <span class="keyword">if</span>: <span class="keyword">never</span>, <span class="keyword">sleep</span>, <span class="keyword">standby</span>, idle (see man page)</div><div class="line"></div><div class="line">============================== DEVICE FEATURE <span class="keyword">ENABLE</span>/<span class="keyword">DISABLE</span> COMMANDS =====</div><div class="line"></div><div class="line">  -s <span class="keyword">VALUE</span>, <span class="comment">--smart=VALUE</span></div><div class="line">        <span class="keyword">Enable</span>/<span class="keyword">disable</span> SMART <span class="keyword">on</span> device (<span class="keyword">on</span>/<span class="keyword">off</span>)</div><div class="line"></div><div class="line">  -o <span class="keyword">VALUE</span>, <span class="comment">--offlineauto=VALUE                                       (ATA)</span></div><div class="line">        <span class="keyword">Enable</span>/<span class="keyword">disable</span> <span class="keyword">automatic</span> <span class="keyword">offline</span> testing <span class="keyword">on</span> device (<span class="keyword">on</span>/<span class="keyword">off</span>)</div><div class="line"></div><div class="line">  -S <span class="keyword">VALUE</span>, <span class="comment">--saveauto=VALUE                                          (ATA)</span></div><div class="line">        <span class="keyword">Enable</span>/<span class="keyword">disable</span> <span class="keyword">Attribute</span> autosave <span class="keyword">on</span> device (<span class="keyword">on</span>/<span class="keyword">off</span>)</div><div class="line"></div><div class="line">  -s <span class="keyword">NAME</span>[,<span class="keyword">VALUE</span>], <span class="comment">--set=NAME[,VALUE]</span></div><div class="line">        <span class="keyword">Enable</span>/<span class="keyword">disable</span>/<span class="keyword">change</span> device setting: aam,[N|<span class="keyword">off</span>], apm,[N|<span class="keyword">off</span>],</div><div class="line">        lookahead,[<span class="keyword">on</span>|<span class="keyword">off</span>], <span class="keyword">security</span>-freeze, <span class="keyword">standby</span>,[N|<span class="keyword">off</span>|<span class="keyword">now</span>],</div><div class="line">        wcache,[<span class="keyword">on</span>|<span class="keyword">off</span>], rcache,[<span class="keyword">on</span>|<span class="keyword">off</span>], wcreorder,[<span class="keyword">on</span>|<span class="keyword">off</span>]</div><div class="line"></div><div class="line">======================================= <span class="keyword">READ</span> <span class="keyword">AND</span> DISPLAY <span class="keyword">DATA</span> OPTIONS =====</div><div class="line"></div><div class="line">  -H, <span class="comment">--health</span></div><div class="line">        <span class="keyword">Show</span> device SMART health <span class="keyword">status</span></div><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# smartctl -H /dev/sda</div><div class="line">smartctl <span class="number">6.6</span> <span class="number">2016</span><span class="number">-05</span><span class="number">-31</span> r4324 [x86_64-linux<span class="number">-4.15</span><span class="number">.0</span><span class="number">-39</span>-generic] (<span class="keyword">local</span> <span class="keyword">build</span>)</div><div class="line">Copyright (C) <span class="number">2002</span><span class="number">-16</span>, Bruce Allen, Christian Franke, www.smartmontools.org</div><div class="line"></div><div class="line">=== <span class="keyword">START</span> <span class="keyword">OF</span> <span class="keyword">READ</span> SMART <span class="keyword">DATA</span> <span class="keyword">SECTION</span> ===</div><div class="line">SMART overall-health <span class="keyword">self</span>-assessment <span class="keyword">test</span> <span class="keyword">result</span>: PASSED</div><div class="line"></div><div class="line"></div><div class="line">  -c, <span class="comment">--capabilities                                            (ATA, NVMe)</span></div><div class="line">        <span class="keyword">Show</span> device SMART capabilities</div><div class="line"></div><div class="line">  -A, <span class="comment">--attributes</span></div><div class="line">        <span class="keyword">Show</span> device SMART vendor-specific <span class="keyword">Attributes</span> <span class="keyword">and</span> <span class="keyword">values</span></div><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# smartctl -A  /dev/sda</div><div class="line">smartctl <span class="number">6.6</span> <span class="number">2016</span><span class="number">-05</span><span class="number">-31</span> r4324 [x86_64-linux<span class="number">-4.15</span><span class="number">.0</span><span class="number">-39</span>-generic] (<span class="keyword">local</span> <span class="keyword">build</span>)</div><div class="line">Copyright (C) <span class="number">2002</span><span class="number">-16</span>, Bruce Allen, Christian Franke, www.smartmontools.org</div><div class="line"></div><div class="line">=== <span class="keyword">START</span> <span class="keyword">OF</span> <span class="keyword">READ</span> SMART <span class="keyword">DATA</span> <span class="keyword">SECTION</span> ===</div><div class="line">SMART <span class="keyword">Attributes</span> <span class="keyword">Data</span> Structure revision <span class="built_in">number</span>: <span class="number">10</span></div><div class="line">Vendor Specific SMART <span class="keyword">Attributes</span> <span class="keyword">with</span> Thresholds:</div><div class="line"><span class="keyword">ID</span># ATTRIBUTE_NAME          FLAG     <span class="keyword">VALUE</span> WORST THRESH <span class="keyword">TYPE</span>      <span class="keyword">UPDATED</span>  WHEN_FAILED RAW_VALUE</div><div class="line">  <span class="number">1</span> Raw_Read_Error_Rate     <span class="number">0x000f</span>   <span class="number">082</span>   <span class="number">063</span>   <span class="number">006</span>    Pre-fail  <span class="keyword">Always</span>       -       <span class="number">195955408</span></div><div class="line">  <span class="number">3</span> Spin_Up_Time            <span class="number">0x0003</span>   <span class="number">097</span>   <span class="number">097</span>   <span class="number">000</span>    Pre-fail  <span class="keyword">Always</span>       -       <span class="number">0</span></div><div class="line">  <span class="number">4</span> Start_Stop_Count        <span class="number">0x0032</span>   <span class="number">100</span>   <span class="number">100</span>   <span class="number">020</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">110</span></div><div class="line">  <span class="number">5</span> Reallocated_Sector_Ct   <span class="number">0x0033</span>   <span class="number">100</span>   <span class="number">100</span>   <span class="number">010</span>    Pre-fail  <span class="keyword">Always</span>       -       <span class="number">0</span></div><div class="line">  <span class="number">7</span> Seek_Error_Rate         <span class="number">0x000f</span>   <span class="number">066</span>   <span class="number">060</span>   <span class="number">045</span>    Pre-fail  <span class="keyword">Always</span>       -       <span class="number">5175994</span></div><div class="line">  <span class="number">9</span> Power_On_Hours          <span class="number">0x0032</span>   <span class="number">100</span>   <span class="number">100</span>   <span class="number">000</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">489</span></div><div class="line"> <span class="number">10</span> Spin_Retry_Count        <span class="number">0x0013</span>   <span class="number">100</span>   <span class="number">100</span>   <span class="number">097</span>    Pre-fail  <span class="keyword">Always</span>       -       <span class="number">0</span></div><div class="line"> <span class="number">12</span> Power_Cycle_Count       <span class="number">0x0032</span>   <span class="number">100</span>   <span class="number">100</span>   <span class="number">020</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">110</span></div><div class="line"><span class="number">183</span> Runtime_Bad_Block       <span class="number">0x0032</span>   <span class="number">100</span>   <span class="number">100</span>   <span class="number">000</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">0</span></div><div class="line"><span class="number">184</span> <span class="keyword">End</span>-<span class="keyword">to</span>-End_Error        <span class="number">0x0032</span>   <span class="number">100</span>   <span class="number">100</span>   <span class="number">099</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">0</span></div><div class="line"><span class="number">187</span> Reported_Uncorrect      <span class="number">0x0032</span>   <span class="number">100</span>   <span class="number">100</span>   <span class="number">000</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">0</span></div><div class="line"><span class="number">188</span> Command_Timeout         <span class="number">0x0032</span>   <span class="number">100</span>   <span class="number">100</span>   <span class="number">000</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">0</span> <span class="number">0</span> <span class="number">0</span></div><div class="line"><span class="number">189</span> High_Fly_Writes         <span class="number">0x003a</span>   <span class="number">100</span>   <span class="number">100</span>   <span class="number">000</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">0</span></div><div class="line"><span class="number">190</span> Airflow_Temperature_Cel <span class="number">0x0022</span>   <span class="number">065</span>   <span class="number">061</span>   <span class="number">040</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">35</span> (<span class="keyword">Min</span>/<span class="keyword">Max</span> <span class="number">24</span>/<span class="number">35</span>)</div><div class="line"><span class="number">193</span> Load_Cycle_Count        <span class="number">0x0032</span>   <span class="number">100</span>   <span class="number">100</span>   <span class="number">000</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">116</span></div><div class="line"><span class="number">194</span> Temperature_Celsius     <span class="number">0x0022</span>   <span class="number">035</span>   <span class="number">022</span>   <span class="number">000</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">35</span> (<span class="number">0</span> <span class="number">22</span> <span class="number">0</span> <span class="number">0</span> <span class="number">0</span>)</div><div class="line"><span class="number">195</span> Hardware_ECC_Recovered  <span class="number">0x001a</span>   <span class="number">001</span>   <span class="number">001</span>   <span class="number">000</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">195955408</span></div><div class="line"><span class="number">197</span> Current_Pending_Sector  <span class="number">0x0012</span>   <span class="number">100</span>   <span class="number">100</span>   <span class="number">000</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">0</span></div><div class="line"><span class="number">198</span> Offline_Uncorrectable   <span class="number">0x0010</span>   <span class="number">100</span>   <span class="number">100</span>   <span class="number">000</span>    Old_age   <span class="keyword">Offline</span>      -       <span class="number">0</span></div><div class="line"><span class="number">199</span> UDMA_CRC_Error_Count    <span class="number">0x003e</span>   <span class="number">200</span>   <span class="number">200</span>   <span class="number">000</span>    Old_age   <span class="keyword">Always</span>       -       <span class="number">0</span></div><div class="line"><span class="number">240</span> Head_Flying_Hours       <span class="number">0x0000</span>   <span class="number">100</span>   <span class="number">253</span>   <span class="number">000</span>    Old_age   <span class="keyword">Offline</span>      -       <span class="number">489</span>h+<span class="number">26</span>m+<span class="number">38.312</span>s</div><div class="line"><span class="number">241</span> Total_LBAs_Written      <span class="number">0x0000</span>   <span class="number">100</span>   <span class="number">253</span>   <span class="number">000</span>    Old_age   <span class="keyword">Offline</span>      -       <span class="number">1023618382</span></div><div class="line"><span class="number">242</span> Total_LBAs_Read         <span class="number">0x0000</span>   <span class="number">100</span>   <span class="number">253</span>   <span class="number">000</span>    Old_age   <span class="keyword">Offline</span>      -       <span class="number">716149754</span></div><div class="line"></div><div class="line"></div><div class="line">  -f <span class="keyword">FORMAT</span>, <span class="comment">--format=FORMAT                                          (ATA)</span></div><div class="line">        <span class="keyword">Set</span> <span class="keyword">output</span> <span class="keyword">format</span> <span class="keyword">for</span> <span class="keyword">attributes</span>: <span class="keyword">old</span>, brief, <span class="keyword">hex</span>[,<span class="keyword">id</span>|val]</div><div class="line"></div><div class="line">  -l <span class="keyword">TYPE</span>, <span class="comment">--log=TYPE</span></div><div class="line">        <span class="keyword">Show</span> device log. <span class="keyword">TYPE</span>: <span class="keyword">error</span>, selftest, selective, <span class="keyword">directory</span>[,g|s],</div><div class="line">                               xerror[,N][,<span class="keyword">error</span>], xselftest[,N][,selftest],</div><div class="line">                               background, sasphy[,<span class="keyword">reset</span>], sataphy[,<span class="keyword">reset</span>],</div><div class="line">                               scttemp[sts,hist], scttempint,N[,p],</div><div class="line">                               scterc[,N,M], devstat[,N], ssd,</div><div class="line">                               gplog,N[,<span class="keyword">RANGE</span>], smartlog,N[,<span class="keyword">RANGE</span>],</div><div class="line">                               nvmelog,N,<span class="keyword">SIZE</span></div><div class="line"></div><div class="line">  -v N,<span class="keyword">OPTION</span> , <span class="comment">--vendorattribute=N,OPTION                            (ATA)</span></div><div class="line">        <span class="keyword">Set</span> display <span class="keyword">OPTION</span> <span class="keyword">for</span> vendor <span class="keyword">Attribute</span> N (see man page)</div><div class="line"></div><div class="line">  -F <span class="keyword">TYPE</span>, <span class="comment">--firmwarebug=TYPE                                         (ATA)</span></div><div class="line">        <span class="keyword">Use</span> firmware bug workaround:</div><div class="line">        <span class="keyword">none</span>, nologdir, samsung, samsung2, samsung3, xerrorlba, swapid</div><div class="line"></div><div class="line">  -P <span class="keyword">TYPE</span>, <span class="comment">--presets=TYPE                                             (ATA)</span></div><div class="line">        Drive-specific presets: <span class="keyword">use</span>, <span class="keyword">ignore</span>, <span class="keyword">show</span>, showall</div><div class="line"></div><div class="line">  -B [+]<span class="keyword">FILE</span>, <span class="comment">--drivedb=[+]FILE                                       (ATA)</span></div><div class="line">        <span class="keyword">Read</span> <span class="keyword">and</span> <span class="keyword">replace</span> [<span class="keyword">add</span>] drive <span class="keyword">database</span> <span class="keyword">from</span> <span class="keyword">FILE</span></div><div class="line">        [<span class="keyword">default</span> <span class="keyword">is</span> +/etc/smart_drivedb.h</div><div class="line">         <span class="keyword">and</span> <span class="keyword">then</span>    /<span class="keyword">var</span>/lib/smartmontools/drivedb/drivedb.h]</div><div class="line"></div><div class="line">============================================ DEVICE <span class="keyword">SELF</span>-<span class="keyword">TEST</span> OPTIONS =====</div><div class="line"></div><div class="line">  -t <span class="keyword">TEST</span>, <span class="comment">--test=TEST</span></div><div class="line">        Run test. <span class="keyword">TEST</span>: <span class="keyword">offline</span>, <span class="keyword">short</span>, <span class="keyword">long</span>, conveyance, <span class="keyword">force</span>, vendor,N,</div><div class="line">                        <span class="keyword">select</span>,M-N, pending,N, afterselect,[<span class="keyword">on</span>|<span class="keyword">off</span>]</div><div class="line"></div><div class="line">  -C, <span class="comment">--captive</span></div><div class="line">        <span class="keyword">Do</span> <span class="keyword">test</span> <span class="keyword">in</span> captive <span class="keyword">mode</span> (along <span class="keyword">with</span> -t)</div><div class="line"></div><div class="line">  -X, <span class="comment">--abort</span></div><div class="line">        <span class="keyword">Abort</span> <span class="keyword">any</span> non-captive <span class="keyword">test</span> <span class="keyword">on</span> device</div><div class="line"></div><div class="line">=================================================== SMARTCTL EXAMPLES =====</div><div class="line"></div><div class="line">  smartctl <span class="comment">--all /dev/sda                    (Prints all SMART information)</span></div><div class="line"></div><div class="line">  smartctl <span class="comment">--smart=on --offlineauto=on --saveauto=on /dev/sda</span></div><div class="line">                                              (Enables SMART <span class="keyword">on</span> <span class="keyword">first</span> disk)</div><div class="line"></div><div class="line">  smartctl <span class="comment">--test=long /dev/sda          (Executes extended disk self-test)</span></div><div class="line"></div><div class="line">  smartctl <span class="comment">--attributes --log=selftest --quietmode=errorsonly /dev/sda</span></div><div class="line">                                      (Prints <span class="keyword">Self</span>-<span class="keyword">Test</span> &amp; <span class="keyword">Attribute</span> <span class="keyword">errors</span>)</div><div class="line">  smartctl <span class="comment">--all --device=3ware,2 /dev/sda</span></div><div class="line">  smartctl <span class="comment">--all --device=3ware,2 /dev/twe0</span></div><div class="line">  smartctl <span class="comment">--all --device=3ware,2 /dev/twa0</span></div><div class="line">  smartctl <span class="comment">--all --device=3ware,2 /dev/twl0</span></div><div class="line">          (Prints all SMART info <span class="keyword">for</span> <span class="number">3</span>rd ATA disk <span class="keyword">on</span> <span class="number">3</span>ware RAID controller)</div><div class="line">  smartctl <span class="comment">--all --device=hpt,1/1/3 /dev/sda</span></div><div class="line">          (Prints all SMART info <span class="keyword">for</span> the SATA disk attached <span class="keyword">to</span> the <span class="number">3</span>rd PMPort</div><div class="line">           <span class="keyword">of</span> the <span class="number">1</span>st channel <span class="keyword">on</span> the <span class="number">1</span>st HighPoint RAID controller)</div><div class="line">  smartctl <span class="comment">--all --device=areca,3/1 /dev/sg2</span></div><div class="line">          (Prints all SMART info <span class="keyword">for</span> <span class="number">3</span>rd ATA disk <span class="keyword">of</span> the <span class="number">1</span>st enclosure</div><div class="line">           <span class="keyword">on</span> Areca RAID controller)</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+    
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+  
+</div>
+    
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="metang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/aipay.jpg" alt="metang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/日志审计/" rel="tag"><i class="fa fa-tag"></i> 日志审计</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/[日志分析]ids2017数据的例子CICFlowMeter-4.0特征提取工具/" rel="next" title="流量特征提取工具CICFlowMeter">
+                <i class="fa fa-chevron-left"></i> 流量特征提取工具CICFlowMeter
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/21/[日志分析]恶意日志的收集/" rel="prev" title="一些恶意日志的收集">
+                一些恶意日志的收集 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.JPG"
+                alt="metang" />
+            
+              <p class="site-author-name" itemprop="name">metang</p>
+              <p class="site-description motion-element" itemprop="description">from Nuaa</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/metang326" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="534747943@qq.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#smartd使用"><span class="nav-number">2.</span> <span class="nav-text">smartd使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#自动报警"><span class="nav-number">2.1.</span> <span class="nav-text">自动报警</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Examples"><span class="nav-number">2.2.</span> <span class="nav-text">Examples</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#smartctl使用"><span class="nav-number">3.</span> <span class="nav-text">smartctl使用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">metang</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>

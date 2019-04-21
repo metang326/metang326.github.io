@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #199475; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #0B6E48, 0 0 5px     #0B6E48; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #044D22;    /*上边框颜色*/
+        border-left-color: #044D22;    /*左边框颜色*/
+    }
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/trojan_32px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/trojan_16px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="日志审计,linux," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Linux Audit守护进程是一个可以审计Linux系统事件的框架。通过使用一个强大的审计框架，系统可以追踪很多事件类型来监控和并审计它。">
+<meta name="keywords" content="日志审计,linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="audit监控进程的使用">
+<meta property="og:url" content="http://yoursite.com/2019/04/21/[日志分析]audit监控进程/index.html">
+<meta property="og:site_name" content="metang&#39;s blog">
+<meta property="og:description" content="Linux Audit守护进程是一个可以审计Linux系统事件的框架。通过使用一个强大的审计框架，系统可以追踪很多事件类型来监控和并审计它。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-21T02:54:13.986Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="audit监控进程的使用">
+<meta name="twitter:description" content="Linux Audit守护进程是一个可以审计Linux系统事件的框架。通过使用一个强大的审计框架，系统可以追踪很多事件类型来监控和并审计它。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'TZVHEBFK02',
+      apiKey: '1ab48ccb78c0b1c98cf0e7935807338f',
+      indexName: 'my_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"输入关键字进行搜索","hits_empty":"找不到关于  ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/21/[日志分析]audit监控进程/"/>
+
+
+
+
+
+  <title>audit监控进程的使用 | metang's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/metang326"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">metang's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In case I don't see ya', good afternoon, good evening and goodnight.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/[日志分析]audit监控进程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="metang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="metang's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">audit监控进程的使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T00:00:00+08:00">
+                2019-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/日志分析/" itemprop="url" rel="index">
+                    <span itemprop="name">日志分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,563
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux Audit守护进程是一个可以审计Linux系统事件的框架。通过使用一个强大的审计框架，系统可以追踪很多事件类型来监控和并审计它。</p>
+<a id="more"></a>
+<h1 id="autrace使用"><a href="#autrace使用" class="headerlink" title="autrace使用"></a>autrace使用</h1><p>教程 <a href="http://man7.org/linux/man-pages/man8/autrace.8.html" target="_blank" rel="external">http://man7.org/linux/man-pages/man8/autrace.8.html</a></p>
+<h2 id="命令语法"><a href="#命令语法" class="headerlink" title="命令语法"></a>命令语法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">autrace program [-r] [program-args]</div></pre></td></tr></table></figure>
+<p><strong>-r:</strong> Limit  syscalls  collected  to  ones  needed for analyzing resource usage. This could help people doing threat modeling. This saves space in logs.</p>
+<p>两个例子：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">The following illustrates a typical session:</div><div class="line"></div><div class="line">autrace /bin/ls /tmp</div><div class="line">ausearch <span class="comment">--start recent -p 2442 -i</span></div><div class="line"></div><div class="line">and for resource usage mode:</div><div class="line"></div><div class="line">autrace -r /bin/ls</div><div class="line">ausearch <span class="comment">--start recent -p 2450 --raw | aureport --file --summary</span></div><div class="line">ausearch <span class="comment">--start recent -p 2450 --raw | aureport --host --summary</span></div></pre></td></tr></table></figure>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>autrace是一个进程在运行时一直运行的命令行工具，就像strace命令一样。它会将跟踪结果保存在/var/www/audit/audit.log文件中，为了使这个命令可以正常运行，你需要先将所有的跟踪规则删除。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# autrace /bin/ls /tmp</div><div class="line">autrace cannot be run with rules loaded.</div><div class="line">Please <span class="keyword">delete</span> all <span class="keyword">rules</span> <span class="keyword">using</span> <span class="string">'auditctl -D'</span> <span class="keyword">if</span> you really wanted <span class="keyword">to</span></div><div class="line">run this command.</div><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# auditctl -D</div><div class="line"><span class="keyword">No</span> <span class="keyword">rules</span></div></pre></td></tr></table></figure>
+<h3 id="测试-autrace-bin-ls-tmp"><a href="#测试-autrace-bin-ls-tmp" class="headerlink" title="测试  autrace /bin/ls /tmp"></a>测试  autrace /bin/ls /tmp</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# autrace /bin/ls /tmp</div><div class="line">Waiting to <span class="keyword">execute</span>: /<span class="keyword">bin</span>/ls</div><div class="line">config-err-AL6x5R</div><div class="line">evince<span class="number">-17425</span></div><div class="line">fcitx-socket-:<span class="number">0</span></div><div class="line">mongodb<span class="number">-27017.</span>sock</div><div class="line">pulse-PKdhtXMmr18n</div><div class="line">sogou-qimpanel:<span class="number">0.</span>pid</div><div class="line">sogou-qimpanel-celltangmingyu</div><div class="line">sogou-qimpaneltangmingyu</div><div class="line">ssh-hNCvHjbAH7t7</div><div class="line">systemd-<span class="keyword">private</span>-ff4273de04ce4c55b26935a8433811f7-bolt.service<span class="number">-2</span>fgcSg</div><div class="line">systemd-<span class="keyword">private</span>-ff4273de04ce4c55b26935a8433811f7-chrony.service-Iu7400</div><div class="line">systemd-<span class="keyword">private</span>-ff4273de04ce4c55b26935a8433811f7-colord.service-Oa8cnd</div><div class="line">systemd-<span class="keyword">private</span>-ff4273de04ce4c55b26935a8433811f7-fwupd.service-mEczCx</div><div class="line">systemd-<span class="keyword">private</span>-ff4273de04ce4c55b26935a8433811f7-rtkit-daemon.service-uQDnPB</div><div class="line">systemd-<span class="keyword">private</span>-ff4273de04ce4c55b26935a8433811f7-systemd-resolved.service<span class="number">-6</span>xPKc3</div><div class="line"><span class="keyword">user</span><span class="number">-1563</span></div><div class="line">VMwareDnD</div><div class="line">vmware-root</div><div class="line">Cleaning up...</div><div class="line"><span class="keyword">Trace</span> complete. You can <span class="keyword">locate</span> the <span class="keyword">records</span> <span class="keyword">with</span> <span class="string">'ausearch -i -p 18226'</span></div></pre></td></tr></table></figure>
+<p>查看跟踪内容</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# ausearch -i -p 18226</div><div class="line"><span class="comment">----</span></div><div class="line">type=PROCTITLE msg=audit(2018年11月20日 14:12:14.311:6667) : proctitle=autrace /bin/ls /tmp </div><div class="line">type=SYSCALL msg=audit(2018年11月20日 14:12:14.311:6667) : arch=x86_64 syscall=close success=yes exit=0 a0=0x4 a1=0x0 a2=0x0 a3=0x7f8192577a10 items=0 ppid=18224 pid=18226 auid=tangmingyu uid=root gid=root euid=root suid=root fsuid=root egid=root sgid=root fsgid=root tty=pts0 ses=4 comm=autrace exe=/sbin/autrace key=(null) </div><div class="line"><span class="comment">----</span></div><div class="line">type=PROCTITLE msg=audit(2018年11月20日 14:12:14.311:6669) : proctitle=autrace /bin/ls /tmp </div><div class="line">type=SYSCALL msg=audit(2018年11月20日 14:12:14.311:6669) : arch=x86_64 syscall=fstat success=yes exit=0 a0=0x1 a1=0x7ffefa2aa7a0 a2=0x7ffefa2aa7a0 a3=0x55e6e54b23e2 items=0 ppid=18224 pid=18226 auid=tangmingyu uid=root gid=root euid=root suid=root fsuid=root egid=root sgid=root fsgid=root tty=pts0 ses=4 comm=autrace exe=/sbin/autrace key=(null) </div><div class="line"><span class="comment">----</span></div><div class="line">type=PROCTITLE msg=audit(2018年11月20日 14:12:14.311:6670) : proctitle=autrace /bin/ls /tmp </div><div class="line">type=SYSCALL msg=audit(2018年11月20日 14:12:14.311:6670) : arch=x86_64 syscall=write success=yes exit=28 a0=0x1 a1=0x55e6e591c4d0 a2=0x1c a3=0xfffffff9 items=0 ppid=18224 pid=18226 auid=tangmingyu uid=root gid=root euid=root suid=root fsuid=root egid=root sgid=root fsgid=root tty=pts0 ses=4 comm=autrace exe=/sbin/autrace key=(null) </div><div class="line"><span class="comment">----</span></div><div class="line">type=PROCTITLE msg=audit(2018年11月20日 14:12:14.311:6671) : proctitle=autrace /bin/ls /tmp </div><div class="line">type=SYSCALL msg=audit(2018年11月20日 14:12:14.311:6671) : arch=x86_64 syscall=read success=yes exit=1 a0=0x3 a1=0x7ffefa2aaf70 a2=0x1 a3=0xfffffff9 items=0 ppid=18224 pid=18226 auid=tangmingyu uid=root gid=root euid=root suid=root fsuid=root egid=root sgid=root fsgid=root tty=pts0 ses=4 comm=autrace exe=/sbin/autrace key=(null)</div></pre></td></tr></table></figure>
+<h3 id="测试-autrace-r-bin-ls"><a href="#测试-autrace-r-bin-ls" class="headerlink" title="测试 autrace -r /bin/ls"></a>测试 autrace -r /bin/ls</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# autrace -r /bin/ls</div><div class="line">Waiting to <span class="keyword">execute</span>: /<span class="keyword">bin</span>/ls</div><div class="line">cur_temp		eclipse-workspace  mininet  oftest    pox  snap     sublime-<span class="built_in">text</span>-imfix	wget-<span class="keyword">log</span>  模板	图片  下载  桌面</div><div class="line">deepin-wine-<span class="keyword">for</span>-ubuntu	<span class="keyword">go</span>		   oflops   openflow  ryu  <span class="keyword">sqldata</span>  <span class="keyword">test</span>		公共的	  视频	文档  音乐</div><div class="line">Cleaning up...</div><div class="line"><span class="keyword">Trace</span> complete. You can <span class="keyword">locate</span> the <span class="keyword">records</span> <span class="keyword">with</span> <span class="string">'ausearch -i -p 18809'</span></div><div class="line"></div><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# ausearch <span class="comment">--start recent -p 18809 --raw | aureport --file --summary</span></div><div class="line"></div><div class="line"><span class="keyword">File</span> Summary Report</div><div class="line">===========================</div><div class="line">total  <span class="keyword">file</span></div><div class="line">===========================</div><div class="line"><span class="number">1</span>  /<span class="keyword">bin</span>/ls</div><div class="line"><span class="number">1</span>  /lib64/ld-linux-x86<span class="number">-64.</span>so<span class="number">.2</span></div><div class="line"><span class="number">1</span>  /etc/ld.so.cache</div><div class="line"><span class="number">1</span>  /lib/x86_64-linux-gnu/libselinux.so<span class="number">.1</span></div><div class="line"><span class="number">1</span>  /lib/x86_64-linux-gnu/libc.so<span class="number">.6</span></div><div class="line"><span class="number">1</span>  /lib/x86_64-linux-gnu/libpcre.so<span class="number">.3</span></div><div class="line"><span class="number">1</span>  /lib/x86_64-linux-gnu/libdl.so<span class="number">.2</span></div><div class="line"><span class="number">1</span>  /lib/x86_64-linux-gnu/libpthread.so<span class="number">.0</span></div><div class="line"><span class="number">1</span>  /proc/filesystems</div><div class="line"><span class="number">1</span>  /usr/lib/locale/locale-<span class="keyword">archive</span></div><div class="line"><span class="number">1</span>  .</div><div class="line"><span class="number">1</span>  /usr/lib/x86_64-linux-gnu/gconv/gconv-modules.cache</div><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# ausearch <span class="comment">--start recent -p 18809 --raw | aureport --host --summary</span></div><div class="line"></div><div class="line">Host Summary Report</div><div class="line">===========================</div><div class="line">total  host</div><div class="line">===========================</div><div class="line">&lt;<span class="keyword">no</span> <span class="keyword">events</span> <span class="keyword">of</span> interest were <span class="keyword">found</span>&gt;</div></pre></td></tr></table></figure>
+<h3 id="测试-autrace-r-usr-share-typora-Typora"><a href="#测试-autrace-r-usr-share-typora-Typora" class="headerlink" title="测试 autrace -r /usr/share/typora/Typora"></a>测试 autrace -r /usr/share/typora/Typora</h3><p>跳出来Typora的运行界面，然后随便输入了一行数字 点击保存。这个过程产生的记录如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu# ausearch --start recent -p 19046 --raw | aureport --file --summary</div><div class="line"></div><div class="line">File Summary Report</div><div class="line">===========================</div><div class="line">total  file</div><div class="line">===========================</div><div class="line">403  /etc/localtime</div><div class="line">227  /dev/shm/</div><div class="line">61  /proc/self/status</div><div class="line">52  /run/user/1000/bus</div><div class="line">37  /root/.icons/DMZ-White/index.theme</div><div class="line">32  /root/.config/Typora/</div><div class="line">24  /usr/share/icons/DMZ-White/index.theme</div><div class="line">24  /usr/share/pixmaps/DMZ-White/index.theme</div><div class="line">21  /root/.config/Typora/themes/</div><div class="line">..........很长</div><div class="line">1  /usr/share/pixmaps/default/cursors/col-resize</div><div class="line">1  /root/.icons/DMZ-White/cursors/h_double_arrow</div><div class="line">1  /usr/share/icons/DMZ-White/cursors/h_double_arrow</div><div class="line">1  /root/.icons/default/cursors/text</div><div class="line">1  /usr/share/icons/default/cursors/text</div><div class="line">1  /usr/share/pixmaps/default/cursors/text</div><div class="line">1  /root/.icons/DMZ-White/cursors/xterm</div><div class="line">1  /usr/share/icons/DMZ-White/cursors/xterm</div><div class="line">1  /usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf</div><div class="line">1  /root/.config/Typora/backups/1</div><div class="line">1  /home/tangmingyu/.hidden</div><div class="line">1  /home/.hidden</div><div class="line">1  /usr/share/icons/Numix/16/status/image-missing.svg</div><div class="line">1  /usr/share/icons/Numix/16/places/folder.svg</div><div class="line">1  /home/tangmingyu/文档/.hidden</div><div class="line">1  /usr/share/icons/Numix/16/mimetypes/text-markdown.svg</div><div class="line">1  /home/tangmingyu/文档/日志分析小组/.hidden</div><div class="line">root@tangmingyu-QiTianM610-D529:/home/tangmingyu#</div></pre></td></tr></table></figure>
+<h1 id="stace"><a href="#stace" class="headerlink" title="stace"></a>stace</h1><h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">usage: strace [-CdffhiqrtttTvVwxxy] [-I n] [-e expr]...</div><div class="line">              [-a column] [-o file] [-s strsize] [-P path]...</div><div class="line">              -p pid... / [-D] [-E var=val]... [-u username] PROG [ARGS]</div><div class="line">   or: strace -c[dfw] [-I n] [-e expr]... [-O overhead] [-S sortby]</div><div class="line">              -p pid... / [-D] [-E var=val]... [-u username] PROG [ARGS]</div><div class="line"></div><div class="line">Output format:</div><div class="line">  -a column      alignment COLUMN for printing syscall results (default 40)</div><div class="line">  -i             print instruction pointer at time of syscall</div><div class="line">  -k             obtain stack trace between each syscall (experimental)</div><div class="line">  -o file        send trace output to FILE instead of stderr</div><div class="line">  -q             suppress messages about attaching, detaching, etc.</div><div class="line">  -r             print relative timestamp</div><div class="line">  -s strsize     limit length of print strings to STRSIZE chars (default 32)</div><div class="line">  -t             print absolute timestamp</div><div class="line">  -tt            print absolute timestamp with usecs</div><div class="line">  -T             print time spent in each syscall</div><div class="line">  -x             print non-ascii strings in hex</div><div class="line">  -xx            print all strings in hex</div><div class="line">  -y             print paths associated with file descriptor arguments</div><div class="line">  -yy            print protocol specific information associated with socket file descriptors</div><div class="line"></div><div class="line">Statistics:</div><div class="line">  -c             count time, calls, and errors for each syscall and report summary</div><div class="line">  -C             like -c but also print regular output</div><div class="line">  -O overhead    <span class="keyword">set</span> overhead <span class="keyword">for</span> tracing syscalls <span class="keyword">to</span> OVERHEAD usecs</div><div class="line">  -S sortby      <span class="keyword">sort</span> syscall counts <span class="keyword">by</span>: <span class="keyword">time</span>, calls, <span class="keyword">name</span>, <span class="keyword">nothing</span> (<span class="keyword">default</span> <span class="keyword">time</span>)</div><div class="line">  -w             summarise syscall latency (<span class="keyword">default</span> <span class="keyword">is</span> <span class="keyword">system</span> <span class="keyword">time</span>)</div><div class="line"></div><div class="line">Filtering:</div><div class="line">  -e expr        a qualifying expression: <span class="keyword">option</span>=[!]all <span class="keyword">or</span> <span class="keyword">option</span>=[!]val1[,val2]...</div><div class="line">     options:    <span class="keyword">trace</span>, abbrev, verbose, <span class="keyword">raw</span>, signal, <span class="keyword">read</span>, write, fault</div><div class="line">  -P <span class="keyword">path</span>        <span class="keyword">trace</span> accesses <span class="keyword">to</span> <span class="keyword">path</span></div><div class="line"></div><div class="line">Tracing:</div><div class="line">  -b execve      detach <span class="keyword">on</span> execve syscall</div><div class="line">  -D             run tracer process <span class="keyword">as</span> a detached grandchild, <span class="keyword">not</span> <span class="keyword">as</span> <span class="keyword">parent</span></div><div class="line">  -f             follow forks</div><div class="line">  -ff            follow forks <span class="keyword">with</span> <span class="keyword">output</span> <span class="keyword">into</span> separate files</div><div class="line">  -I interruptible</div><div class="line">     <span class="number">1</span>:          <span class="keyword">no</span> signals <span class="keyword">are</span> blocked</div><div class="line">     <span class="number">2</span>:          fatal signals <span class="keyword">are</span> blocked <span class="keyword">while</span> decoding syscall (<span class="keyword">default</span>)</div><div class="line">     <span class="number">3</span>:          fatal signals <span class="keyword">are</span> <span class="keyword">always</span> blocked (<span class="keyword">default</span> <span class="keyword">if</span> <span class="string">'-o FILE PROG'</span>)</div><div class="line">     <span class="number">4</span>:          fatal signals <span class="keyword">and</span> SIGTSTP (^Z) <span class="keyword">are</span> <span class="keyword">always</span> blocked</div><div class="line">                 (useful <span class="keyword">to</span> make <span class="string">'strace -o FILE PROG'</span> <span class="keyword">not</span> <span class="keyword">stop</span> <span class="keyword">on</span> ^Z)</div><div class="line"></div><div class="line"><span class="keyword">Startup</span>:</div><div class="line">  -E <span class="keyword">var</span>         remove <span class="keyword">var</span> <span class="keyword">from</span> the environment <span class="keyword">for</span> command</div><div class="line">  -E <span class="keyword">var</span>=val     put <span class="keyword">var</span>=val <span class="keyword">in</span> the environment <span class="keyword">for</span> command</div><div class="line">  -p pid         <span class="keyword">trace</span> process <span class="keyword">with</span> process <span class="keyword">id</span> PID, may be repeated</div><div class="line">  -u username    run command <span class="keyword">as</span> username handling setuid <span class="keyword">and</span>/<span class="keyword">or</span> setgid</div><div class="line"></div><div class="line">Miscellaneous:</div><div class="line">  -d             <span class="keyword">enable</span> debug <span class="keyword">output</span> <span class="keyword">to</span> stderr</div><div class="line">  -v             verbose <span class="keyword">mode</span>: print unabbreviated argv, stat, termios, etc. args</div><div class="line">  -h             print <span class="keyword">help</span> message</div><div class="line">  -V             print <span class="keyword">version</span></div></pre></td></tr></table></figure>
+<h2 id="测试-strace-p-17195（谷歌浏览器pid）"><a href="#测试-strace-p-17195（谷歌浏览器pid）" class="headerlink" title="测试 strace -p 17195（谷歌浏览器pid）"></a>测试 strace -p 17195（谷歌浏览器pid）</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">futex(0x7fff4a526f58, FUTEX_WAIT_PRIVATE, 0, &#123;tv_sec=29, tv_nsec=14812037&#125;) = 0</div><div class="line">futex(0x7fff4a526f08, FUTEX_WAKE_PRIVATE, 1) = 0</div><div class="line">gettid()                                = 1</div><div class="line">gettid()                                = 1</div><div class="line">futex(0x7fff4a526f58, FUTEX_WAIT_PRIVATE, 0, &#123;tv_sec=14, tv_nsec=475116389&#125;) = -1 ETIMEDOUT (Connection timed out)</div><div class="line">futex(0x7fff4a526f08, FUTEX_WAKE_PRIVATE, 1) = 0</div><div class="line">gettid()                                = 1</div><div class="line">gettid()                                = 1</div><div class="line">gettid()                                = 1</div><div class="line">gettid()                                = 1</div><div class="line">futex(0x7fff4a526f58, FUTEX_WAIT_PRIVATE, 0, &#123;tv_sec=0, tv_nsec=29569165&#125;) = -1 ETIMEDOUT (Connection timed out)</div><div class="line">futex(0x7fff4a526f08, FUTEX_WAKE_PRIVATE, 1) = 0</div><div class="line">gettid()                                = 1</div><div class="line">gettid()                                = 1</div><div class="line">gettid()                                = 1</div><div class="line">madvise(0x14a188e31000, 4096, MADV_DONTNEED) = 0</div><div class="line">madvise(0x14a189148000, 8192, MADV_DONTNEED) = 0</div><div class="line">madvise(0x14a189154000, 28672, MADV_DONTNEED) = 0</div><div class="line">madvise(0x14a1893e7000, 20480, MADV_DONTNEED) = 0</div><div class="line">gettid()                                = 1</div><div class="line">futex(0x7fff4a526f58, FUTEX_WAIT_PRIVATE, 0, &#123;tv_sec=31, tv_nsec=118372204&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+    
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+  
+</div>
+    
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="metang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/aipay.jpg" alt="metang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/日志审计/" rel="tag"><i class="fa fa-tag"></i> 日志审计</a>
+          
+            <a href="/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/[botnet检测]monkey研究/" rel="next" title="infection monkey源码研究">
+                <i class="fa fa-chevron-left"></i> infection monkey源码研究
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/21/[日志分析]ids2017数据的例子CICFlowMeter-4.0特征提取工具/" rel="prev" title="流量特征提取工具CICFlowMeter">
+                流量特征提取工具CICFlowMeter <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.JPG"
+                alt="metang" />
+            
+              <p class="site-author-name" itemprop="name">metang</p>
+              <p class="site-description motion-element" itemprop="description">from Nuaa</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/metang326" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="534747943@qq.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#autrace使用"><span class="nav-number">1.</span> <span class="nav-text">autrace使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#命令语法"><span class="nav-number">1.1.</span> <span class="nav-text">命令语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#注意"><span class="nav-number">1.1.1.</span> <span class="nav-text">注意</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试-autrace-bin-ls-tmp"><span class="nav-number">1.1.2.</span> <span class="nav-text">测试  autrace /bin/ls /tmp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试-autrace-r-bin-ls"><span class="nav-number">1.1.3.</span> <span class="nav-text">测试 autrace -r /bin/ls</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试-autrace-r-usr-share-typora-Typora"><span class="nav-number">1.1.4.</span> <span class="nav-text">测试 autrace -r /usr/share/typora/Typora</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#stace"><span class="nav-number">2.</span> <span class="nav-text">stace</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用方法"><span class="nav-number">2.1.</span> <span class="nav-text">使用方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试-strace-p-17195（谷歌浏览器pid）"><span class="nav-number">2.2.</span> <span class="nav-text">测试 strace -p 17195（谷歌浏览器pid）</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">metang</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>

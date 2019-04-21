@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #199475; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #0B6E48, 0 0 5px     #0B6E48; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #044D22;    /*上边框颜色*/
+        border-left-color: #044D22;    /*左边框颜色*/
+    }
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/trojan_32px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/trojan_16px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="日志审计,流量分析,异常检测," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ids2017数据集使用CICFlowMeter作为流特征提取工具，能够根据提交的pcap文件生成有80多个特征的csv文件，使用方法有两种：在线和离线模式。在线模式可以实时监控并产生特征，监听结束之后可以保存到本地；离线模式是提交一个pcap文件，得到一个包含特征的csv文件。">
+<meta name="keywords" content="日志审计,流量分析,异常检测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="流量特征提取工具CICFlowMeter">
+<meta property="og:url" content="http://yoursite.com/2019/04/21/[日志分析]ids2017数据的例子CICFlowMeter-4.0特征提取工具/index.html">
+<meta property="og:site_name" content="metang&#39;s blog">
+<meta property="og:description" content="ids2017数据集使用CICFlowMeter作为流特征提取工具，能够根据提交的pcap文件生成有80多个特征的csv文件，使用方法有两种：在线和离线模式。在线模式可以实时监控并产生特征，监听结束之后可以保存到本地；离线模式是提交一个pcap文件，得到一个包含特征的csv文件。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-21T03:09:00.456Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="流量特征提取工具CICFlowMeter">
+<meta name="twitter:description" content="ids2017数据集使用CICFlowMeter作为流特征提取工具，能够根据提交的pcap文件生成有80多个特征的csv文件，使用方法有两种：在线和离线模式。在线模式可以实时监控并产生特征，监听结束之后可以保存到本地；离线模式是提交一个pcap文件，得到一个包含特征的csv文件。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'TZVHEBFK02',
+      apiKey: '1ab48ccb78c0b1c98cf0e7935807338f',
+      indexName: 'my_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"输入关键字进行搜索","hits_empty":"找不到关于  ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/21/[日志分析]ids2017数据的例子CICFlowMeter-4.0特征提取工具/"/>
+
+
+
+
+
+  <title>流量特征提取工具CICFlowMeter | metang's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/metang326"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">metang's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In case I don't see ya', good afternoon, good evening and goodnight.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/[日志分析]ids2017数据的例子CICFlowMeter-4.0特征提取工具/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="metang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="metang's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">流量特征提取工具CICFlowMeter</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T00:00:00+08:00">
+                2019-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/日志分析/" itemprop="url" rel="index">
+                    <span itemprop="name">日志分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  578
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>ids2017数据集使用CICFlowMeter作为流特征提取工具，能够根据提交的pcap文件生成有80多个特征的csv文件，使用方法有两种：在线和离线模式。在线模式可以实时监控并产生特征，监听结束之后可以保存到本地；离线模式是提交一个pcap文件，得到一个包含特征的csv文件。</p>
+<a id="more"></a>
+<h1 id="特征举例"><a href="#特征举例" class="headerlink" title="特征举例"></a>特征举例</h1><table>
+<thead>
+<tr>
+<th>Flow ID</th>
+<th>Source IP</th>
+<th>Source Port</th>
+<th>Destination IP</th>
+<th>Destination Port</th>
+<th>Protocol</th>
+<th>Timestamp</th>
+<th>Flow Duration</th>
+<th>Total Fwd Packets</th>
+<th>Total Backward Packets</th>
+<th>Total Length of Fwd Packets</th>
+<th>Total Length of Bwd Packets</th>
+<th>Fwd Packet Length Max</th>
+<th>Fwd Packet Length Min</th>
+<th>Fwd Packet Length Mean</th>
+<th>Fwd Packet Length Std</th>
+<th>Bwd Packet Length Max</th>
+<th>Bwd Packet Length Min</th>
+<th>Bwd Packet Length Mean</th>
+<th>Bwd Packet Length Std</th>
+<th>Flow Bytes/s</th>
+<th>Flow Packets/s</th>
+<th>Flow IAT Mean</th>
+<th>Flow IAT Std</th>
+<th>Flow IAT Max</th>
+<th>Flow IAT Min</th>
+<th>Fwd IAT Total</th>
+<th>Fwd IAT Mean</th>
+<th>Fwd IAT Std</th>
+<th>Fwd IAT Max</th>
+<th>Fwd IAT Min</th>
+<th>Bwd IAT Total</th>
+<th>Bwd IAT Mean</th>
+<th>Bwd IAT Std</th>
+<th>Bwd IAT Max</th>
+<th>Bwd IAT Min</th>
+<th>Fwd PSH Flags</th>
+<th>Bwd PSH Flags</th>
+<th>Fwd URG Flags</th>
+<th>Bwd URG Flags</th>
+<th>Fwd Header Length</th>
+<th>Bwd Header Length</th>
+<th style="text-align:right">Fwd Packets/s</th>
+<th>Bwd Packets/s</th>
+<th>Min Packet Length</th>
+<th>Max Packet Length</th>
+<th>Packet Length Mean</th>
+<th>Packet Length Std</th>
+<th>Packet Length Variance</th>
+<th>FIN Flag Count</th>
+<th>SYN Flag Count</th>
+<th>RST Flag Count</th>
+<th>PSH Flag Count</th>
+<th>ACK Flag Count</th>
+<th>URG Flag Count</th>
+<th>CWE Flag Count</th>
+<th>ECE Flag Count</th>
+<th>Down/Up Ratio</th>
+<th>Average Packet Size</th>
+<th>Avg Fwd Segment Size</th>
+<th>Avg Bwd Segment Size</th>
+<th>Fwd Header Length</th>
+<th>Fwd Avg Bytes/Bulk</th>
+<th>Fwd Avg Packets/Bulk</th>
+<th>Fwd Avg Bulk Rate</th>
+<th>Bwd Avg Bytes/Bulk</th>
+<th>Bwd Avg Packets/Bulk</th>
+<th>Bwd Avg Bulk Rate</th>
+<th>Subflow Fwd Packets</th>
+<th>Subflow Fwd Bytes</th>
+<th>Subflow Bwd Packets</th>
+<th>Subflow Bwd Bytes</th>
+<th>Init_Win_bytes_forward</th>
+<th>Init_Win_bytes_backward</th>
+<th>act_data_pkt_fwd</th>
+<th>min_seg_size_forward</th>
+<th>Active Mean</th>
+<th>Active Std</th>
+<th>Active Max</th>
+<th>Active Min</th>
+<th>Idle Mean</th>
+<th>Idle Std</th>
+<th>Idle Max</th>
+<th>Idle Min</th>
+<th>Label</th>
+<th>External IP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>192.168.10.16-199.244.48.55-41936-443-6</td>
+<td>192.168.10.16</td>
+<td>41936</td>
+<td>199.244.48.55</td>
+<td>443</td>
+<td>6</td>
+<td>7/7/2017 3:30</td>
+<td>143347</td>
+<td>47</td>
+<td>60</td>
+<td>1325</td>
+<td>108751</td>
+<td>570</td>
+<td>0</td>
+<td>28.19148936</td>
+<td>110.2697559</td>
+<td>2896</td>
+<td>0</td>
+<td>1812.516667</td>
+<td>822.0897409</td>
+<td>767898.8748</td>
+<td>746.4404557</td>
+<td>1352.330189</td>
+<td>5067.810221</td>
+<td>23061</td>
+<td>1</td>
+<td>143347</td>
+<td>3116.23913</td>
+<td>7502.019684</td>
+<td>23823</td>
+<td>1</td>
+<td>120283</td>
+<td>2038.694915</td>
+<td>6167.670541</td>
+<td>24538</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1200</td>
+<td>1928</td>
+<td style="text-align:right">327.8757142</td>
+<td>418.5647415</td>
+<td>0</td>
+<td>2896</td>
+<td>1019.222222</td>
+<td>1082.537011</td>
+<td>1171886.38</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1028.747664</td>
+<td>28.19148936</td>
+<td>1812.516667</td>
+<td>1200</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>47</td>
+<td>1325</td>
+<td>60</td>
+<td>108751</td>
+<td>29200</td>
+<td>61</td>
+<td>30</td>
+<td>20</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>BENIGN</td>
+<td></td>
+</tr>
+<tr>
+<td>192.168.10.16-54.210.195.63-42970-80-6</td>
+<td>192.168.10.16</td>
+<td>42970</td>
+<td>54.210.195.63</td>
+<td>80</td>
+<td>6</td>
+<td>7/7/2017 3:30</td>
+<td>50905</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>39.28887143</td>
+<td>50905</td>
+<td>0</td>
+<td>50905</td>
+<td>50905</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>32</td>
+<td>32</td>
+<td style="text-align:right">19.64443571</td>
+<td>19.64443571</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>32</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>251</td>
+<td>110</td>
+<td>0</td>
+<td>32</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>BENIGN</td>
+<td></td>
+</tr>
+<tr>
+<td>192.168.10.16-199.244.48.55-41944-443-6</td>
+<td>192.168.10.16</td>
+<td>41944</td>
+<td>199.244.48.55</td>
+<td>443</td>
+<td>6</td>
+<td>7/7/2017 3:30</td>
+<td>143899</td>
+<td>46</td>
+<td>58</td>
+<td>1325</td>
+<td>110185</td>
+<td>570</td>
+<td>0</td>
+<td>28.80434783</td>
+<td>111.4072847</td>
+<td>4344</td>
+<td>0</td>
+<td>1899.741379</td>
+<td>942.9987732</td>
+<td>774918.5192</td>
+<td>722.7291364</td>
+<td>1397.07767</td>
+<td>5193.055313</td>
+<td>23360</td>
+<td>1</td>
+<td>143899</td>
+<td>3197.755556</td>
+<td>7655.879725</td>
+<td>23883</td>
+<td>2</td>
+<td>120525</td>
+<td>2114.473684</td>
+<td>6287.286944</td>
+<td>23836</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1168</td>
+<td>1864</td>
+<td style="text-align:right">319.6686565</td>
+<td>403.0604799</td>
+<td>0</td>
+<td>4344</td>
+<td>1062</td>
+<td>1169.249973</td>
+<td>1367145.5</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1072.211538</td>
+<td>28.80434783</td>
+<td>1899.741379</td>
+<td>1168</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>46</td>
+<td>1325</td>
+<td>58</td>
+<td>110185</td>
+<td>29200</td>
+<td>61</td>
+<td>30</td>
+<td>20</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>BENIGN</td>
+<td></td>
+</tr>
+<tr>
+<td>192.168.10.3-192.168.10.17-53-12886-17</td>
+<td>192.168.10.17</td>
+<td>12886</td>
+<td>192.168.10.3</td>
+<td>53</td>
+<td>17</td>
+<td>7/7/2017 3:30</td>
+<td>313</td>
+<td>2</td>
+<td>2</td>
+<td>90</td>
+<td>206</td>
+<td>45</td>
+<td>45</td>
+<td>45</td>
+<td>0</td>
+<td>103</td>
+<td>103</td>
+<td>103</td>
+<td>0</td>
+<td>945686.901</td>
+<td>12779.55272</td>
+<td>104.3333333</td>
+<td>170.3652938</td>
+<td>301</td>
+<td>2</td>
+<td>10</td>
+<td>10</td>
+<td>0</td>
+<td>10</td>
+<td>10</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>40</td>
+<td>64</td>
+<td style="text-align:right">6389.776358</td>
+<td>6389.776358</td>
+<td>45</td>
+<td>103</td>
+<td>68.2</td>
+<td>31.76790834</td>
+<td>1009.2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>85.25</td>
+<td>45</td>
+<td>103</td>
+<td>40</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>90</td>
+<td>2</td>
+<td>206</td>
+<td>-1</td>
+<td>-1</td>
+<td>1</td>
+<td>20</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>BENIGN</td>
+</tr>
+</tbody>
+</table>
+<h1 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h1><p>一开始是在csdn上看到有人发了22w条记录：<br><a href="https://download.csdn.net/download/qq_31667705/10824935" target="_blank" rel="external">https://download.csdn.net/download/qq_31667705/10824935</a></p>
+<p>这是加拿大网络安全研究所（UNB）的数据，该文件是一个csv文件格式，可以用excel打开，已经整理完成。方便研究者用于机器学习或深度学习，一共包含22.5w条记录。主要用于DDoS的检测。</p>
+<p>然后进一步找到了最原始的发布方：<br><a href="https://www.unb.ca/cic/datasets/" target="_blank" rel="external">https://www.unb.ca/cic/datasets/</a><br><a href="https://www.unb.ca/cic/datasets/ids-2017.html" target="_blank" rel="external">https://www.unb.ca/cic/datasets/ids-2017.html</a><br>他的源数据是pcap格式的，然后放到<a href="http://netflowmeter.ca/这个网站得到了80多个特征。可以通过在线提交或者https://github.com/ISCX/CICFlowMeter下载源码" target="_blank" rel="external">http://netflowmeter.ca/这个网站得到了80多个特征。可以通过在线提交或者https://github.com/ISCX/CICFlowMeter下载源码</a></p>
+
+      
+    </div>
+    
+    
+    
+    
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+  
+</div>
+    
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="metang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/aipay.jpg" alt="metang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/日志审计/" rel="tag"><i class="fa fa-tag"></i> 日志审计</a>
+          
+            <a href="/tags/流量分析/" rel="tag"><i class="fa fa-tag"></i> 流量分析</a>
+          
+            <a href="/tags/异常检测/" rel="tag"><i class="fa fa-tag"></i> 异常检测</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/[日志分析]audit监控进程/" rel="next" title="audit监控进程的使用">
+                <i class="fa fa-chevron-left"></i> audit监控进程的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/21/[日志分析]smartd使用/" rel="prev" title="smartd的安装及使用">
+                smartd的安装及使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.JPG"
+                alt="metang" />
+            
+              <p class="site-author-name" itemprop="name">metang</p>
+              <p class="site-description motion-element" itemprop="description">from Nuaa</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/metang326" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="534747943@qq.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#特征举例"><span class="nav-number">1.</span> <span class="nav-text">特征举例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#来源"><span class="nav-number">2.</span> <span class="nav-text">来源</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">metang</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>

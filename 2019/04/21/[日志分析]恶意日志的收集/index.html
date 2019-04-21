@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #199475; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #0B6E48, 0 0 5px     #0B6E48; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #044D22;    /*上边框颜色*/
+        border-left-color: #044D22;    /*左边框颜色*/
+    }
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/trojan_32px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/trojan_16px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="日志审计,异常检测," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Linux Audit守护进程是一个可以审计Linux系统事件的框架。通过使用一个强大的审计框架，系统可以追踪很多事件类型来监控和并审计它。 最近调研了一些恶意日志，可以用于研究异常检测。">
+<meta name="keywords" content="日志审计,异常检测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一些恶意日志的收集">
+<meta property="og:url" content="http://yoursite.com/2019/04/21/[日志分析]恶意日志的收集/index.html">
+<meta property="og:site_name" content="metang&#39;s blog">
+<meta property="og:description" content="Linux Audit守护进程是一个可以审计Linux系统事件的框架。通过使用一个强大的审计框架，系统可以追踪很多事件类型来监控和并审计它。 最近调研了一些恶意日志，可以用于研究异常检测。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-21T02:57:02.703Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一些恶意日志的收集">
+<meta name="twitter:description" content="Linux Audit守护进程是一个可以审计Linux系统事件的框架。通过使用一个强大的审计框架，系统可以追踪很多事件类型来监控和并审计它。 最近调研了一些恶意日志，可以用于研究异常检测。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'TZVHEBFK02',
+      apiKey: '1ab48ccb78c0b1c98cf0e7935807338f',
+      indexName: 'my_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"输入关键字进行搜索","hits_empty":"找不到关于  ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/21/[日志分析]恶意日志的收集/"/>
+
+
+
+
+
+  <title>一些恶意日志的收集 | metang's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/metang326"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">metang's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In case I don't see ya', good afternoon, good evening and goodnight.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/[日志分析]恶意日志的收集/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="metang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="metang's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">一些恶意日志的收集</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T00:00:00+08:00">
+                2019-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/日志分析/" itemprop="url" rel="index">
+                    <span itemprop="name">日志分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,212
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux Audit守护进程是一个可以审计Linux系统事件的框架。通过使用一个强大的审计框架，系统可以追踪很多事件类型来监控和并审计它。</p>
+<p>最近调研了一些恶意日志，可以用于研究异常检测。</p>
+<a id="more"></a>
+<h2 id="KDD99"><a href="#KDD99" class="headerlink" title="KDD99"></a>KDD99</h2><ul>
+<li><strong>KDD CUP 99 dataset</strong> 就是KDD竞赛在1999年举行时采用的数据集。1998年美国国防部高级规划署（DARPA）在MIT林肯实验室进行了一项入侵检测评估项目收集而来的数据。</li>
+<li>内容类型: 网络流量，主机行为</li>
+<li>是否特征化: 是</li>
+<li>适用范围: 主机入侵检测，异常流量监控</li>
+</ul>
+<p>数据来源 <a href="http://kdd.ics.uci.edu/databases/kddcup99/kddcup99.html" target="_blank" rel="external">http://kdd.ics.uci.edu/databases/kddcup99/kddcup99.html</a></p>
+<p>1998年美国国防部高级规划署（DARPA）在MIT林肯实验室进行了一项入侵检测评估项目。林肯实验室建立了模拟美国空军局域网的一个网络环境，收集了9周时间的 TCPdump(*) 网络连接和系统审计数据，仿真各种用户类型、各种不同的网络流量和攻击手段，使它就像一个真实的网络环境。这些TCPdump采集的原始数据被分为两个部分：7周时间的训练数据 大概包含5,000,000多个网络连接记录，剩下的2周时间的测试数据大概包含2,000,000个网络连接记录。</p>
+<p>一个网络连接定义为在某个时间内从开始到结束的TCP数据包序列，并且在这段时间内，数据在预定义的协议下（如TCP、UDP）从源IP地址到目的IP地址的传递。每个网络连接被标记为正常（normal）或异常（attack），异常类型被细分为4大类共39种攻击类型，其中22种攻击类型出现在训练集中，另有17种未知攻击类型出现在测试集中。</p>
+<p>4种异常类型分别是：</p>
+<ol>
+<li><p>DOS, denial-of-service. 拒绝服务攻击，例如ping-of-death, syn flood, smurf等；</p>
+</li>
+<li><p>R2L, unauthorized access from a remote machine to a local machine. 来自远程主机的未授权访问，例如guessing password；</p>
+</li>
+<li><p>U2R, unauthorized access to local superuser privileges by a local unpivileged user. 未授权的本地超级用户特权访问，例如buffer overflow attacks；</p>
+</li>
+<li><p>PROBING, surveillance and probing, 端口监视或扫描，例如port-scan, ping-sweep等。</p>
+</li>
+</ol>
+<p>随后来自哥伦比亚大学的Sal Stolfo 教授和来自北卡罗莱纳州立大学的 Wenke Lee 教授采用数据挖掘等技术对以上的数据集进行特征分析和数据预处理，形成了一个新的数据集。该数据集用于1999年举行的KDD CUP竞赛中，成为著名的KDD99数据集。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">0,tcp,http,SF,215,45076,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,1,0.00,0.00,0.00,0.00,1.00,0.00,0.00,0,0,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,normal.</div><div class="line">0,tcp,http,SF,162,4528,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,2,2,0.00,0.00,0.00,0.00,1.00,0.00,0.00,1,1,1.00,0.00,1.00,0.00,0.00,0.00,0.00,0.00,normal.</div><div class="line">0,tcp,http,SF,236,1228,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,1,0.00,0.00,0.00,0.00,1.00,0.00,0.00,2,2,1.00,0.00,0.50,0.00,0.00,0.00,0.00,0.00,normal.</div><div class="line">0,icmp,ecr_i,SF,1032,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,511,511,0.00,0.00,0.00,0.00,1.00,0.00,0.00,255,255,1.00,0.00,1.00,0.00,0.00,0.00,0.00,0.00,smurf.</div><div class="line">0,icmp,ecr_i,SF,1032,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,511,511,0.00,0.00,0.00,0.00,1.00,0.00,0.00,255,255,1.00,0.00,1.00,0.00,0.00,0.00,0.00,0.00,smurf.</div><div class="line">0,icmp,ecr_i,SF,1032,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,511,511,0.00,0.00,0.00,0.00,1.00,0.00,0.00,255,255,1.00,0.00,1.00,0.00,0.00,0.00,0.00,0.00,smurf.</div><div class="line">0,icmp,ecr_i,SF,1032,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,511,511,0.00,0.00,0.00,0.00,1.00,0.00,0.00,255,255,1.00,0.00,1.00,0.00,0.00,0.00,0.00,0.00,smurf.</div><div class="line">0,icmp,ecr_i,SF,1032,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,511,511,0.00,0.00,0.00,0.00,1.00,0.00,0.00,255,255,1.00,0.00,1.00,0.00,0.00,0.00,0.00,0.00,smurf.</div></pre></td></tr></table></figure>
+<p>特征见下：</p>
+<p><a href="http://blog.sina.com.cn/s/blog_707b645501010btk.html" target="_blank" rel="external">http://blog.sina.com.cn/s/blog_707b645501010btk.html</a> 对此有比较详细的解释</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">back,buffer_overflow,ftp_write,guess_passwd,imap,ipsweep,land,loadmodule,multihop,neptune,nmap,normal,perl,phf,pod,portsweep,rootkit,satan,smurf,spy,teardrop,warezclient,warezmaster.</div><div class="line">duration: continuous.</div><div class="line">protocol_type: symbolic.</div><div class="line">service: symbolic.</div><div class="line">flag: symbolic.</div><div class="line">src_bytes: continuous.</div><div class="line">dst_bytes: continuous.</div><div class="line">land: symbolic.</div><div class="line">wrong_fragment: continuous.</div><div class="line">urgent: continuous.</div><div class="line">hot: continuous.</div><div class="line">num_failed_logins: continuous.</div><div class="line">logged_in: symbolic.</div><div class="line">num_compromised: continuous.</div><div class="line">root_shell: continuous.</div><div class="line">su_attempted: continuous.</div><div class="line">num_root: continuous.</div><div class="line">num_file_creations: continuous.</div><div class="line">num_shells: continuous.</div><div class="line">num_access_files: continuous.</div><div class="line">num_outbound_cmds: continuous.</div><div class="line">is_host_login: symbolic.</div><div class="line">is_guest_login: symbolic.</div><div class="line">count: continuous.</div><div class="line">srv_count: continuous.</div><div class="line">serror_rate: continuous.</div><div class="line">srv_serror_rate: continuous.</div><div class="line">rerror_rate: continuous.</div><div class="line">srv_rerror_rate: continuous.</div><div class="line">same_srv_rate: continuous.</div><div class="line">diff_srv_rate: continuous.</div><div class="line">srv_diff_host_rate: continuous.</div><div class="line">dst_host_count: continuous.</div><div class="line">dst_host_srv_count: continuous.</div><div class="line">dst_host_same_srv_rate: continuous.</div><div class="line">dst_host_diff_srv_rate: continuous.</div><div class="line">dst_host_same_src_port_rate: continuous.</div><div class="line">dst_host_srv_diff_host_rate: continuous.</div><div class="line">dst_host_serror_rate: continuous.</div><div class="line">dst_host_srv_serror_rate: continuous.</div><div class="line">dst_host_rerror_rate: continuous.</div><div class="line">dst_host_srv_rerror_rate: continuous.</div></pre></td></tr></table></figure>
+<h2 id="VAST-Challenge-2013-Mini-Challenge-3数据集"><a href="#VAST-Challenge-2013-Mini-Challenge-3数据集" class="headerlink" title="VAST Challenge 2013: Mini-Challenge 3数据集"></a>VAST Challenge 2013: Mini-Challenge 3数据集</h2><p><a href="http://www.vacommunity.org/VAST+Challenge+2013%3A+Mini-Challenge+3" target="_blank" rel="external">http://www.vacommunity.org/VAST+Challenge+2013%3A+Mini-Challenge+3</a></p>
+<p>Challenge 2013是IEEE Visualization 举办的可视分析挑战赛VAST Challenge 2013 中关于网络安全数据可视分析的竞赛数据集，该数据集提供了某虚构的跨国公司内部网络两周的运行日志，日志类型有3种，分别是网络流量Netflow日志数据和Big Brother 网络健康和状态数据，日志包括：第一、二周的Netflow和Big Brother日志，第二周的入侵预防系统日志数据，通过日志的分析可以找出网络中存在的异常，网络包含的主机和服务器约1100 台，原始日志量接近10 GB，记录数超过9000万行</p>
+<h3 id="比赛提出的任务"><a href="#比赛提出的任务" class="headerlink" title="比赛提出的任务"></a>比赛提出的任务</h3><p>了解两周内在您的网络上发生的事件，使用的所有数据来识别最多12个事件并尽可能地描述它们。</p>
+<p>其中IP和对应的hostname也给出了（一共1100+条）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">#The following are the IPs on the Big Marketing internal network.</div><div class="line">#Column 1:  IP</div><div class="line">#Column 2:  Host Name. Hosts with a &quot;WSS&quot; prefix are user workstations. &quot;Administrator&quot; is the administrator workstation. Others are servers.</div><div class="line">#Column 3 (Optional): Comments</div><div class="line"></div><div class="line">172.10.0.2 DC01.BIGMKT1.COM	Domain controller</div><div class="line">172.10.0.3 MAIL01.BIGMKT1.COM	SMTP</div><div class="line">172.10.0.4 WEB01.BIGMKT1.COM	HTTP</div><div class="line">172.10.0.5 WEB01A.BIGMKT1.COM	HTTP</div><div class="line">172.10.0.9 WEB01B.BIGMKT1.COM	HTTP</div><div class="line">172.10.0.7 WEB01C.BIGMKT1.COM	HTTP</div><div class="line">172.10.0.8 WEB01D.BIGMKT1.COM	HTTP</div><div class="line">172.10.0.40 Administrator.BIGMKT1.COM</div><div class="line">172.10.1.1 WSS1-01.BIGMKT1.COM</div><div class="line">172.10.1.2 WSS1-02.BIGMKT1.COM</div><div class="line">172.10.1.3 WSS1-03.BIGMKT1.COM</div><div class="line">172.10.1.4 WSS1-04.BIGMKT1.COM</div><div class="line">172.10.1.5 WSS1-05.BIGMKT1.COM</div></pre></td></tr></table></figure>
+<h3 id="数据格式"><a href="#数据格式" class="headerlink" title="数据格式"></a>数据格式</h3><h4 id="IPS-syslog-week2-csv"><a href="#IPS-syslog-week2-csv" class="headerlink" title="IPS-syslog-week2.csv"></a>IPS-syslog-week2.csv</h4><p>入侵防护系统（IPS）监视和记录网络活动。当它识别出明显的恶意活动时，IPS会尝试阻止或阻止该活动。在这种情况下，Big Marketing使用启用了威胁检测机制的思科自适应安全设备型号ASA5510。 IPS配置了默认检测规则以及特定于站点的专用规则。</p>
+<p>Message code, inthe format &lt; ASA-n-nnnnnn &gt;  具体的txt需要到表里进行查找</p>
+<h4 id="bb-week2-csv"><a href="#bb-week2-csv" class="headerlink" title="bb-week2.csv"></a>bb-week2.csv</h4><p>在网络上安装了名为Big Brother的商业网络健康监控程序。 大约每五分钟，每个工作站和服务器发送一次状态更新。</p>
+<p>bbcontent这条比较长，长这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Wed Apr 10 07:56:14 PDT 2013 [WEB02B.BIGMKT2.COM] up: 18 days, 1 users, 38 procs, load=0%, PhysicalMem: 4GB(14%)\n\n\n\nMemory Statistics\nTotal Physical memory:           4294500352 bytes (4.00GB)\nAvailable Physical memory:       3698483200 bytes (3.45GB)\nTotal PageFile size:             8587112448 bytes (8.00GB)\nAvailable PageFile size:         8004886528 bytes (7.46GB)\nTotal Virtual memory size:       8587112448 bytes (8.00GB)\nAvailable Virtual memory size:   8006012928 bytes (7.46GB)\n\nMost active processes\n00.07%\tvmtoolsd (0x49c [1180])\n00.03%\tsvchost#3 (0x308 [776])\n00.01%\tWmiPrvSE (0x730 [1840])\n00.01%\tw3wp (0x464 [1124])\n00.01%\tSystem (0x4 [4])\n00.01%\tsvchost#2 (0x2cc [716])\n00.01%\tsvchost#1 (0x27c [636])\n00.01%\tlsass (0x1d0 [464])\n00.01%\tbbnt (0x424 [1060])\n00.00%\twinlogon (0x188 [392])\n\n\nStatus unchanged in 59.98 minutes\nStatus message received from 172.20.0.6\n</div></pre></td></tr></table></figure>
+<h4 id="nf-week2-csv"><a href="#nf-week2-csv" class="headerlink" title="nf-week2.csv"></a>nf-week2.csv</h4><p>Big Marketing捕获防火墙的网络流量，因此可以捕获从Big Marketing到互联网，或从互联网进入Big Marketing的transactions。 在网络流数据中，两台计算机之间的一系列消息被组合成一个流记录。 虽然每个流记录包括源和目标IP，但源和目标的指定不保证是正确的。 在流收集器未捕获流中的初始事务并且将响应视为第一事务的情况下，目标IP可被标记为源IP，反之亦然。 下表描述了网络流表中的字段。</p>
+<h2 id="登录日志"><a href="#登录日志" class="headerlink" title="登录日志"></a>登录日志</h2><ul>
+<li><strong>auth.log</strong> 主要是都是登录失败的日志 适合用作判断是爆破登录还是正常的输错密码</li>
+<li>内容类型: 主机行为</li>
+<li>是否特征化：否</li>
+<li>使用范围: 入侵检测 异常流量 WAF(网站应用级入侵防御系统)</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+    
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+  
+</div>
+    
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="metang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/aipay.jpg" alt="metang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/日志审计/" rel="tag"><i class="fa fa-tag"></i> 日志审计</a>
+          
+            <a href="/tags/异常检测/" rel="tag"><i class="fa fa-tag"></i> 异常检测</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/[日志分析]smartd使用/" rel="next" title="smartd的安装及使用">
+                <i class="fa fa-chevron-left"></i> smartd的安装及使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.JPG"
+                alt="metang" />
+            
+              <p class="site-author-name" itemprop="name">metang</p>
+              <p class="site-description motion-element" itemprop="description">from Nuaa</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/metang326" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="534747943@qq.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#KDD99"><span class="nav-number">1.</span> <span class="nav-text">KDD99</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VAST-Challenge-2013-Mini-Challenge-3数据集"><span class="nav-number">2.</span> <span class="nav-text">VAST Challenge 2013: Mini-Challenge 3数据集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#比赛提出的任务"><span class="nav-number">2.1.</span> <span class="nav-text">比赛提出的任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据格式"><span class="nav-number">2.2.</span> <span class="nav-text">数据格式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#IPS-syslog-week2-csv"><span class="nav-number">2.2.1.</span> <span class="nav-text">IPS-syslog-week2.csv</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#bb-week2-csv"><span class="nav-number">2.2.2.</span> <span class="nav-text">bb-week2.csv</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#nf-week2-csv"><span class="nav-number">2.2.3.</span> <span class="nav-text">nf-week2.csv</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#登录日志"><span class="nav-number">3.</span> <span class="nav-text">登录日志</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">metang</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>
