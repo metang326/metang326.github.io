@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #199475; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #0B6E48, 0 0 5px     #0B6E48; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #044D22;    /*上边框颜色*/
+        border-left-color: #044D22;    /*左边框颜色*/
+    }
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/trojan_32px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/trojan_16px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="恶意软件检测,沙箱,cuckoo," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="沙盒(Sanbox)是一种将未知、不可信的软件隔离执行的安全机制。恶意软件分析沙盒一般用来将不可信软件放在隔离环境中自动地动态执行，然后提取其运行过程中的进程行为、网络行为、文件行为等动态行为，安全研究员可以根据这些行为分析结果对恶意软件进行更深入地分析。为了搭建一个运行恶意样本的隔离环境，近期调研了cuckoo沙箱，实现了host与多guest机的配置，并且可以通过api提交样本自动化运行。">
+<meta name="keywords" content="恶意软件检测,沙箱,cuckoo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cuckoo沙箱安装笔记">
+<meta property="og:url" content="http://yoursite.com/2019/10/13/[恶意软件检测]cuckoo沙箱安装笔记/index.html">
+<meta property="og:site_name" content="metang&#39;s blog">
+<meta property="og:description" content="沙盒(Sanbox)是一种将未知、不可信的软件隔离执行的安全机制。恶意软件分析沙盒一般用来将不可信软件放在隔离环境中自动地动态执行，然后提取其运行过程中的进程行为、网络行为、文件行为等动态行为，安全研究员可以根据这些行为分析结果对恶意软件进行更深入地分析。为了搭建一个运行恶意样本的隔离环境，近期调研了cuckoo沙箱，实现了host与多guest机的配置，并且可以通过api提交样本自动化运行。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-10-27T05:41:06.958Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="cuckoo沙箱安装笔记">
+<meta name="twitter:description" content="沙盒(Sanbox)是一种将未知、不可信的软件隔离执行的安全机制。恶意软件分析沙盒一般用来将不可信软件放在隔离环境中自动地动态执行，然后提取其运行过程中的进程行为、网络行为、文件行为等动态行为，安全研究员可以根据这些行为分析结果对恶意软件进行更深入地分析。为了搭建一个运行恶意样本的隔离环境，近期调研了cuckoo沙箱，实现了host与多guest机的配置，并且可以通过api提交样本自动化运行。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'TZVHEBFK02',
+      apiKey: '1ab48ccb78c0b1c98cf0e7935807338f',
+      indexName: 'my_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"输入关键字进行搜索","hits_empty":"找不到关于  ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/10/13/[恶意软件检测]cuckoo沙箱安装笔记/"/>
+
+
+
+
+
+  <title>cuckoo沙箱安装笔记 | metang's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/metang326"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">metang's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In case I don't see ya', good afternoon, good evening and goodnight.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/13/[恶意软件检测]cuckoo沙箱安装笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="metang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="metang's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">cuckoo沙箱安装笔记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-13T00:00:00+08:00">
+                2019-10-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/恶意软件检测/" itemprop="url" rel="index">
+                    <span itemprop="name">恶意软件检测</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,395
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>沙盒(Sanbox)</strong>是一种将未知、不可信的软件隔离执行的安全机制。恶意软件分析沙盒一般用来将不可信软件放在隔离环境中自动地动态执行，然后提取其运行过程中的进程行为、网络行为、文件行为等动态行为，安全研究员可以根据这些行为分析结果对恶意软件进行更深入地分析。为了搭建一个运行恶意样本的隔离环境，近期调研了cuckoo沙箱，实现了host与多guest机的配置，并且可以通过api提交样本自动化运行。</p>
+<a id="more"></a>
+<h1 id="安装参考教程"><a href="#安装参考教程" class="headerlink" title="安装参考教程"></a>安装参考教程</h1><ol>
+<li>很详细的一篇：<a href="https://blog.csdn.net/Bingoooooo_/article/details/94248229" target="_blank" rel="external">https://blog.csdn.net/Bingoooooo_/article/details/94248229</a></li>
+<li>总体步骤正确：<a href="https://www.jianshu.com/p/ac009f6c2710" target="_blank" rel="external">https://www.jianshu.com/p/ac009f6c2710</a></li>
+</ol>
+<h1 id="安装过程遇到的问题"><a href="#安装过程遇到的问题" class="headerlink" title="安装过程遇到的问题"></a>安装过程遇到的问题</h1><p>按照参考1基本就可以完成沙箱的配置，但是中途还是会踩坑，记录一下。</p>
+<h2 id="1-运行cuckoo报错ImportError-lib-so–cannot-open-shared-object-file-No-such-file-or-directory"><a href="#1-运行cuckoo报错ImportError-lib-so–cannot-open-shared-object-file-No-such-file-or-directory" class="headerlink" title="1. 运行cuckoo报错ImportError:lib*.so–cannot open shared object file: No such file or directory"></a>1. 运行cuckoo报错ImportError:lib<em>*</em>.so–cannot open shared object file: No such file or directory</h2><ul>
+<li><p>解决方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">软链接方式</div><div class="line">    1.1 找到文件</div><div class="line"></div><div class="line">            find  /  -name  lib**.so   (缺失的动态链接库)  </div><div class="line"></div><div class="line">    1.2 建立软链接</div><div class="line"></div><div class="line">            ln - /path/to/lib**.so   /usr/lib</div><div class="line"></div><div class="line">     1.3 sudo ldconfig</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="2-运行cuckoo报错AttributeError-Rules-instance-has-no-attribute-‘save’"><a href="#2-运行cuckoo报错AttributeError-Rules-instance-has-no-attribute-‘save’" class="headerlink" title="2. 运行cuckoo报错AttributeError: Rules instance has no attribute ‘save’"></a>2. 运行cuckoo报错AttributeError: Rules instance has no attribute ‘save’</h2><p>Please pip uninstall yara. It’s very outdated and we’re using yara-python==3.6.3 instead.</p>
+<ul>
+<li>解决方法：照着提示做</li>
+</ul>
+<h2 id="3-cuckoo配置过程中mongo数据库没有用户"><a href="#3-cuckoo配置过程中mongo数据库没有用户" class="headerlink" title="3. cuckoo配置过程中mongo数据库没有用户"></a>3. cuckoo配置过程中mongo数据库没有用户</h2><ul>
+<li>解决方法：<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">在cukcoo_db的数据库里加入用户：</div><div class="line">    db.createUser(  </div><div class="line">      &#123;  </div><div class="line">        user: &quot;admin&quot;,  </div><div class="line">        pwd: &quot;admin&quot;,  </div><div class="line">        roles: [ &#123; role: &quot;userAdminAnyDatabase&quot;, db: &quot;admin&quot; &#125; ]  </div><div class="line">      &#125;  </div><div class="line">    )</div><div class="line"></div><div class="line">    mongo --port 27017 -u &quot;admin&quot; -p &quot;admin&quot; --authenticationDatabase &quot;admin&quot;</div><div class="line">    </div><div class="line">    db.createUser( &#123; user: &quot;tmy&quot;, pwd: &quot;pwd&quot;, roles: [ &#123; role: &quot;readWrite&quot;, db: &quot;cuckoo_db&quot; &#125; ] &#125;)</div><div class="line">    </div><div class="line">    mongo --host localhost:27017 -u tmy -p pwd --authenticationDatabase admin</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="4-pip-install-MySQL-python报错"><a href="#4-pip-install-MySQL-python报错" class="headerlink" title="4. pip install MySQL-python报错"></a>4. pip install MySQL-python报错</h2><ul>
+<li>解决方法：先sudo apt-get install libmysqlclient-dev，然后pip install</li>
+</ul>
+<h2 id="5-最大打开文件数量太小"><a href="#5-最大打开文件数量太小" class="headerlink" title="5. 最大打开文件数量太小"></a>5. 最大打开文件数量太小</h2><ul>
+<li><p>解决方法：修改最大打开文件数量</p>
+<figure class="highlight plain"><figcaption><span>sudo echo 1000000 > sudo</span><a href="/proc/sys/fs/nr_open">link</a></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ ulimit -n</div><div class="line">1024</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ cat /proc/sys/fs/nr_open</div><div class="line">1000000</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ ulimit -n 1000000</div><div class="line">bash: ulimit: open files: 无法修改 limit 值: 不允许的操作</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ sudo ulimit -n 1000000</div><div class="line">sudo: ulimit：找不到命令</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$  sudo vi /etc/security/limits.conf</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ ulimit -n</div><div class="line">1024</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ sudo sh -c &quot;ulimit -n 65535 &amp;&amp; exec su $LOGNAME&quot;</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ ulimit -n</div><div class="line">500000</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ . venv/bin/activate</div><div class="line">(venv) tangmingyu@tangmingyu-QiTianM610-D529:~$ ulimit -n</div><div class="line">500000</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="6-win7虚拟机之前一直连不上外网"><a href="#6-win7虚拟机之前一直连不上外网" class="headerlink" title="6. win7虚拟机之前一直连不上外网"></a>6. win7虚拟机之前一直连不上外网</h2><ul>
+<li>解决方法：开启iptables的转发<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@tangmingyu-QiTianM610-D529:~# </div><div class="line">iptables -P FORWARD ACCEPT</div><div class="line">iptables -P FORWARD ACCEPT</div><div class="line">iptables -A FORWARD -o eth0 -i vboxnet0 -s 192.168.2.0/24 -m conntrack --ctstate NEW -j ACCEPT</div><div class="line">iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT</div><div class="line">iptables -A POSTROUTING -t nat -j MASQUERADE</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="7-软件提交之后一直是pending状态"><a href="#7-软件提交之后一直是pending状态" class="headerlink" title="7. 软件提交之后一直是pending状态"></a>7. 软件提交之后一直是pending状态</h2><ul>
+<li>解决方法：原因是virtual manager的地址写成了virtual box</li>
+</ul>
+<p><a href="https://github.com/cuckoosandbox/cuckoo/issues/2346" target="_blank" rel="external">https://github.com/cuckoosandbox/cuckoo/issues/2346</a></p>
+<h2 id="8-如果系统没启用root账户，由于-tcpdump-的执行需要-root-权限，则需要以下配置"><a href="#8-如果系统没启用root账户，由于-tcpdump-的执行需要-root-权限，则需要以下配置" class="headerlink" title="8.如果系统没启用root账户，由于 tcpdump 的执行需要 root 权限，则需要以下配置:"></a>8.如果系统没启用root账户，由于 tcpdump 的执行需要 root 权限，则需要以下配置:</h2><figure class="highlight plain"><figcaption><span>sudo setcap cap_net_raw,cap_net_admin</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">sudo chmod +s /usr/sbin/tcpdump</div><div class="line">以上方法都试过，没有用。</div><div class="line">后来搜到了官方给的，成功了：</div><div class="line">sudo apt-get install apparmor-utils</div><div class="line">sudo aa-disable /usr/sbin/tcpdump</div><div class="line">https://cuckoo.sh/docs/faq/index.html#permission-denied-for-tcpdump</div></pre></td></tr></table></figure>
+<h2 id="9-mongo数据库的验证：db-auth-‘admin’-‘admin’-返回1表示成功"><a href="#9-mongo数据库的验证：db-auth-‘admin’-‘admin’-返回1表示成功" class="headerlink" title="9. mongo数据库的验证：db.auth(‘admin’, ‘admin’)  返回1表示成功"></a>9. mongo数据库的验证：db.auth(‘admin’, ‘admin’)  返回1表示成功</h2><h2 id="10-验证guest是否成功连接上："><a href="#10-验证guest是否成功连接上：" class="headerlink" title="10. 验证guest是否成功连接上："></a>10. 验证guest是否成功连接上：</h2><pre><code>tangmingyu@tangmingyu-QiTianM610-D529:~$ curl 192.168.2.200:8000
+{&quot;message&quot;: &quot;Cuckoo Agent!&quot;, &quot;version&quot;: &quot;0.10&quot;, &quot;features&quot;: [&quot;execpy&quot;, &quot;pinning&quot;, &quot;logs&quot;, &quot;largefile&quot;, &quot;unicodepath&quot;]}
+</code></pre><h2 id="11-error-fetching-configuration-file"><a href="#11-error-fetching-configuration-file" class="headerlink" title="11. error fetching configuration file"></a>11. error fetching configuration file</h2><pre><code>一定要以管理员身份运行agent
+</code></pre><h2 id="12-多guest配置"><a href="#12-多guest配置" class="headerlink" title="12. 多guest配置"></a>12. 多guest配置</h2><ul>
+<li>解决方法：<br>主要参考了<a href="https://blog.csdn.net/weixin_42651205/article/details/83900436" target="_blank" rel="external">https://blog.csdn.net/weixin_42651205/article/details/83900436</a><br>照着做就可以，注意完全克隆虚拟机，然后改镜像名称和host添加新增虚拟机的配置。<br>不过我的虚拟机原本设置的是没有密码，复制虚拟机后初始化时突然要输入用户名和密码了，账号：Administrator；密码为空试一下，成功进去了，然后再调用的时候就不用密码了。</li>
+</ul>
+<h1 id="沙箱运行情况"><a href="#沙箱运行情况" class="headerlink" title="沙箱运行情况"></a>沙箱运行情况</h1><h2 id="运行方式"><a href="#运行方式" class="headerlink" title="运行方式"></a>运行方式</h2><blockquote>
+<p> . venv/bin/activate</p>
+<p>一个终端运行cuckoo -d；另一个运行cuckoo web</p>
+</blockquote>
+<p>VIRUSTOTAL获取样本恶意数据库情况：最近不能翻墙，连不上<br>替代：<a href="https://metadefender.opswat.com" target="_blank" rel="external">https://metadefender.opswat.com</a></p>
+<p>有弹窗的情况下就会截图，安装软件的时候会自己点击next，一直到安装好软件并运行。如果卡在某个步骤了，会自动定时退出。</p>
+<p>一份完整的报告大概都要90MB，其中所占空间最大的是memory、report也有十几兆</p>
+<p>报告中还会给软件打分，但是说仅供参考<br>Please notice: The scoring system is currently still in development and should be considered an alpha feature.</p>
+<h2 id="配置api自动化提交"><a href="#配置api自动化提交" class="headerlink" title="配置api自动化提交"></a>配置api自动化提交</h2><p><a href="https://cuckoo.readthedocs.io/en/latest/usage/api/#" target="_blank" rel="external">https://cuckoo.readthedocs.io/en/latest/usage/api/#</a><br>直接cuckoo api</p>
+<blockquote>
+<p>(venv) tangmingyu@tangmingyu-QiTianM610-D529:~/venv/bin$ cuckoo api<br>2019-09-18 21:17:27,179 [werkzeug] INFO:  * Running on <a href="http://localhost:8090/" target="_blank" rel="external">http://localhost:8090/</a> (Press CTRL+C to quit)</p>
+</blockquote>
+<p>通过命令行就可以提交样本自动分析了。</p>
+<p>然后查看cuckoo.conf中的api_token = bZ0mLmUX2QElehFjI33OOQ</p>
+<blockquote>
+<p>curl -H “Authorization: Bearer bZ0mLmUX2QElehFjI33OOQ”  -F file=@/home/tangmingyu/文档/安全沙箱安装/恶意软件样本/test1.exe <a href="http://localhost:8090/tasks/create/file" target="_blank" rel="external">http://localhost:8090/tasks/create/file</a></p>
+</blockquote>
+<p>python脚本提交样本：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">import requests</div><div class="line"></div><div class="line">REST_URL = &quot;http://localhost:9090/tasks/create/file&quot;</div><div class="line">SAMPLE_FILE = &quot;/home/tangmingyu/文档/安全沙箱安装/恶意软件样本/test1.exe&quot;</div><div class="line">HEADERS = &#123;&quot;Authorization&quot;: &quot;Bearer bZ0mLmUX2QElehFjI33OOQ&quot;&#125;</div><div class="line"></div><div class="line">with open(SAMPLE_FILE, &quot;rb&quot;) as sample:</div><div class="line">    files = &#123;&quot;file&quot;: (&quot;temp_file_name&quot;, sample)&#125;</div><div class="line">    r = requests.post(REST_URL, headers=HEADERS, files=files)</div><div class="line"></div><div class="line"></div><div class="line">SAMPLE_FILE = &quot;/home/tangmingyu/文档/安全沙箱安装/恶意软件样本/test2.exe&quot;</div><div class="line">HEADERS = &#123;&quot;Authorization&quot;: &quot;Bearer bZ0mLmUX2QElehFjI33OOQ&quot;&#125;</div><div class="line"></div><div class="line">with open(SAMPLE_FILE, &quot;rb&quot;) as sample:</div><div class="line">    files = &#123;&quot;file&quot;: (&quot;temp_file_name&quot;, sample)&#125;</div><div class="line">    r = requests.post(REST_URL, headers=HEADERS, files=files)</div><div class="line"></div><div class="line"># Add your code to error checking for r.status_code.</div><div class="line"></div><div class="line">task_id = r.json()[&quot;task_id&quot;]</div></pre></td></tr></table></figure></p>
+<p>sudo /usr/bin/mongod -f /etc/mongodb.conf</p>
+<h2 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h2><p>mysql存的是提交任务时间 虚拟机配置之类的信息；mongo存储的是软件提交运行之后，产生的那些分析数据。</p>
+<ul>
+<li><p>好用的mong数据库可视化工具adminMongo：</p>
+<p><a href="https://www.cnblogs.com/zhangycun/p/10534123.html" target="_blank" rel="external">https://www.cnblogs.com/zhangycun/p/10534123.html</a></p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+    
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+  
+</div>
+    
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="metang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/aipay.jpg" alt="metang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/恶意软件检测/" rel="tag"><i class="fa fa-tag"></i> 恶意软件检测</a>
+          
+            <a href="/tags/沙箱/" rel="tag"><i class="fa fa-tag"></i> 沙箱</a>
+          
+            <a href="/tags/cuckoo/" rel="tag"><i class="fa fa-tag"></i> cuckoo</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/[日志分析]audit监控进程/" rel="next" title="audit监控进程的使用">
+                <i class="fa fa-chevron-left"></i> audit监控进程的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.JPG"
+                alt="metang" />
+            
+              <p class="site-author-name" itemprop="name">metang</p>
+              <p class="site-description motion-element" itemprop="description">from Nuaa</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/metang326" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="534747943@qq.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装参考教程"><span class="nav-number">1.</span> <span class="nav-text">安装参考教程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装过程遇到的问题"><span class="nav-number">2.</span> <span class="nav-text">安装过程遇到的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-运行cuckoo报错ImportError-lib-so–cannot-open-shared-object-file-No-such-file-or-directory"><span class="nav-number">2.1.</span> <span class="nav-text">1. 运行cuckoo报错ImportError:lib*.so–cannot open shared object file: No such file or directory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-运行cuckoo报错AttributeError-Rules-instance-has-no-attribute-‘save’"><span class="nav-number">2.2.</span> <span class="nav-text">2. 运行cuckoo报错AttributeError: Rules instance has no attribute ‘save’</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-cuckoo配置过程中mongo数据库没有用户"><span class="nav-number">2.3.</span> <span class="nav-text">3. cuckoo配置过程中mongo数据库没有用户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-pip-install-MySQL-python报错"><span class="nav-number">2.4.</span> <span class="nav-text">4. pip install MySQL-python报错</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-最大打开文件数量太小"><span class="nav-number">2.5.</span> <span class="nav-text">5. 最大打开文件数量太小</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-win7虚拟机之前一直连不上外网"><span class="nav-number">2.6.</span> <span class="nav-text">6. win7虚拟机之前一直连不上外网</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-软件提交之后一直是pending状态"><span class="nav-number">2.7.</span> <span class="nav-text">7. 软件提交之后一直是pending状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-如果系统没启用root账户，由于-tcpdump-的执行需要-root-权限，则需要以下配置"><span class="nav-number">2.8.</span> <span class="nav-text">8.如果系统没启用root账户，由于 tcpdump 的执行需要 root 权限，则需要以下配置:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-mongo数据库的验证：db-auth-‘admin’-‘admin’-返回1表示成功"><span class="nav-number">2.9.</span> <span class="nav-text">9. mongo数据库的验证：db.auth(‘admin’, ‘admin’)  返回1表示成功</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-验证guest是否成功连接上："><span class="nav-number">2.10.</span> <span class="nav-text">10. 验证guest是否成功连接上：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-error-fetching-configuration-file"><span class="nav-number">2.11.</span> <span class="nav-text">11. error fetching configuration file</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12-多guest配置"><span class="nav-number">2.12.</span> <span class="nav-text">12. 多guest配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#沙箱运行情况"><span class="nav-number">3.</span> <span class="nav-text">沙箱运行情况</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#运行方式"><span class="nav-number">3.1.</span> <span class="nav-text">运行方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置api自动化提交"><span class="nav-number">3.2.</span> <span class="nav-text">配置api自动化提交</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库"><span class="nav-number">3.3.</span> <span class="nav-text">数据库</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">metang</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>
