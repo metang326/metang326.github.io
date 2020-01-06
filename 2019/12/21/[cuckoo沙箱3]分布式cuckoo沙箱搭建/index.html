@@ -97,14 +97,14 @@
 <meta name="description" content="因为分布式cuckoo沙箱在网上没看到什么教程，所以期间还走了挺多弯路，根本原因就是没有仔细地看一遍官方的手册，遗漏了一些细节。所以强烈建议搭建沙箱时完整看一遍官方的手册，网上的教程虽然看着方便但还是没这个全面。 最终实现的理想分布式cuckoo是：server控制n个worker，每个worker的virtualbox上配置了m个虚拟机。实现n*m个虚拟机同时运行恶意软件样本。">
 <meta name="keywords" content="cuckoo沙箱,恶意软件检测">
 <meta property="og:type" content="article">
-<meta property="og:title" content="分布式cuckoo沙箱搭建">
+<meta property="og:title" content="【cuckoo沙箱系列3】分布式cuckoo沙箱搭建">
 <meta property="og:url" content="http://yoursite.com/2019/12/21/[cuckoo沙箱3]分布式cuckoo沙箱搭建/index.html">
 <meta property="og:site_name" content="metang&#39;s blog">
 <meta property="og:description" content="因为分布式cuckoo沙箱在网上没看到什么教程，所以期间还走了挺多弯路，根本原因就是没有仔细地看一遍官方的手册，遗漏了一些细节。所以强烈建议搭建沙箱时完整看一遍官方的手册，网上的教程虽然看着方便但还是没这个全面。 最终实现的理想分布式cuckoo是：server控制n个worker，每个worker的virtualbox上配置了m个虚拟机。实现n*m个虚拟机同时运行恶意软件样本。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-01-06T09:50:52.175Z">
+<meta property="og:updated_time" content="2020-01-06T11:16:17.953Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="分布式cuckoo沙箱搭建">
+<meta name="twitter:title" content="【cuckoo沙箱系列3】分布式cuckoo沙箱搭建">
 <meta name="twitter:description" content="因为分布式cuckoo沙箱在网上没看到什么教程，所以期间还走了挺多弯路，根本原因就是没有仔细地看一遍官方的手册，遗漏了一些细节。所以强烈建议搭建沙箱时完整看一遍官方的手册，网上的教程虽然看着方便但还是没这个全面。 最终实现的理想分布式cuckoo是：server控制n个worker，每个worker的virtualbox上配置了m个虚拟机。实现n*m个虚拟机同时运行恶意软件样本。">
 
 
@@ -141,7 +141,7 @@
 
 
 
-  <title>分布式cuckoo沙箱搭建 | metang's blog</title>
+  <title>【cuckoo沙箱系列3】分布式cuckoo沙箱搭建 | metang's blog</title>
   
 
 
@@ -335,7 +335,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">分布式cuckoo沙箱搭建</h1>
+          <h1 class="post-title" itemprop="name headline">【cuckoo沙箱系列3】分布式cuckoo沙箱搭建</h1>
         
 
         <div class="post-meta">
@@ -403,7 +403,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  826
+                  823
                 </span>
               
 
@@ -442,28 +442,28 @@
 <p><strong>开启server后，可以通过web访问查看各个挂载到server的worker节点的情况：</strong></p>
 <p><a href="http://192.168.105.127:9003/" target="_blank" rel="external">http://192.168.105.127:9003/</a></p>
 <p><strong>挂载成功的worker节点在Active processes这里会变成绿色的，如果是红色的，则可能是supervisorctl启动有问题。</strong></p>
-<h2 id="worker节点部署"><a href="#worker节点部署" class="headerlink" title="worker节点部署"></a>worker节点部署</h2><ol>
+<h2 id="worker节点部署"><a href="#worker节点部署" class="headerlink" title="worker节点部署"></a>worker节点部署</h2><ul>
 <li>需要在cuckoo config配置里把api调用的验证token去掉：</li>
-</ol>
+</ul>
 <blockquote>
 <p>api_token =<br># api_token = bZ0mLmUX2QElehFjI33OOQ</p>
 </blockquote>
-<ol>
+<ul>
 <li>开启api</li>
-</ol>
+</ul>
 <blockquote>
 <p>nohup cuckoo api –host 192.168.2.136 &amp;</p>
 </blockquote>
-<ol>
+<ul>
 <li>注册当前节点到server</li>
-</ol>
+</ul>
 <blockquote>
 <p>curl <a href="http://192.168.105.127:9003/api/node" target="_blank" rel="external">http://192.168.105.127:9003/api/node</a> -F name=tmy -F url=<a href="http://192.168.2.136:8090/" target="_blank" rel="external">http://192.168.2.136:8090/</a></p>
 </blockquote>
-<ol>
-<li>开启后台cuckoo<br><a href="https://cuckoo.sh/docs/usage/start.html#cuckoo-in-the-background" target="_blank" rel="external">https://cuckoo.sh/docs/usage/start.html#cuckoo-in-the-background</a><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">supervisord -c supervisord.conf</div><div class="line">supervisorctl start cuckoo:</div><div class="line">supervisorctl start distributed</div></pre></td></tr></table></figure>
-</li>
-</ol>
+<ul>
+<li>开启后台cuckoo<br><a href="https://cuckoo.sh/docs/usage/start.html#cuckoo-in-the-background" target="_blank" rel="external">https://cuckoo.sh/docs/usage/start.html#cuckoo-in-the-background</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">supervisord -c supervisord.conf</div><div class="line">supervisorctl start cuckoo:</div><div class="line">supervisorctl start distributed</div></pre></td></tr></table></figure>
 <p><strong>如果修改了cuckoo的配置，需要supervisorctl stop cuckoo:停止之后重启。</strong></p>
 <p>之前有尝试过修改mongo数据库地址，只是重启了cuckoo -d没有stop，这种情况下提交样本后报告存储的路径还是旧的mongo地址。</p>
 <h1 id="ditributed下发任务到指定node"><a href="#ditributed下发任务到指定node" class="headerlink" title="ditributed下发任务到指定node"></a>ditributed下发任务到指定node</h1><p>python代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">import requests</div><div class="line"></div><div class="line">REST_URL = &quot;http://192.168.105.127:9003/api/task&quot;</div><div class="line">SAMPLE_FILE = &quot;/home/tangmingyu/TEST_CUCKOO/f-mydoom.exe&quot;</div><div class="line">params = &#123;</div><div class="line">    &apos;timeout&apos;:60,</div><div class="line">    &apos;priority&apos;:6,</div><div class="line">    &apos;node&apos;: &apos;tmy&apos;</div><div class="line">&#125;</div><div class="line">with open(SAMPLE_FILE, &quot;rb&quot;) as sample:</div><div class="line">    files = &#123;&quot;file&quot;: (&quot;temp_file_name&quot;, sample)&#125;</div><div class="line">    print files</div><div class="line">    r = requests.post(REST_URL, files=files,data=params)</div><div class="line"></div><div class="line">print r.status_code</div><div class="line">print r.text</div></pre></td></tr></table></figure></p>
@@ -572,8 +572,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/12/21/[cuckoo沙箱2]在虚拟机搭建单节点cuckoo/" rel="next" title="在虚拟机搭建单节点cuckoo沙箱">
-                <i class="fa fa-chevron-left"></i> 在虚拟机搭建单节点cuckoo沙箱
+              <a href="/2019/12/21/[cuckoo沙箱2]在虚拟机搭建单节点cuckoo/" rel="next" title="【cuckoo沙箱系列2】在虚拟机搭建单节点cuckoo沙箱">
+                <i class="fa fa-chevron-left"></i> 【cuckoo沙箱系列2】在虚拟机搭建单节点cuckoo沙箱
               </a>
             
           </div>
@@ -582,8 +582,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/12/21/[cuckoo沙箱0]总体框架介绍/" rel="prev" title="cuckoo沙箱总体框架介绍">
-                cuckoo沙箱总体框架介绍 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/12/21/[cuckoo沙箱1]在物理机搭建单节点cuckoo/" rel="prev" title="【cuckoo沙箱系列1】在物理机搭建单节点cuckoo沙箱">
+                【cuckoo沙箱系列1】在物理机搭建单节点cuckoo沙箱 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>

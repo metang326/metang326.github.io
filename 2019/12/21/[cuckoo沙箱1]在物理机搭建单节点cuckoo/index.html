@@ -97,14 +97,14 @@
 <meta name="description" content="最基础的搭建步骤就是在单个物理机节点部署cuckoo，能够调用配置好的virtual box完成运行任务并产生报告。在搭建好了单个cuckoo之后，可以考虑进阶的分布式搭建。">
 <meta name="keywords" content="cuckoo沙箱,恶意软件检测">
 <meta property="og:type" content="article">
-<meta property="og:title" content="在物理机搭建单节点cuckoo沙箱">
+<meta property="og:title" content="【cuckoo沙箱系列1】在物理机搭建单节点cuckoo沙箱">
 <meta property="og:url" content="http://yoursite.com/2019/12/21/[cuckoo沙箱1]在物理机搭建单节点cuckoo/index.html">
 <meta property="og:site_name" content="metang&#39;s blog">
 <meta property="og:description" content="最基础的搭建步骤就是在单个物理机节点部署cuckoo，能够调用配置好的virtual box完成运行任务并产生报告。在搭建好了单个cuckoo之后，可以考虑进阶的分布式搭建。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-01-06T08:21:47.269Z">
+<meta property="og:updated_time" content="2020-01-06T11:14:03.010Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="在物理机搭建单节点cuckoo沙箱">
+<meta name="twitter:title" content="【cuckoo沙箱系列1】在物理机搭建单节点cuckoo沙箱">
 <meta name="twitter:description" content="最基础的搭建步骤就是在单个物理机节点部署cuckoo，能够调用配置好的virtual box完成运行任务并产生报告。在搭建好了单个cuckoo之后，可以考虑进阶的分布式搭建。">
 
 
@@ -141,7 +141,7 @@
 
 
 
-  <title>在物理机搭建单节点cuckoo沙箱 | metang's blog</title>
+  <title>【cuckoo沙箱系列1】在物理机搭建单节点cuckoo沙箱 | metang's blog</title>
   
 
 
@@ -335,7 +335,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">在物理机搭建单节点cuckoo沙箱</h1>
+          <h1 class="post-title" itemprop="name headline">【cuckoo沙箱系列1】在物理机搭建单节点cuckoo沙箱</h1>
         
 
         <div class="post-meta">
@@ -403,7 +403,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1,067
+                  1,056
                 </span>
               
 
@@ -451,19 +451,19 @@
 </blockquote>
 <p>查看cuckoo.conf中的api_token = bZ0mLmUX2QElehFjI33OOQ，把这边注释掉就不需要api_token的验证了，比较省事。</p>
 <h2 id="python脚本提交样本"><a href="#python脚本提交样本" class="headerlink" title="python脚本提交样本"></a>python脚本提交样本</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">import requests</div><div class="line"></div><div class="line">REST_URL = &quot;http://localhost:8090/tasks/create/file&quot;</div><div class="line">SAMPLE_FILE = &quot;/home/tangmingyu/文档/安全沙箱安装/恶意软件样本/test1.exe&quot;</div><div class="line"></div><div class="line">with open(SAMPLE_FILE, &quot;rb&quot;) as sample:</div><div class="line">    files = &#123;&quot;file&quot;: (&quot;temp_file_name&quot;, sample)&#125;</div><div class="line">    r = requests.post(REST_URL, files=files)</div></pre></td></tr></table></figure>
-<h1 id="安装过程遇到的问题"><a href="#安装过程遇到的问题" class="headerlink" title="安装过程遇到的问题"></a>安装过程遇到的问题</h1><ol>
+<h1 id="安装过程遇到的问题"><a href="#安装过程遇到的问题" class="headerlink" title="安装过程遇到的问题"></a>安装过程遇到的问题</h1><ul>
 <li>运行cuckoo报错ImportError:lib<em>*</em>.so–cannot open shared object file: No such file or directory</li>
-</ol>
+</ul>
 <blockquote>
 <p>1-软链接方式<br>    1.1 找到文件<br>            find  /  -name  lib<strong>.so   (缺失的动态链接库)<br>    1.2 建立软链接<br>            ln - /path/to/lib</strong>.so   /usr/lib<br>     1.3 sudo ldconfig</p>
 </blockquote>
-<ol>
+<ul>
 <li>运行cuckoo报错AttributeError: Rules instance has no attribute ‘save’</li>
-</ol>
+</ul>
 <blockquote>
 <p>Please pip uninstall yara. It’s very outdated and we’re using yara-python==3.6.3 instead.</p>
 </blockquote>
-<ol>
+<ul>
 <li><p>pip install MySQL-python报错</p>
 <blockquote>
 <p>先sudo apt-get install libmysqlclient-dev，然后pip install</p>
@@ -475,13 +475,13 @@
 <li><p>win7虚拟机之前一直连不上外网</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">iptables -P FORWARD ACCEPT</div><div class="line">iptables -A FORWARD -o eth0 -i vboxnet0 -s 192.168.2.0/24 -m conntrack --ctstate NEW -j ACCEPT</div><div class="line">iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT</div><div class="line">iptables -A POSTROUTING -t nat -j MASQUERADE</div></pre></td></tr></table></figure>
 </li>
-</ol>
+</ul>
 <p>开启转发功能之后虚拟机可以连接外网了，但是本机可能就baidu都上不了。这时候需要修改一下vi /etc/resolv.conf，改为144.144.144.144</p>
-<ol>
+<ul>
 <li>提交之后task一直是pending状态，原因是virtual manager的地址写成了virtual box</li>
-</ol>
+</ul>
 <p><a href="https://github.com/cuckoosandbox/cuckoo/issues/2346" target="_blank" rel="external">https://github.com/cuckoosandbox/cuckoo/issues/2346</a></p>
-<ol>
+<ul>
 <li><p>如果系统没启用root账户，由于 tcpdump 的执行需要 root 权限，则需要以下配置:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">sudo setcap cap_net_raw,cap_net_admin=eip /usr/sbin/tcpdump</div><div class="line">sudo chmod +s /usr/sbin/tcpdump</div><div class="line">以上方法都试过，没有用。</div><div class="line"></div><div class="line">后来搜到了官方给的，成功了：</div><div class="line">sudo apt-get install apparmor-utils</div><div class="line">sudo aa-disable /usr/sbin/tcpdump</div><div class="line">https://cuckoo.sh/docs/faq/index.html#permission-denied-for-tcpdump</div></pre></td></tr></table></figure>
 </li>
@@ -496,7 +496,7 @@
 <p>账号：Administrator；密码为空试一下</p>
 </blockquote>
 </li>
-</ol>
+</ul>
 <h1 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h1><p>mysql存的是提交任务时间 虚拟机配置之类的信息；mongo存储的是软件提交运行之后，产生的那些分析数据。</p>
 <p>##好用的可视化mong数据库工具adminMongo<br>教程网址：<a href="https://www.cnblogs.com/zhangycun/p/10534123.html" target="_blank" rel="external">https://www.cnblogs.com/zhangycun/p/10534123.html</a></p>
 <p>开启方式：</p>
@@ -574,8 +574,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/10/13/[恶意软件检测]cuckoo沙箱安装笔记/" rel="next" title="cuckoo沙箱安装笔记">
-                <i class="fa fa-chevron-left"></i> cuckoo沙箱安装笔记
+              <a href="/2019/12/21/[cuckoo沙箱3]分布式cuckoo沙箱搭建/" rel="next" title="【cuckoo沙箱系列3】分布式cuckoo沙箱搭建">
+                <i class="fa fa-chevron-left"></i> 【cuckoo沙箱系列3】分布式cuckoo沙箱搭建
               </a>
             
           </div>
@@ -584,8 +584,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/12/21/[cuckoo沙箱2]在虚拟机搭建单节点cuckoo/" rel="prev" title="在虚拟机搭建单节点cuckoo沙箱">
-                在虚拟机搭建单节点cuckoo沙箱 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/12/21/[cuckoo沙箱0]总体框架介绍/" rel="prev" title="【cuckoo沙箱系列0】cuckoo沙箱总体框架介绍">
+                【cuckoo沙箱系列0】cuckoo沙箱总体框架介绍 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
