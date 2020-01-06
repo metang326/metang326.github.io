@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #199475; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #0B6E48, 0 0 5px     #0B6E48; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #044D22;    /*上边框颜色*/
+        border-left-color: #044D22;    /*左边框颜色*/
+    }
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/trojan_32px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/trojan_16px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="cuckoo沙箱,恶意软件检测," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="因为后续考虑要进行分布式沙箱的搭建，如果全部使用物理机作为cuckoo节点开销比较大（主要是没有地方放那么多主机…），因此后续我又调研了一下在虚拟机安装cuckoo的方法。其实cuckoo分析程序本身就是在命令行以及配置一些文件就ok的，难点主要在于给virtual box里面的虚拟机进行agent配置的时候，没有界面很难操作。因此需要用vnc开启远程桌面。">
+<meta name="keywords" content="cuckoo沙箱,恶意软件检测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在虚拟机搭建单节点cuckoo沙箱">
+<meta property="og:url" content="http://yoursite.com/2019/12/21/[cuckoo沙箱2]在虚拟机搭建单节点cuckoo/index.html">
+<meta property="og:site_name" content="metang&#39;s blog">
+<meta property="og:description" content="因为后续考虑要进行分布式沙箱的搭建，如果全部使用物理机作为cuckoo节点开销比较大（主要是没有地方放那么多主机…），因此后续我又调研了一下在虚拟机安装cuckoo的方法。其实cuckoo分析程序本身就是在命令行以及配置一些文件就ok的，难点主要在于给virtual box里面的虚拟机进行agent配置的时候，没有界面很难操作。因此需要用vnc开启远程桌面。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-01-06T08:38:50.337Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在虚拟机搭建单节点cuckoo沙箱">
+<meta name="twitter:description" content="因为后续考虑要进行分布式沙箱的搭建，如果全部使用物理机作为cuckoo节点开销比较大（主要是没有地方放那么多主机…），因此后续我又调研了一下在虚拟机安装cuckoo的方法。其实cuckoo分析程序本身就是在命令行以及配置一些文件就ok的，难点主要在于给virtual box里面的虚拟机进行agent配置的时候，没有界面很难操作。因此需要用vnc开启远程桌面。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'TZVHEBFK02',
+      apiKey: '1ab48ccb78c0b1c98cf0e7935807338f',
+      indexName: 'my_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"输入关键字进行搜索","hits_empty":"找不到关于  ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/12/21/[cuckoo沙箱2]在虚拟机搭建单节点cuckoo/"/>
+
+
+
+
+
+  <title>在虚拟机搭建单节点cuckoo沙箱 | metang's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/metang326"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">metang's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In case I don't see ya', good afternoon, good evening and goodnight.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/21/[cuckoo沙箱2]在虚拟机搭建单节点cuckoo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="metang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="metang's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在虚拟机搭建单节点cuckoo沙箱</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-21T00:00:00+08:00">
+                2019-12-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cuckoo沙箱/" itemprop="url" rel="index">
+                    <span itemprop="name">cuckoo沙箱</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,614
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>因为后续考虑要进行分布式沙箱的搭建，如果全部使用物理机作为cuckoo节点开销比较大（主要是没有地方放那么多主机…），因此后续我又调研了一下在虚拟机安装cuckoo的方法。其实cuckoo分析程序本身就是在命令行以及配置一些文件就ok的，难点主要在于给virtual box里面的虚拟机进行agent配置的时候，没有界面很难操作。因此需要用vnc开启远程桌面。</p>
+<a id="more"></a>
+<h1 id="1-安装环境准备"><a href="#1-安装环境准备" class="headerlink" title="1. 安装环境准备"></a>1. 安装环境准备</h1><p>pip临时清华源后缀：</p>
+<blockquote>
+<p>-i <a href="https://pypi.tuna.tsinghua.edu.cn/simple" target="_blank" rel="external">https://pypi.tuna.tsinghua.edu.cn/simple</a></p>
+</blockquote>
+<p>安装cuckoo的依赖：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">sudo apt-get update -y</div><div class="line">sudo apt-get upgrade -y</div><div class="line">sudo apt-get install python python-pip python-dev libffi-dev libssl-dev -y</div><div class="line">sudo apt-get install python-virtualenv python-setuptools -y</div><div class="line">sudo apt-get install libjpeg-dev zlib1g-dev swig -y</div><div class="line">sudo apt-get install mongodb -y</div><div class="line">sudo apt-get install mysql-server -y</div><div class="line">sudo apt-get install mysql-client -y</div><div class="line">sudo pip install -U cuckoo -i https://pypi.tuna.tsinghua.edu.cn/simple -y</div><div class="line">sudo apt-get install apparmor-utils -y</div><div class="line">sudo apt-get install libcap2-bin -y</div><div class="line">sudo apt-get install yara -y</div><div class="line">sudo apt-get install python-yara -y</div><div class="line">sudo apt-get install volatility -y</div><div class="line">sudo apt-get install python-psycopg2 -y</div><div class="line">sudo apt-get install libmysqld-dev -y</div><div class="line">sudo apt-get install python-mysqldb -y</div><div class="line"></div><div class="line">sudo apt install lrzsz -y   （用来传输文件）</div></pre></td></tr></table></figure>
+<h1 id="2-在虚拟的python环境中安装cuckoo"><a href="#2-在虚拟的python环境中安装cuckoo" class="headerlink" title="2. 在虚拟的python环境中安装cuckoo"></a>2. 在虚拟的python环境中安装cuckoo</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">virtualenv venv</div><div class="line">. venv/bin/activate</div><div class="line">(venv)$ pip install -U pip setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple</div><div class="line">(venv)$ pip install -U cuckoo -i https://pypi.tuna.tsinghua.edu.cn/simple</div><div class="line">(venv)$ pip install yara-python==3.6.3 -i https://pypi.tuna.tsinghua.edu.cn/simple</div><div class="line">(venv)$  pip install mysql-python  -i https://pypi.tuna.tsinghua.edu.cn/simple</div></pre></td></tr></table></figure>
+<h1 id="3-创建mysql数据库"><a href="#3-创建mysql数据库" class="headerlink" title="3. 创建mysql数据库"></a>3. 创建mysql数据库</h1><blockquote>
+<p>查看初始密码：</p>
+<p>sudo vim /etc/mysql/debian.cnf</p>
+</blockquote>
+<p>mysql -udebian-sys-maint  -pFT5P9SLcErDxGHT7</p>
+<p>进入数据库之后新建cuckoo的数据库：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">CREATE DATABASE cuckoo_db;</div></pre></td></tr></table></figure>
+<h1 id="4-创建mongo数据库"><a href="#4-创建mongo数据库" class="headerlink" title="4. 创建mongo数据库"></a>4. 创建mongo数据库</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">命令行输入：mongo</div><div class="line">use cuckoo_db</div><div class="line">db.createUser(  </div><div class="line"> &#123;  </div><div class="line">   user: &quot;admin&quot;,  </div><div class="line">   pwd: &quot;admin&quot;,  </div><div class="line">   roles: [ &#123; role: &quot;readWrite&quot;, db: &quot;cuckoo_db&quot; &#125; ]  </div><div class="line"> &#125;  </div><div class="line">)</div><div class="line">然后就成功创建了用户，可以通过db.auth(&quot;admin&quot;, &quot;admin&quot;)验证创建是否成功。</div><div class="line"></div><div class="line">在终端输入下面命令可以成功进入数据库：</div><div class="line">mongo --port 27017 -u &quot;admin&quot; -p &quot;admin&quot; --authenticationDatabase &quot;cuckoo_db&quot;</div></pre></td></tr></table></figure>
+<h1 id="5-安装virtual-box"><a href="#5-安装virtual-box" class="headerlink" title="5. 安装virtual box"></a>5. 安装virtual box</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install virtualbox</div></pre></td></tr></table></figure>
+<p>然后启动virtual box mange，开始创建虚拟机：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">命令行：VBoxManage createvm --name cuckoo_vm1 --register</div><div class="line">命令行输出：Settings file: &apos;/home/ics/VirtualBox VMs/cuckoo_vm1/cuckoo_vm1.vbox&apos;</div><div class="line"></div><div class="line">然后就可以通过VBoxManage list vms查看到该机器了：</div><div class="line">命令行输出：&quot;cuckoo_vm1&quot; &#123;d06a7037-c094-4918-8ad0-53cc40ea87ba&#125;</div><div class="line"></div><div class="line">基本参数的配置：</div><div class="line">VBoxManage modifyvm cuckoo_vm1 --ostype Windows7_64（或者Windows7就是32位）</div><div class="line">VBoxManage modifyvm cuckoo_vm1 --memory 2048</div><div class="line">VBoxManage createmedium --filename cuckoo_vm1_HDD_SYS_100G.vdi --size 10000</div><div class="line">VBoxManage createmedium --filename cuckoo_vm1_HDD_HOME_100G.vdi --size 10000</div><div class="line">VBoxManage storagectl cuckoo_vm1 --name IDE --add ide --controller PIIX4 --bootable on</div><div class="line">VBoxManage storagectl cuckoo_vm1 --name SATA --add sata --controller IntelAhci --bootable on</div><div class="line"></div><div class="line">关联镜像：</div><div class="line">VBoxManage storageattach cuckoo_vm1 --storagectl SATA --port 0 --device 0 --type hdd --medium cuckoo_vm1_HDD_SYS_100G.vdi</div><div class="line">VBoxManage storageattach cuckoo_vm1 --storagectl SATA --port 1 --device 0 --type hdd --medium cuckoo_vm1_HDD_HOME_100G.vdi</div><div class="line"></div><div class="line">VBoxManage storageattach cuckoo_vm1 --storagectl IDE --port 0 --device 0 --type dvddrive --medium /home/ics/data/cn_windows_7_ultimate_with_sp1_x86_dvd_u_677486.iso</div><div class="line"></div><div class="line">VBoxManage storageattach cuckoo_vm1 --storagectl IDE --port 1 --device 0 --type dvddrive --medium /home/ics/data/VBoxGuestAdditions_4.1.2.iso（本次没有用到）</div><div class="line"></div><div class="line"></div><div class="line">查看虚拟机信息：</div><div class="line">VBoxManage list runningvms</div><div class="line">VBoxManage showvminfo cuckoo_vm1</div><div class="line"></div><div class="line">开启虚拟机：</div><div class="line">VBoxManage startvm cuckoo_vm1 --type headless</div><div class="line">关闭虚拟机：</div><div class="line">VBoxManage controlvm cuckoo_vm1 poweroff</div><div class="line"></div><div class="line">VBoxManage controlvm cuckoo_vm1 savestate</div></pre></td></tr></table></figure>
+<h1 id="6-vbox开启vnc远程桌面"><a href="#6-vbox开启vnc远程桌面" class="headerlink" title="6. vbox开启vnc远程桌面"></a>6. vbox开启vnc远程桌面</h1><p><strong>virtual box配置(命令行)：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">VBoxManage controlvm cuckoo_vm1 poweroff</div><div class="line">VBoxManage modifyvm cuckoo_vm1 --vrdeport 5540 --vrdeaddress &quot;&quot;            VBoxManage modifyvm  cuckoo_vm1  --vrde on           </div><div class="line">VBoxManage startvm cuckoo_vm1 --type headless</div></pre></td></tr></table></figure>
+<p>以上命令的作用是开启vbox中安装好的虚拟机的远程桌面，然后在vnc client连接192.168.1.14:5440（上面的命令行配置的），就可以看到界面进行操作了。</p>
+<h1 id="7-virtual-box配置host-only模式"><a href="#7-virtual-box配置host-only模式" class="headerlink" title="7. virtual box配置host only模式"></a>7. virtual box配置host only模式</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">命令行：VBoxManage hostonlyif create</div><div class="line">返回：Interface &apos;vboxnet0&apos; was successfully created</div><div class="line"> VBoxManage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1 --netmask 255.255.255.0</div><div class="line"></div><div class="line">取消dhcp：</div><div class="line">VBoxManage dhcpserver modify --netname &quot;HostInterfaceNetworking-vboxnet0&quot; --disable</div><div class="line">查看验证已经取消dhcp：</div><div class="line">VBoxManage list dhcpservers</div><div class="line"></div><div class="line">命令行设置host only模式</div><div class="line">VBoxManage modifyvm cuckoo_vm1 --nic2 hostonly --nictype2 82545EM --cableconnected2 on --hostonlyadapter2 vboxnet0</div><div class="line"></div><div class="line">---------------------------------------------------------------------</div><div class="line">以上部分设置好了之后主机可以ping到虚拟机，虚拟机可以ping到主机，虚拟机不能上外网。</div><div class="line">---------------------------------------------------------------------</div><div class="line"></div><div class="line">然后在本机配置一下iptable的转发：</div><div class="line">sudo -i</div><div class="line">sysctl -w net.ipv4.ip_forward=1</div><div class="line">echo 1 &gt; /proc/sys/net/ipv4/ip_forward</div><div class="line">sudo vi /etc/sysctl.conf</div><div class="line"></div><div class="line">去掉net.ipv4.ip_forward=1 前的#号，保存</div><div class="line"></div><div class="line">sysctl -p /etc/sysctl.conf</div><div class="line"></div><div class="line">sudo iptables -P FORWARD ACCEPT</div><div class="line">iptables -A FORWARD -o ens32 -i vboxnet0 -s 192.168.56.0/24 -m conntrack --ctstate NEW -j ACCEPT</div><div class="line">iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT</div><div class="line">iptables -A POSTROUTING -t nat -j MASQUERADE</div><div class="line"></div><div class="line">sudo vi /etc/network/interfaces</div><div class="line">#在最后添加两行</div><div class="line">pre-up iptables-restore &lt; /etc/iptables.rules</div><div class="line">post-down iptables-save &gt; /etc/iptables.rules</div><div class="line"></div><div class="line">查看配置</div><div class="line">sudo iptables -L -n</div></pre></td></tr></table></figure>
+<p>开启转发功能之后虚拟机可以连接外网了，但是本机可能就baidu都上不了。这时候需要修改一下vi /etc/resolv.conf，改为144.144.144.144</p>
+<h1 id="8-win7客户端运行agent配置"><a href="#8-win7客户端运行agent配置" class="headerlink" title="8. win7客户端运行agent配置"></a>8. win7客户端运行agent配置</h1><p><strong>agent.py运行环境准备</strong></p>
+<blockquote>
+<p>安装python2.7和PIL</p>
+<p>将CWD/agent/agent.py文件拷贝到客户机里。我们需要这个文件能开机自启动，做法如下： 把agent.py文件放到系统开机启动目录中，在Win7中默认的路径是C:\Users[username]\AppData\Roaming\MicroSoft\Windows\Start Menu\Programs\Startup\。</p>
+<p>将后缀名改为pyw，管理员身份运行。在任务管理器中查看进程，或在命令行中执行netstat -an查看是否有8000端口的监听，来确定agent是否在运行。</p>
+</blockquote>
+<p>配置虚拟机用户名密码：Administrator 1234</p>
+<p><strong>管理员身份运行cmd：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">reg add &quot;hklm\software\Microsoft\Windows NT\CurrentVersion\WinLogon&quot; /v DefaultUserName /d Administrator  /t REG_SZ /f</div><div class="line">reg add &quot;hklm\software\Microsoft\Windows NT\CurrentVersion\WinLogon&quot; /v DefaultPassword /d 1234 /t REG_SZ /f</div><div class="line">reg add &quot;hklm\software\Microsoft\Windows NT\CurrentVersion\WinLogon&quot; /v AutoAdminLogon /d 1 /t REG_SZ /f</div><div class="line">reg add &quot;hklm\system\CurrentControlSet\Control\TerminalServer&quot; /v AllowRemoteRPC /d 0x01 /t REG_DWORD /f</div><div class="line">reg add &quot;HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System&quot; /v LocalAccountTokenFilterPolicy /d 0x01 /t REG_DWORD /f</div><div class="line"></div><div class="line"></div><div class="line">reg add &quot;hklm\software\Microsoft\Windows NT\CurrentVersion\WinLogon&quot; /v DefaultUserName /d cuckoo1  /t REG_SZ /f</div><div class="line">reg add &quot;hklm\software\Microsoft\Windows NT\CurrentVersion\WinLogon&quot; /v DefaultPassword /d 1234 /t REG_SZ /f</div><div class="line">reg add &quot;hklm\software\Microsoft\Windows NT\CurrentVersion\WinLogon&quot; /v AutoAdminLogon /d 1 /t REG_SZ /f</div><div class="line">reg add &quot;hklm\system\CurrentControlSet\Control\TerminalServer&quot; /v AllowRemoteRPC /d 0x01 /t REG_DWORD /f</div><div class="line">reg add &quot;HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System&quot; /v LocalAccountTokenFilterPolicy /d 0x01 /t REG_DWORD /f</div></pre></td></tr></table></figure>
+<p><strong>在本机测试是否运行了agent：</strong></p>
+<p>curl 192.168.56.100:8000</p>
+<p><strong>运行后保存当前状态的快照：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">VBoxManage snapshot cuckoo_vm1 take cuckoo_vm1_init</div></pre></td></tr></table></figure>
+<h1 id="9-cuckoo配置文件修改"><a href="#9-cuckoo配置文件修改" class="headerlink" title="9. cuckoo配置文件修改"></a>9. cuckoo配置文件修改</h1><p>需要按照自己配置的数据库、IP等修改。</p>
+<p><strong>cuckoo.conf</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[database部分]</div><div class="line">connection = mysql://debian-sys-maint:FT5P9SLcErDxGHT7@localhost:3306/cuckoo_db</div><div class="line">[cuckoo]</div><div class="line">version_check = no</div><div class="line">machinery = virtualbox</div><div class="line">process_results = yes</div></pre></td></tr></table></figure>
+<p><strong>virtualbox.conf</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[virtualbox]</div><div class="line">mode = headless</div><div class="line">path = /usr/bin/vboxmanage</div><div class="line">interface = vboxnet0</div><div class="line">machines = cuckoo1 //你的虚拟机名称</div><div class="line">controlports = 5000-5050</div><div class="line"></div><div class="line">[windows7]</div><div class="line">label = cuckoo1 //你的虚拟机名称，需要与machines一致</div><div class="line">platform = windows</div><div class="line">ip = 192.168.56.101</div><div class="line">snapshot = snapshot1 //创建的快照名称</div></pre></td></tr></table></figure>
+<p><strong>reporting.conf</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[mongodb]</div><div class="line">enabled = yes  //默认是no</div><div class="line">host = 127.0.0.1</div><div class="line">port = 27017</div><div class="line">db = cuckoo //数据集名称</div><div class="line">store_memdump = yes</div><div class="line">paginate = 100</div></pre></td></tr></table></figure>
+<h1 id="10-cuckoo提交样本运行"><a href="#10-cuckoo提交样本运行" class="headerlink" title="10. cuckoo提交样本运行"></a>10. cuckoo提交样本运行</h1><p>首先运行以下指令，解决tcpdump的权限被拒绝：</p>
+<blockquote>
+<p>sudo aa-disable /usr/sbin/tcpdump</p>
+</blockquote>
+<p>启动虚拟python环境：</p>
+<blockquote>
+<p>. venv/bin/activate</p>
+</blockquote>
+<p>开启分析后台：</p>
+<blockquote>
+<p>cuckoo -d</p>
+</blockquote>
+<p>开启web展示页面：</p>
+<blockquote>
+<p>cuckoo web –host 0.0.0.0</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+    
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+  
+</div>
+    
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="metang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/aipay.jpg" alt="metang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/cuckoo沙箱/" rel="tag"><i class="fa fa-tag"></i> cuckoo沙箱</a>
+          
+            <a href="/tags/恶意软件检测/" rel="tag"><i class="fa fa-tag"></i> 恶意软件检测</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/21/[cuckoo沙箱3]分布式cuckoo沙箱搭建/" rel="next" title="分布式cuckoo沙箱搭建">
+                <i class="fa fa-chevron-left"></i> 分布式cuckoo沙箱搭建
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/21/[cuckoo沙箱1]在物理机搭建单节点cuckoo/" rel="prev" title="在物理机搭建单节点cuckoo沙箱">
+                在物理机搭建单节点cuckoo沙箱 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.JPG"
+                alt="metang" />
+            
+              <p class="site-author-name" itemprop="name">metang</p>
+              <p class="site-description motion-element" itemprop="description">from Nuaa</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/metang326" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="534747943@qq.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-安装环境准备"><span class="nav-number">1.</span> <span class="nav-text">1. 安装环境准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-在虚拟的python环境中安装cuckoo"><span class="nav-number">2.</span> <span class="nav-text">2. 在虚拟的python环境中安装cuckoo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-创建mysql数据库"><span class="nav-number">3.</span> <span class="nav-text">3. 创建mysql数据库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-创建mongo数据库"><span class="nav-number">4.</span> <span class="nav-text">4. 创建mongo数据库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-安装virtual-box"><span class="nav-number">5.</span> <span class="nav-text">5. 安装virtual box</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-vbox开启vnc远程桌面"><span class="nav-number">6.</span> <span class="nav-text">6. vbox开启vnc远程桌面</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-virtual-box配置host-only模式"><span class="nav-number">7.</span> <span class="nav-text">7. virtual box配置host only模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-win7客户端运行agent配置"><span class="nav-number">8.</span> <span class="nav-text">8. win7客户端运行agent配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#9-cuckoo配置文件修改"><span class="nav-number">9.</span> <span class="nav-text">9. cuckoo配置文件修改</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#10-cuckoo提交样本运行"><span class="nav-number">10.</span> <span class="nav-text">10. cuckoo提交样本运行</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">metang</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>

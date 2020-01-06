@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #199475; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #0B6E48, 0 0 5px     #0B6E48; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #044D22;    /*上边框颜色*/
+        border-left-color: #044D22;    /*左边框颜色*/
+    }
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/trojan_32px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/trojan_16px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="cuckoo沙箱,恶意软件检测," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="最基础的搭建步骤就是在单个物理机节点部署cuckoo，能够调用配置好的virtual box完成运行任务并产生报告。在搭建好了单个cuckoo之后，可以考虑进阶的分布式搭建。">
+<meta name="keywords" content="cuckoo沙箱,恶意软件检测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在物理机搭建单节点cuckoo沙箱">
+<meta property="og:url" content="http://yoursite.com/2019/12/21/[cuckoo沙箱1]在物理机搭建单节点cuckoo/index.html">
+<meta property="og:site_name" content="metang&#39;s blog">
+<meta property="og:description" content="最基础的搭建步骤就是在单个物理机节点部署cuckoo，能够调用配置好的virtual box完成运行任务并产生报告。在搭建好了单个cuckoo之后，可以考虑进阶的分布式搭建。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-01-06T08:21:47.269Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在物理机搭建单节点cuckoo沙箱">
+<meta name="twitter:description" content="最基础的搭建步骤就是在单个物理机节点部署cuckoo，能够调用配置好的virtual box完成运行任务并产生报告。在搭建好了单个cuckoo之后，可以考虑进阶的分布式搭建。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'TZVHEBFK02',
+      apiKey: '1ab48ccb78c0b1c98cf0e7935807338f',
+      indexName: 'my_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"输入关键字进行搜索","hits_empty":"找不到关于  ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/12/21/[cuckoo沙箱1]在物理机搭建单节点cuckoo/"/>
+
+
+
+
+
+  <title>在物理机搭建单节点cuckoo沙箱 | metang's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/metang326"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">metang's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In case I don't see ya', good afternoon, good evening and goodnight.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/21/[cuckoo沙箱1]在物理机搭建单节点cuckoo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="metang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="metang's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在物理机搭建单节点cuckoo沙箱</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-21T00:00:00+08:00">
+                2019-12-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cuckoo沙箱/" itemprop="url" rel="index">
+                    <span itemprop="name">cuckoo沙箱</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,067
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最基础的搭建步骤就是在单个物理机节点部署cuckoo，能够调用配置好的virtual box完成运行任务并产生报告。在搭建好了单个cuckoo之后，可以考虑进阶的分布式搭建。</p>
+<a id="more"></a>
+<h1 id="主要的参考教程"><a href="#主要的参考教程" class="headerlink" title="主要的参考教程"></a>主要的参考教程</h1><ol>
+<li>很详细的一篇：<a href="https://blog.csdn.net/Bingoooooo_/article/details/94248229" target="_blank" rel="external">https://blog.csdn.net/Bingoooooo_/article/details/94248229</a></li>
+<li>总体步骤正确的：<a href="https://www.jianshu.com/p/ac009f6c2710" target="_blank" rel="external">https://www.jianshu.com/p/ac009f6c2710</a></li>
+</ol>
+<h1 id="单节点沙箱运行方式"><a href="#单节点沙箱运行方式" class="headerlink" title="单节点沙箱运行方式"></a>单节点沙箱运行方式</h1><p> . venv/bin/activate  进入虚拟环境。<br>一个终端运行cuckoo -d；另一个运行cuckoo web</p>
+<p>（cuckoo -d开启的是后台分析进程，提交样本的方式下面介绍了很多，但是后台分析进程是基础，没有开启的话无法分析样本的）</p>
+<h2 id="web访问提交样本"><a href="#web访问提交样本" class="headerlink" title="web访问提交样本"></a>web访问提交样本</h2><p>cuckoo web运行后会给出ip:端口，访问web就可以直接通过网页提交样本，查看报告，调试的时候很方便。能够知道虚拟机是否调用成功了，产生的报告有没有问题。</p>
+<h2 id="命令行cuckoo-submit提交样本"><a href="#命令行cuckoo-submit提交样本" class="headerlink" title="命令行cuckoo submit提交样本"></a>命令行cuckoo submit提交样本</h2><p>下发任务并且传参数运行：</p>
+<blockquote>
+<p>cuckoo submit    –timeout 600  –package exe  –options arguments=’m0nk3y -s 192.168.2.136:5000’ /home/tangmingyu/TEST_CUCKOO/monkey-windows-64.exe</p>
+</blockquote>
+<h2 id="开启cuckoo-api"><a href="#开启cuckoo-api" class="headerlink" title="开启cuckoo api"></a>开启cuckoo api</h2><p><a href="https://cuckoo.readthedocs.io/en/latest/usage/api/#" target="_blank" rel="external">https://cuckoo.readthedocs.io/en/latest/usage/api/#</a><br>直接cuckoo api</p>
+<blockquote>
+<p>(venv) tangmingyu@tangmingyu-QiTianM610-D529:~/venv/bin$ cuckoo api<br>2019-09-18 21:17:27,179 [werkzeug] INFO:  * Running on <a href="http://localhost:8090/" target="_blank" rel="external">http://localhost:8090/</a> (Press CTRL+C to quit)</p>
+</blockquote>
+<h2 id="命令行提交样本"><a href="#命令行提交样本" class="headerlink" title="命令行提交样本"></a>命令行提交样本</h2><p>通过命令行就可以提交样本自动分析了。</p>
+<blockquote>
+<p>curl -H “Authorization: Bearer bZ0mLmUX2QElehFjI33OOQ”  -F file=@/home/tangmingyu/文档/安全沙箱安装/恶意软件样本/test1.exe <a href="http://localhost:8090/tasks/create/file" target="_blank" rel="external">http://localhost:8090/tasks/create/file</a></p>
+</blockquote>
+<p>查看cuckoo.conf中的api_token = bZ0mLmUX2QElehFjI33OOQ，把这边注释掉就不需要api_token的验证了，比较省事。</p>
+<h2 id="python脚本提交样本"><a href="#python脚本提交样本" class="headerlink" title="python脚本提交样本"></a>python脚本提交样本</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">import requests</div><div class="line"></div><div class="line">REST_URL = &quot;http://localhost:8090/tasks/create/file&quot;</div><div class="line">SAMPLE_FILE = &quot;/home/tangmingyu/文档/安全沙箱安装/恶意软件样本/test1.exe&quot;</div><div class="line"></div><div class="line">with open(SAMPLE_FILE, &quot;rb&quot;) as sample:</div><div class="line">    files = &#123;&quot;file&quot;: (&quot;temp_file_name&quot;, sample)&#125;</div><div class="line">    r = requests.post(REST_URL, files=files)</div></pre></td></tr></table></figure>
+<h1 id="安装过程遇到的问题"><a href="#安装过程遇到的问题" class="headerlink" title="安装过程遇到的问题"></a>安装过程遇到的问题</h1><ol>
+<li>运行cuckoo报错ImportError:lib<em>*</em>.so–cannot open shared object file: No such file or directory</li>
+</ol>
+<blockquote>
+<p>1-软链接方式<br>    1.1 找到文件<br>            find  /  -name  lib<strong>.so   (缺失的动态链接库)<br>    1.2 建立软链接<br>            ln - /path/to/lib</strong>.so   /usr/lib<br>     1.3 sudo ldconfig</p>
+</blockquote>
+<ol>
+<li>运行cuckoo报错AttributeError: Rules instance has no attribute ‘save’</li>
+</ol>
+<blockquote>
+<p>Please pip uninstall yara. It’s very outdated and we’re using yara-python==3.6.3 instead.</p>
+</blockquote>
+<ol>
+<li><p>pip install MySQL-python报错</p>
+<blockquote>
+<p>先sudo apt-get install libmysqlclient-dev，然后pip install</p>
+</blockquote>
+</li>
+<li><p>修改最大打开文件数量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ sudo echo 1000000 &gt; sudo /proc/sys/fs/nr_open</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ ulimit -n</div><div class="line">1024</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ cat /proc/sys/fs/nr_open</div><div class="line">1000000</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$  sudo vi /etc/security/limits.conf</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ ulimit -n</div><div class="line">1024</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ sudo sh -c &quot;ulimit -n 65535 &amp;&amp; exec su $LOGNAME&quot;</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ ulimit -n</div><div class="line">500000</div><div class="line">tangmingyu@tangmingyu-QiTianM610-D529:~$ . venv/bin/activate</div><div class="line">(venv) tangmingyu@tangmingyu-QiTianM610-D529:~$ ulimit -n</div><div class="line">500000</div></pre></td></tr></table></figure>
+</li>
+<li><p>win7虚拟机之前一直连不上外网</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">iptables -P FORWARD ACCEPT</div><div class="line">iptables -A FORWARD -o eth0 -i vboxnet0 -s 192.168.2.0/24 -m conntrack --ctstate NEW -j ACCEPT</div><div class="line">iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT</div><div class="line">iptables -A POSTROUTING -t nat -j MASQUERADE</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>开启转发功能之后虚拟机可以连接外网了，但是本机可能就baidu都上不了。这时候需要修改一下vi /etc/resolv.conf，改为144.144.144.144</p>
+<ol>
+<li>提交之后task一直是pending状态，原因是virtual manager的地址写成了virtual box</li>
+</ol>
+<p><a href="https://github.com/cuckoosandbox/cuckoo/issues/2346" target="_blank" rel="external">https://github.com/cuckoosandbox/cuckoo/issues/2346</a></p>
+<ol>
+<li><p>如果系统没启用root账户，由于 tcpdump 的执行需要 root 权限，则需要以下配置:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">sudo setcap cap_net_raw,cap_net_admin=eip /usr/sbin/tcpdump</div><div class="line">sudo chmod +s /usr/sbin/tcpdump</div><div class="line">以上方法都试过，没有用。</div><div class="line"></div><div class="line">后来搜到了官方给的，成功了：</div><div class="line">sudo apt-get install apparmor-utils</div><div class="line">sudo aa-disable /usr/sbin/tcpdump</div><div class="line">https://cuckoo.sh/docs/faq/index.html#permission-denied-for-tcpdump</div></pre></td></tr></table></figure>
+</li>
+<li><p>mongo数据库的验证<br>db.auth(‘admin’, ‘admin’)  返回1表示成功</p>
+</li>
+<li><p>验证guest是否成功连接上：<br>tangmingyu@tangmingyu-QiTianM610-D529:~$ curl 192.168.2.200:8000<br>{“message”: “Cuckoo Agent!”, “version”: “0.10”, “features”: [“execpy”, “pinning”, “logs”, “largefile”, “unicodepath”]}</p>
+</li>
+<li><p>error fetching configuration file<br>在虚拟机里一定要以管理员身份运行agent</p>
+</li>
+<li><p>复制虚拟机之后突然要输入用户名和密码了</p>
+<blockquote>
+<p>账号：Administrator；密码为空试一下</p>
+</blockquote>
+</li>
+</ol>
+<h1 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h1><p>mysql存的是提交任务时间 虚拟机配置之类的信息；mongo存储的是软件提交运行之后，产生的那些分析数据。</p>
+<p>##好用的可视化mong数据库工具adminMongo<br>教程网址：<a href="https://www.cnblogs.com/zhangycun/p/10534123.html" target="_blank" rel="external">https://www.cnblogs.com/zhangycun/p/10534123.html</a></p>
+<p>开启方式：</p>
+<blockquote>
+<p>cd adminMongo<br>npm start</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+    
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+  
+</div>
+    
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="metang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/aipay.jpg" alt="metang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/cuckoo沙箱/" rel="tag"><i class="fa fa-tag"></i> cuckoo沙箱</a>
+          
+            <a href="/tags/恶意软件检测/" rel="tag"><i class="fa fa-tag"></i> 恶意软件检测</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/21/[cuckoo沙箱2]在虚拟机搭建单节点cuckoo/" rel="next" title="在虚拟机搭建单节点cuckoo沙箱">
+                <i class="fa fa-chevron-left"></i> 在虚拟机搭建单节点cuckoo沙箱
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/21/[cuckoo沙箱0]总体框架介绍/" rel="prev" title="cuckoo沙箱总体框架介绍">
+                cuckoo沙箱总体框架介绍 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.JPG"
+                alt="metang" />
+            
+              <p class="site-author-name" itemprop="name">metang</p>
+              <p class="site-description motion-element" itemprop="description">from Nuaa</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/metang326" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="534747943@qq.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#主要的参考教程"><span class="nav-number">1.</span> <span class="nav-text">主要的参考教程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#单节点沙箱运行方式"><span class="nav-number">2.</span> <span class="nav-text">单节点沙箱运行方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#web访问提交样本"><span class="nav-number">2.1.</span> <span class="nav-text">web访问提交样本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命令行cuckoo-submit提交样本"><span class="nav-number">2.2.</span> <span class="nav-text">命令行cuckoo submit提交样本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开启cuckoo-api"><span class="nav-number">2.3.</span> <span class="nav-text">开启cuckoo api</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命令行提交样本"><span class="nav-number">2.4.</span> <span class="nav-text">命令行提交样本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python脚本提交样本"><span class="nav-number">2.5.</span> <span class="nav-text">python脚本提交样本</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装过程遇到的问题"><span class="nav-number">3.</span> <span class="nav-text">安装过程遇到的问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据库"><span class="nav-number">4.</span> <span class="nav-text">数据库</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">metang</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>
