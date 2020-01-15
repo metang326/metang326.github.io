@@ -83,7 +83,7 @@
 
 
 
-  <meta name="keywords" content="日志审计,流量分析,异常检测," />
+  <meta name="keywords" content="流量分析,日志审计,异常检测," />
 
 
 
@@ -95,14 +95,14 @@
 
 
 <meta name="description" content="ids2017数据集使用CICFlowMeter作为流特征提取工具，能够根据提交的pcap文件生成有80多个特征的csv文件，使用方法有两种：在线和离线模式。在线模式可以实时监控并产生特征，监听结束之后可以保存到本地；离线模式是提交一个pcap文件，得到一个包含特征的csv文件。">
-<meta name="keywords" content="日志审计,流量分析,异常检测">
+<meta name="keywords" content="流量分析,日志审计,异常检测">
 <meta property="og:type" content="article">
 <meta property="og:title" content="流量特征提取工具CICFlowMeter">
 <meta property="og:url" content="https://metang326.coding.me/2019/04/21/[日志分析]ids2017数据的例子CICFlowMeter-4.0特征提取工具/index.html">
 <meta property="og:site_name" content="metang&#39;s blog">
 <meta property="og:description" content="ids2017数据集使用CICFlowMeter作为流特征提取工具，能够根据提交的pcap文件生成有80多个特征的csv文件，使用方法有两种：在线和离线模式。在线模式可以实时监控并产生特征，监听结束之后可以保存到本地；离线模式是提交一个pcap文件，得到一个包含特征的csv文件。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-21T03:41:26.540Z">
+<meta property="og:updated_time" content="2020-01-15T03:07:56.247Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="流量特征提取工具CICFlowMeter">
 <meta name="twitter:description" content="ids2017数据集使用CICFlowMeter作为流特征提取工具，能够根据提交的pcap文件生成有80多个特征的csv文件，使用方法有两种：在线和离线模式。在线模式可以实时监控并产生特征，监听结束之后可以保存到本地；离线模式是提交一个pcap文件，得到一个包含特征的csv文件。">
@@ -408,7 +408,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  568
+                  654
                 </span>
               
 
@@ -438,7 +438,11 @@
 <h1 id="特征"><a href="#特征" class="headerlink" title="特征"></a>特征</h1><p>这是ids2017数据集的特征，label这个标签是数据集根据实验环境标注的，实际使用CICFlowMeter生成的是无标签的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">| Flow ID | Source IP| Source Port | Destination IP | Destination Port |Protocol | Timestamp| Flow Duration | Total Fwd Packets | Total Backward Packets | Total Length of Fwd Packets | Total Length of Bwd Packets | Fwd Packet Length Max | Fwd Packet Length Min | Fwd Packet Length Mean | Fwd Packet Length Std | Bwd Packet Length Max | Bwd Packet Length Min | Bwd Packet Length Mean | Bwd Packet Length Std | Flow Bytes/s | Flow Packets/s | Flow IAT Mean | Flow IAT Std | Flow IAT Max | Flow IAT Min | Fwd IAT Total | Fwd IAT Mean | Fwd IAT Std | Fwd IAT Max | Fwd IAT Min | Bwd IAT Total | Bwd IAT Mean | Bwd IAT Std | Bwd IAT Max | Bwd IAT Min | Fwd PSH Flags | Bwd PSH Flags | Fwd URG Flags | Bwd URG Flags | Fwd Header Length | Bwd Header Length | Fwd Packets/s | Bwd Packets/s | Min Packet Length | Max Packet Length | Packet Length Mean | Packet Length Std | Packet Length Variance | FIN Flag Count | SYN Flag Count | RST Flag Count | PSH Flag Count | ACK Flag Count | URG Flag Count | CWE Flag Count | ECE Flag Count | Down/Up Ratio | Average Packet Size | Avg Fwd Segment Size | Avg Bwd Segment Size | Fwd Header Length | Fwd Avg Bytes/Bulk | Fwd Avg Packets/Bulk | Fwd Avg Bulk Rate | Bwd Avg Bytes/Bulk | Bwd Avg Packets/Bulk | Bwd Avg Bulk Rate | Subflow Fwd Packets | Subflow Fwd Bytes | Subflow Bwd Packets | Subflow Bwd Bytes | Init_Win_bytes_forward | Init_Win_bytes_backward | act_data_pkt_fwd | min_seg_size_forward | Active Mean | Active Std | Active Max | Active Min | Idle Mean | Idle Std | Idle Max | Idle Min | Label  | External IP |</div></pre></td></tr></table></figure></p>
 <h1 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h1><p>一开始是在csdn上看到有人发了22w条记录：<br><a href="https://download.csdn.net/download/qq_31667705/10824935" target="_blank" rel="external">https://download.csdn.net/download/qq_31667705/10824935</a></p>
 <p>这是加拿大网络安全研究所（UNB）的数据，该文件是一个csv文件格式，可以用excel打开，已经整理完成。方便研究者用于机器学习或深度学习，一共包含22.5w条记录。主要用于DDoS的检测。</p>
-<p>然后进一步找到了最原始的发布方：<br><a href="https://www.unb.ca/cic/datasets/" target="_blank" rel="external">https://www.unb.ca/cic/datasets/</a><br><a href="https://www.unb.ca/cic/datasets/ids-2017.html" target="_blank" rel="external">https://www.unb.ca/cic/datasets/ids-2017.html</a><br>他的源数据是pcap格式的，然后放到<a href="http://netflowmeter.ca/这个网站得到了80多个特征。可以通过在线提交或者https://github.com/ISCX/CICFlowMeter下载源码" target="_blank" rel="external">http://netflowmeter.ca/这个网站得到了80多个特征。可以通过在线提交或者https://github.com/ISCX/CICFlowMeter下载源码</a></p>
+<p>然后进一步找到了最原始的发布方：<br><a href="https://www.unb.ca/cic/datasets/" target="_blank" rel="external">https://www.unb.ca/cic/datasets/</a><br><a href="https://www.unb.ca/cic/datasets/ids-2017.html" target="_blank" rel="external">https://www.unb.ca/cic/datasets/ids-2017.html</a><br>他的源数据是pcap格式的，然后放到<a href="http://netflowmeter.ca/这个网站得到了80多个特征。" target="_blank" rel="external">http://netflowmeter.ca/这个网站得到了80多个特征。</a></p>
+<p>可以通过在线提交或者<a href="https://github.com/ISCX/CICFlowMeter下载源码" target="_blank" rel="external">https://github.com/ISCX/CICFlowMeter下载源码</a></p>
+<ul>
+<li>源码编译运行的方式我没试过，当时是直接下了官网给的可执行文件运行的，只需要配置好libpcap就可以直接运行。但目前github上没有提供这种可执行文件的下载方式了，需要的同学可以邮件联系我发给你。（534747943@qq.com）</li>
+</ul>
 
       
     </div>
@@ -495,9 +499,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/日志审计/" rel="tag"><i class="fa fa-tag"></i> 日志审计</a>
-          
             <a href="/tags/流量分析/" rel="tag"><i class="fa fa-tag"></i> 流量分析</a>
+          
+            <a href="/tags/日志审计/" rel="tag"><i class="fa fa-tag"></i> 日志审计</a>
           
             <a href="/tags/异常检测/" rel="tag"><i class="fa fa-tag"></i> 异常检测</a>
           
@@ -512,8 +516,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/04/21/[日志分析]audit监控进程/" rel="next" title="audit监控进程的使用">
-                <i class="fa fa-chevron-left"></i> audit监控进程的使用
+              <a href="/2019/04/14/[爬虫]使用virustotal的api进行URL扫描/" rel="next" title="使用virustotal的api进行URL扫描">
+                <i class="fa fa-chevron-left"></i> 使用virustotal的api进行URL扫描
               </a>
             
           </div>
@@ -522,8 +526,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/04/21/[日志分析]smartd使用/" rel="prev" title="smartd的安装及使用">
-                smartd的安装及使用 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/04/21/[botnet检测]monkey研究/" rel="prev" title="infection monkey源码研究">
+                infection monkey源码研究 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
