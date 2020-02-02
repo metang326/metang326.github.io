@@ -317,7 +317,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://metang326.coding.me/2019/04/21/[botnet检测]infection monkey笔记/">
+    <link itemprop="mainEntityOfPage" href="https://metang326.coding.me/2019/04/21/[botnet检测]monkey研究/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="metang">
@@ -336,7 +336,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/04/21/[botnet检测]infection monkey笔记/" itemprop="url">infection monkey的安装部署及使用</a></h1>
+                <a class="post-title-link" href="/2019/04/21/[botnet检测]monkey研究/" itemprop="url">infection monkey源码研究</a></h1>
         
 
         <div class="post-meta">
@@ -404,7 +404,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1,055
+                  1,419
                 </span>
               
 
@@ -431,9 +431,12 @@
       
         
           <p>Infection Monkey是一款由以色列安全公司GuardiCore在2016黑帽大会上发布的数据中心安全检测工具，其主要用于数据中心边界及内部服务器安全性的自动化检测。该工具在架构上，则分为Monkey（扫描及漏洞利用端）以及C&amp;C服务器（相当于reporter，但仅仅只是用于收集monkey探测的信息）</p>
+<p>infection Monkey</p>
+<p>nfection Monkey</p>
+<p>对infection Monkey的源码进行了一些调研，主要分为monkey_island和monkey两部分，island的身份是c&amp;c服务器，负责收集monkey传来的数据到数据库里；monkey负责的是感染新monkey，向c&amp;c服务器汇总信息。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2019/04/21/[botnet检测]infection monkey笔记/#more" rel="contents">
+            <a class="btn" href="/2019/04/21/[botnet检测]monkey研究/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1173,188 +1176,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://metang326.coding.me/2017/11/13/[CTF]Fair-Play/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="metang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/avatar.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="metang's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/13/[CTF]Fair-Play/" itemprop="url">Fair-Play</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-13T00:00:00+08:00">
-                2017-11-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/实验吧CTF题解/" itemprop="url" rel="index">
-                    <span itemprop="name">实验吧CTF题解</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/实验吧CTF题解/密码学/" itemprop="url" rel="index">
-                    <span itemprop="name">密码学</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                  <span class="post-meta-divider">|</span>
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  1,983
-                </span>
-              
-
-              
-
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>The quick brown fox jumps over the lazy dog!<br>​        ihxo{smzdodcikmodcismzd}</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/11/13/[CTF]Fair-Play/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-    
-<div>
-  
-</div>
-    
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://metang326.coding.me/2017/11/13/[CTF]密文 rot13/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1483,6 +1304,179 @@
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/11/13/[CTF]密文 rot13/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+    
+<div>
+  
+</div>
+    
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://metang326.coding.me/2017/11/13/[hexo搭建博客]hexo next主题配置algolia搜索功能/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="metang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="metang's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/13/[hexo搭建博客]hexo next主题配置algolia搜索功能/" itemprop="url">hexo next主题配置algolia搜索功能</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-13T00:00:00+08:00">
+                2017-11-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hexo搭建博客/" itemprop="url" rel="index">
+                    <span itemprop="name">hexo搭建博客</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  828
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>在文章数量增多了的情况下，查找文章就变得不方便了，于是需要增加一个搜索功能。</p>
+<p>在网上搜了不少教程，内容基本大同小异，但是照着配置的过程中还是出现了一些问题，可能是不同版本的配置方法会稍有不同吧。</p>
+<p>这里记录一下我的配置过程：</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/11/13/[hexo搭建博客]hexo next主题配置algolia搜索功能/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1720,7 +1714,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://metang326.coding.me/2017/11/13/[CTF]古典密码/">
+    <link itemprop="mainEntityOfPage" href="https://metang326.coding.me/2017/11/13/[CTF]Fair-Play/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="metang">
@@ -1739,7 +1733,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/11/13/[CTF]古典密码/" itemprop="url">古典密码</a></h1>
+                <a class="post-title-link" href="/2017/11/13/[CTF]Fair-Play/" itemprop="url">Fair-Play</a></h1>
         
 
         <div class="post-meta">
@@ -1818,7 +1812,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  180
+                  1,983
                 </span>
               
 
@@ -1844,14 +1838,10 @@
 
       
         
-          <h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>密文内容如下{79 67 85 123 67 70 84 69 76 88 79 85 89 68 69 67 84 78 71 65 72 79 72 82 78 70 73 69 78 77 125 73 79 84 65} </p>
-<p>​    请对其进行解密 </p>
-<p>提示：1.加解密方法就在谜面中</p>
-<p>​             2.利用key值的固定结构 </p>
-<p>​    格式：CTF{ } </p>
+          <h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>The quick brown fox jumps over the lazy dog!<br>​        ihxo{smzdodcikmodcismzd}</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/11/13/[CTF]古典密码/#more" rel="contents">
+            <a class="btn" href="/2017/11/13/[CTF]Fair-Play/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
