@@ -83,7 +83,7 @@
 
 
 
-  <meta name="keywords" content="流量分析,日志审计,异常检测," />
+  <meta name="keywords" content="日志审计,流量分析,异常检测," />
 
 
 
@@ -95,14 +95,14 @@
 
 
 <meta name="description" content="ids2017数据集使用CICFlowMeter作为流特征提取工具，能够根据提交的pcap文件生成有80多个特征的csv文件，使用方法有两种：在线和离线模式。在线模式可以实时监控并产生特征，监听结束之后可以保存到本地；离线模式是提交一个pcap文件，得到一个包含特征的csv文件。">
-<meta name="keywords" content="流量分析,日志审计,异常检测">
+<meta name="keywords" content="日志审计,流量分析,异常检测">
 <meta property="og:type" content="article">
 <meta property="og:title" content="流量特征提取工具CICFlowMeter">
 <meta property="og:url" content="https://metang326.coding.me/2019/04/21/[日志分析]ids2017数据的例子CICFlowMeter-4.0特征提取工具/index.html">
 <meta property="og:site_name" content="metang&#39;s blog">
 <meta property="og:description" content="ids2017数据集使用CICFlowMeter作为流特征提取工具，能够根据提交的pcap文件生成有80多个特征的csv文件，使用方法有两种：在线和离线模式。在线模式可以实时监控并产生特征，监听结束之后可以保存到本地；离线模式是提交一个pcap文件，得到一个包含特征的csv文件。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-01-15T03:07:56.247Z">
+<meta property="og:updated_time" content="2020-02-03T03:44:18.285Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="流量特征提取工具CICFlowMeter">
 <meta name="twitter:description" content="ids2017数据集使用CICFlowMeter作为流特征提取工具，能够根据提交的pcap文件生成有80多个特征的csv文件，使用方法有两种：在线和离线模式。在线模式可以实时监控并产生特征，监听结束之后可以保存到本地；离线模式是提交一个pcap文件，得到一个包含特征的csv文件。">
@@ -408,7 +408,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  654
+                  725
                 </span>
               
 
@@ -441,8 +441,13 @@
 <p>然后进一步找到了最原始的发布方：<br><a href="https://www.unb.ca/cic/datasets/" target="_blank" rel="external">https://www.unb.ca/cic/datasets/</a><br><a href="https://www.unb.ca/cic/datasets/ids-2017.html" target="_blank" rel="external">https://www.unb.ca/cic/datasets/ids-2017.html</a><br>他的源数据是pcap格式的，然后放到<a href="http://netflowmeter.ca/这个网站得到了80多个特征。" target="_blank" rel="external">http://netflowmeter.ca/这个网站得到了80多个特征。</a></p>
 <p>可以通过在线提交或者<a href="https://github.com/ISCX/CICFlowMeter下载源码" target="_blank" rel="external">https://github.com/ISCX/CICFlowMeter下载源码</a></p>
 <ul>
-<li>源码编译运行的方式我没试过，当时是直接下了官网给的可执行文件运行的，只需要配置好libpcap就可以直接运行。但目前github上没有提供这种可执行文件的下载方式了，需要的同学可以邮件联系我发给你。（534747943@qq.com）</li>
+<li>源码编译运行的方式我没试过，当时是直接下了官网给的可执行文件运行的，只需要配置好libpcap就可以直接运行。但目前github上没有提供这种可执行文件的下载方式了，我传到了百度网盘，链接在下面，需要的同学可以下载尝试运行。</li>
+<li>压缩包里面有一个readme，是作者给的，可以参考。我在ubuntu18.04可成功运行，【在线监听方式】和【离线提交csv获取特征方式】都能顺利执行。</li>
 </ul>
+<blockquote>
+<p>链接：<a href="https://pan.baidu.com/s/1J82195oHTCBqXcRILW6IWw" target="_blank" rel="external">https://pan.baidu.com/s/1J82195oHTCBqXcRILW6IWw</a> </p>
+<p>提取码：q4uc</p>
+</blockquote>
 
       
     </div>
@@ -499,9 +504,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/流量分析/" rel="tag"><i class="fa fa-tag"></i> 流量分析</a>
-          
             <a href="/tags/日志审计/" rel="tag"><i class="fa fa-tag"></i> 日志审计</a>
+          
+            <a href="/tags/流量分析/" rel="tag"><i class="fa fa-tag"></i> 流量分析</a>
           
             <a href="/tags/异常检测/" rel="tag"><i class="fa fa-tag"></i> 异常检测</a>
           
@@ -516,8 +521,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/04/21/[botnet检测]monkey研究/" rel="next" title="infection monkey源码研究">
-                <i class="fa fa-chevron-left"></i> infection monkey源码研究
+              <a href="/2019/04/21/[日志分析]smartd使用/" rel="next" title="smartd的安装及使用">
+                <i class="fa fa-chevron-left"></i> smartd的安装及使用
               </a>
             
           </div>
@@ -615,7 +620,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-count">38</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -626,7 +631,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
