@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="metang&#39;s blog">
 <meta property="og:description" content="Kafka环境需要先安装java和zookeeper，步骤比较繁琐，使用docker就可以简化很多。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-04-16T04:19:31.435Z">
+<meta property="og:updated_time" content="2020-04-16T05:21:52.057Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="docker配置Kafka环境">
 <meta name="twitter:description" content="Kafka环境需要先安装java和zookeeper，步骤比较繁琐，使用docker就可以简化很多。">
@@ -408,7 +408,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  509
+                  516
                 </span>
               
 
@@ -448,9 +448,13 @@
 <blockquote>
 <p>sudo docker run hello-world</p>
 </blockquote>
-<h1 id="在Docker环境下部署Kafka"><a href="#在Docker环境下部署Kafka" class="headerlink" title="在Docker环境下部署Kafka"></a>在Docker环境下部署Kafka</h1><blockquote>
+<h1 id="在Docker环境下部署Kafka"><a href="#在Docker环境下部署Kafka" class="headerlink" title="在Docker环境下部署Kafka"></a>在Docker环境下部署Kafka</h1><p><strong>pull镜像</strong></p>
+<blockquote>
 <p>docker pull wurstmeister/zookeeper  </p>
 <p>docker pull wurstmeister/kafka</p>
+</blockquote>
+<p><strong>开启服务</strong></p>
+<blockquote>
 <p>docker run -d –name zookeeper -p 2181:2181 -t wurstmeister/zookeeper</p>
 <p>docker run -d –name kafka –publish 9092:9092 –link zookeeper –env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 –env KAFKA_ADVERTISED_HOST_NAME=<strong>192.168.105.223</strong> –env KAFKA_ADVERTISED_PORT=9092 –volume /etc/localtime:/etc/localtime wurstmeister/kafka:latest</p>
 </blockquote>
