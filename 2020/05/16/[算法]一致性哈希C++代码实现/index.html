@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #199475; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #0B6E48, 0 0 5px     #0B6E48; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #044D22;    /*上边框颜色*/
+        border-left-color: #044D22;    /*左边框颜色*/
+    }
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/trojan_32px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/trojan_16px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="算法,C++," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="复习算法的过程中看到了对一致性哈希的讲解，发现GitHub上很多代码实现的功能都不全（比如新增节点、删除节点时没考虑数据的迁移），于是自己代码实现了一下，总体思路参考左程云的书。使用了虚拟节点，并且在新增实际节点或者删除实际节点时，会对数据进行迁移。整个思路理解起来其实不难，但在自己实现的时候发现要考虑的细节还挺多的，很多是之前看书时没有想过的。代码见https://github.com/meta">
+<meta name="keywords" content="算法,C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一致性哈希代码实现">
+<meta property="og:url" content="https://metang326.coding.me/2020/05/16/[算法]一致性哈希C++代码实现/index.html">
+<meta property="og:site_name" content="metang&#39;s blog">
+<meta property="og:description" content="复习算法的过程中看到了对一致性哈希的讲解，发现GitHub上很多代码实现的功能都不全（比如新增节点、删除节点时没考虑数据的迁移），于是自己代码实现了一下，总体思路参考左程云的书。使用了虚拟节点，并且在新增实际节点或者删除实际节点时，会对数据进行迁移。整个思路理解起来其实不难，但在自己实现的时候发现要考虑的细节还挺多的，很多是之前看书时没有想过的。代码见https://github.com/meta">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-05-16T10:57:56.643Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一致性哈希代码实现">
+<meta name="twitter:description" content="复习算法的过程中看到了对一致性哈希的讲解，发现GitHub上很多代码实现的功能都不全（比如新增节点、删除节点时没考虑数据的迁移），于是自己代码实现了一下，总体思路参考左程云的书。使用了虚拟节点，并且在新增实际节点或者删除实际节点时，会对数据进行迁移。整个思路理解起来其实不难，但在自己实现的时候发现要考虑的细节还挺多的，很多是之前看书时没有想过的。代码见https://github.com/meta">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'TZVHEBFK02',
+      apiKey: '1ab48ccb78c0b1c98cf0e7935807338f',
+      indexName: 'my_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"输入关键字进行搜索","hits_empty":"找不到关于  ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://metang326.coding.me/2020/05/16/[算法]一致性哈希C++代码实现/"/>
+
+
+
+
+
+  <title>一致性哈希代码实现 | metang's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/metang326"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">metang's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In case I don't see ya', good afternoon, good evening and goodnight.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://metang326.coding.me/2020/05/16/[算法]一致性哈希C++代码实现/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="metang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="metang's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">一致性哈希代码实现</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-16T00:00:00+08:00">
+                2020-05-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 阅读数
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,305
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>复习算法的过程中看到了对一致性哈希的讲解，发现GitHub上很多代码实现的功能都不全（比如新增节点、删除节点时没考虑数据的迁移），于是自己代码实现了一下，总体思路参考左程云的书。使用了虚拟节点，并且在新增实际节点或者删除实际节点时，会对数据进行迁移。整个思路理解起来其实不难，但在自己实现的时候发现要考虑的细节还挺多的，很多是之前看书时没有想过的。代码见<a href="https://github.com/metang326/consistent_hashing_cpp" target="_blank" rel="external">https://github.com/metang326/consistent_hashing_cpp</a><br><a id="more"></a></p>
+<h1 id="一致性哈希原理"><a href="#一致性哈希原理" class="headerlink" title="一致性哈希原理"></a>一致性哈希原理</h1><ul>
+<li><p>映射空间可抽象为一个环，长度为$2^{32}$，范围为[0, $2^{32}-1$]，每个服务器节点根据自己的哈希值被映射到这个环上；</p>
+</li>
+<li><p>判断一条数据属于哪个服务器节点的方法：根据数据的哈希值，去哈希环找到第一个大于等于数据哈希值的机器（可以理解为离它最近）。如果数据的哈希值大于当前最大的机器哈希值，那么就把这个数据放在位置最靠前（哈希值最小）的机器上，因为是一个环；</p>
+</li>
+<li><p>为了解决实际机器过少导致的数据倾斜问题（例如目前一共3个机器，机器A、B的哈希值分别为1和2，而另一个机器C的哈希值为 $2^{32}-1$，那么大部分的数据都会被分给机器C），引入了虚拟节点概念，虚拟节点相当于真实节点的分身，一个真实节点可以有很多个虚拟节点，当数据被分配给这些虚拟节点时，本质上是分给这个真实节点的。由于数量变多了，数据分布的均衡性会有所提高；</p>
+</li>
+<li>新增节点时：例如原本的节点哈希值列表为[1,100,500,1000]，新增节点800后，在501~799范围内的数据原本是分给哈希值为1000的节点的，现在要把这部分数据迁移到节点800；</li>
+<li>删除节点：例如原本的节点哈希值列表为[1,100,500,800，1000]，删除节点500后，原本范围是101~500的数据要迁移到节点800.</li>
+</ul>
+<h1 id="代码实现过程的一些思考"><a href="#代码实现过程的一些思考" class="headerlink" title="代码实现过程的一些思考"></a>代码实现过程的一些思考</h1><p>理解原理其实不难，但实现的时候需要考虑的东西就有很多了，比如要怎么处理虚拟节点和实际节点的对应关系、新增或者删除节点后的数据要怎么处理。</p>
+<blockquote>
+<p>下面直接说数据存放在某个虚拟节点，其实是存在这个虚拟节点对应的实际节点上的，为了描述方便才这样说的。虚拟节点本身其实并不是实际存在的，只是为了让数据分布的更加均匀而设置的。</p>
+</blockquote>
+<ol>
+<li><strong>哈希值怎么得到</strong></li>
+</ol>
+<p>使用了 Murmurhash算法，它是一种非加密型哈希函数，适用于一般的哈希检索操作。高运算性能，低碰撞率，由Austin Appleby创建于2008年，现已应用到Hadoop、libstdc++、nginx、libmemcached等开源系统。2011年Appleby被Google雇佣，随后Google推出其变种的CityHash算法。代码里直接复用了MurmurHash2的实现。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">unsigned int my_getMurMurHash(const void *key, int len)</div></pre></td></tr></table></figure>
+<ol>
+<li><strong>如何找到第一个大于等于当前数据哈希值的节点</strong></li>
+</ol>
+<p>在哈希类中存储一个有序的虚拟节点哈希值列表this-&gt;sorted_node_hash_list，在这个列表中使用二分查找，返回值为节点在列表中的位置，从而方便在添加、删除节点时，复用这个函数然后找到当前位置后面的节点。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">unsigned int consistent_hash::find_nearest_node(unsigned int hash_value)</div></pre></td></tr></table></figure>
+<ol>
+<li><strong>新增一个实际节点</strong></li>
+</ol>
+<p>看了Github上一些别人实现的一致性哈希，大多都没考虑新增节点时数据的迁移问题。在新增一个实际节点后，会为它生成一些虚拟节点，每个虚拟节点有一个自己的哈希值，会对应到哈希环中的一个位置，插入新虚拟节点后可能会需要从后面位置的虚拟节点上“抢”一些数据。抢夺的数据可能与当前的虚拟节点是属于同一个实际节点的，例如：原本的虚拟节点列表为[1,100,500，1500]，在新增实际节点A时，先生成了一个虚拟节点1000，那么它会从1500节点上“抢”走范围在501~1000的数据；然后节点A又生成了一个哈希值为800的虚拟节点，那么就会从节点1000上“抢”走范围在501~800的数据。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">void consistent_hash::add_real_node(string ip, unsigned int virtual_node_num)</div></pre></td></tr></table></figure>
+<ol>
+<li><strong>删除一个实际节点</strong></li>
+</ol>
+<p>删除一个实际节点时，属于它的虚拟节点也要删除。如果在删除过程中，某个虚拟节点有存放数据，那么就要从当前虚拟节点的位置向后遍历，找到第一个不属于要被删除实际节点的虚拟节点。例如目前哈希值为1000、属于A实际节点的虚拟节点要被删掉了，1500节点也属于A，不能把数据迁移到这里；2000节点属于B，因此选择把1000节点上的数据迁移到2000节点。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">void consistent_hash::drop_real_node(string ip)</div></pre></td></tr></table></figure>
+<h1 id="代码运行结果"><a href="#代码运行结果" class="headerlink" title="代码运行结果"></a>代码运行结果</h1><p>重点测试了新增节点、删除节点后数据的迁移。完整代码见<a href="https://github.com/metang326/consistent_hashing_cpp" target="_blank" rel="external">https://github.com/metang326/consistent_hashing_cpp</a></p>
+<p><strong>测试步骤：</strong></p>
+<ol>
+<li>创建实际节点192.168.2.136，拥有300个虚拟节点；</li>
+<li>插入6条数据；</li>
+<li>打印哈希表状况，目前6条数据放置的虚拟节点都属于实际节点192.168.2.136；</li>
+<li>新增两个实际节点，192.168.2.137和192.168.2.138，各有300个虚拟节点。在插入过程中，有部分数据会迁移到新增的虚拟节点上；</li>
+<li>打印哈希表状况，目前6条数据放置的虚拟节点和第一次打印时有所变化；</li>
+<li>删除实际节点192.168.2.136，属于它的数据节点如果存放了数据，则要迁移到离它最近的、后面的一个属于别的实际节点的虚拟节点；</li>
+<li>打印哈希表状况，目前6条数据放置的虚拟节点只属于192.168.2.137或者192.168.2.138。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">consistent_hash hash = consistent_hash();</div><div class="line">hash.add_real_node(&quot;192.168.2.136&quot;, 300);</div><div class="line"></div><div class="line">hash.put(&quot;metang1996&quot;);</div><div class="line">hash.put(&quot;buaa&quot;);</div><div class="line">hash.put(&quot;hello world&quot;);</div><div class="line">hash.put(&quot;test add data&quot;);</div><div class="line">hash.put(&quot;python&quot;);</div><div class="line">hash.put(&quot;c++&quot;);</div><div class="line"></div><div class="line">cout &lt;&lt; endl &lt;&lt; &quot;---------------------------------step 1---------------------------------&quot; &lt;&lt; endl;</div><div class="line">hash.print();</div><div class="line"></div><div class="line">cout &lt;&lt; endl &lt;&lt; &quot;---------------------------------step 2---------------------------------&quot; &lt;&lt; endl;</div><div class="line">hash.add_real_node(&quot;192.168.2.137&quot;, 300);</div><div class="line">hash.add_real_node(&quot;192.168.2.138&quot;, 300);</div><div class="line">hash.print();</div><div class="line"></div><div class="line">cout &lt;&lt; endl &lt;&lt; &quot;---------------------------------step 3---------------------------------&quot; &lt;&lt; endl;</div><div class="line">hash.drop_real_node(&quot;192.168.2.136&quot;);</div><div class="line">hash.print();</div></pre></td></tr></table></figure>
+<p><strong>运行结果：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div></pre></td><td class="code"><pre><div class="line">[add_real_node] 192.168.2.136</div><div class="line">[add_real_node finished]        192.168.2.136</div><div class="line"></div><div class="line">data:   metang1996(4222505775)  was put on virtual node:192.168.2.136:263(4235609549)</div><div class="line">data:   buaa(3454011751)        was put on virtual node:192.168.2.136:267(3456706561)</div><div class="line">data:   hello world(1164859173) was put on virtual node:192.168.2.136:164(1166539894)</div><div class="line">data:   test add data(4091638786)       was put on virtual node:192.168.2.136:174(4105552776)</div><div class="line">data:   python(2193893537)      was put on virtual node:192.168.2.136:258(2228356111)</div><div class="line">data:   c++(3909345298) was put on virtual node:192.168.2.136:29(3930339622)</div><div class="line"></div><div class="line">---------------------------------step 1---------------------------------</div><div class="line"></div><div class="line">------------consistent_hash.print()------------</div><div class="line">real_node_sum:  1       virtual_node_sum:       300</div><div class="line"></div><div class="line">------------consistent_hash.print_real_node------------</div><div class="line">real_node ip:192.168.2.136      virtual_node_num=300</div><div class="line">virtual node:   192.168.2.136:29(3930339622)    has data:(c++,3909345298)</div><div class="line">virtual node:   192.168.2.136:164(1166539894)   has data:(hello world,1164859173)</div><div class="line">virtual node:   192.168.2.136:174(4105552776)   has data:(test add data,4091638786)</div><div class="line">virtual node:   192.168.2.136:258(2228356111)   has data:(python,2193893537)</div><div class="line">virtual node:   192.168.2.136:263(4235609549)   has data:(metang1996,4222505775)</div><div class="line">virtual node:   192.168.2.136:267(3456706561)   has data:(buaa,3454011751)</div><div class="line"></div><div class="line"></div><div class="line">---------------------------------step 2---------------------------------</div><div class="line">[add_real_node] 192.168.2.137</div><div class="line">[move data]     2193893537      from node:      192.168.2.136:258(2228356111)   to      192.168.2.137:1(2212322557)</div><div class="line">[move data]     3909345298      from node:      192.168.2.136:29(3930339622)    to      192.168.2.137:13(3929102228)</div><div class="line">[move data]     2193893537      from node:      192.168.2.137:1(2212322557)     to      192.168.2.137:55(2202566453)</div><div class="line">[move data]     3909345298      from node:      192.168.2.137:13(3929102228)    to      192.168.2.137:127(3918333119)</div><div class="line">[move data]     3454011751      from node:      192.168.2.136:267(3456706561)   to      192.168.2.137:172(3455963154)</div><div class="line">[add_real_node finished]        192.168.2.137</div><div class="line"></div><div class="line">[add_real_node] 192.168.2.138</div><div class="line">[move data]     2193893537      from node:      192.168.2.137:55(2202566453)    to      192.168.2.138:2(2195513987)</div><div class="line">[move data]     1164859173      from node:      192.168.2.136:164(1166539894)   to      192.168.2.138:25(1166108575)</div><div class="line">[move data]     4222505775      from node:      192.168.2.136:263(4235609549)   to      192.168.2.138:166(4227248974)</div><div class="line">[add_real_node finished]        192.168.2.138</div><div class="line"></div><div class="line"></div><div class="line">------------consistent_hash.print()------------</div><div class="line">real_node_sum:  3       virtual_node_sum:       900</div><div class="line"></div><div class="line">------------consistent_hash.print_real_node------------</div><div class="line">real_node ip:192.168.2.136      virtual_node_num=300</div><div class="line">virtual node:   192.168.2.136:174(4105552776)   has data:(test add data,4091638786)</div><div class="line"></div><div class="line">------------consistent_hash.print_real_node------------</div><div class="line">real_node ip:192.168.2.137      virtual_node_num=300</div><div class="line">virtual node:   192.168.2.137:127(3918333119)   has data:(c++,3909345298)</div><div class="line">virtual node:   192.168.2.137:172(3455963154)   has data:(buaa,3454011751)</div><div class="line"></div><div class="line">------------consistent_hash.print_real_node------------</div><div class="line">real_node ip:192.168.2.138      virtual_node_num=300</div><div class="line">virtual node:   192.168.2.138:2(2195513987)     has data:(python,2193893537)</div><div class="line">virtual node:   192.168.2.138:25(1166108575)    has data:(hello world,1164859173)</div><div class="line">virtual node:   192.168.2.138:166(4227248974)   has data:(metang1996,4222505775)</div><div class="line"></div><div class="line"></div><div class="line">---------------------------------step 3---------------------------------</div><div class="line">[drop_real_node]        192.168.2.136</div><div class="line">[move data]     test add data   from node:      192.168.2.136:174(4105552776)   to      192.168.2.138:181(4105865009)</div><div class="line">[drop_real_node finished]       192.168.2.136</div><div class="line"></div><div class="line"></div><div class="line">------------consistent_hash.print()------------</div><div class="line">real_node_sum:  2       virtual_node_sum:       600</div><div class="line"></div><div class="line">------------consistent_hash.print_real_node------------</div><div class="line">real_node ip:192.168.2.137      virtual_node_num=300</div><div class="line">virtual node:   192.168.2.137:127(3918333119)   has data:(c++,3909345298)</div><div class="line">virtual node:   192.168.2.137:172(3455963154)   has data:(buaa,3454011751)</div><div class="line"></div><div class="line">------------consistent_hash.print_real_node------------</div><div class="line">real_node ip:192.168.2.138      virtual_node_num=300</div><div class="line">virtual node:   192.168.2.138:2(2195513987)     has data:(python,2193893537)</div><div class="line">virtual node:   192.168.2.138:25(1166108575)    has data:(hello world,1164859173)</div><div class="line">virtual node:   192.168.2.138:166(4227248974)   has data:(metang1996,4222505775)</div><div class="line">virtual node:   192.168.2.138:181(4105865009)   has data:(test add data,4091638786)</div></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+    
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+  
+</div>
+    
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="metang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/aipay.jpg" alt="metang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/算法/" rel="tag"><i class="fa fa-tag"></i> 算法</a>
+          
+            <a href="/tags/C/" rel="tag"><i class="fa fa-tag"></i> C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/05/01/[日志分析]基于开源URL数据字符串特征的恶意性检测/" rel="next" title="基于开源URL数据字符串特征的恶意性检测，本科毕业设计">
+                <i class="fa fa-chevron-left"></i> 基于开源URL数据字符串特征的恶意性检测，本科毕业设计
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.JPG"
+                alt="metang" />
+            
+              <p class="site-author-name" itemprop="name">metang</p>
+              <p class="site-description motion-element" itemprop="description">from Nuaa</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/metang326" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="534747943@qq.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一致性哈希原理"><span class="nav-number">1.</span> <span class="nav-text">一致性哈希原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码实现过程的一些思考"><span class="nav-number">2.</span> <span class="nav-text">代码实现过程的一些思考</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码运行结果"><span class="nav-number">3.</span> <span class="nav-text">代码运行结果</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">metang</span>
+
+  
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>
