@@ -94,18 +94,18 @@
 
 
 
-<meta name="description" content="nike官网专属定制补货提醒，每十秒钟一次监控是否补货，有补货则使用PotPlayer播放报警mp3">
+<meta name="description" content="nike官网专属定制补货提醒，每十秒钟一次监控是否补货，有补货则使用PotPlayer播放报警mp3或者发送邮件。">
 <meta name="keywords" content="爬虫">
 <meta property="og:type" content="article">
 <meta property="og:title" content="nike by you补货提醒">
 <meta property="og:url" content="https://metang326.coding.me/2020/04/16/[爬虫]nike by you补货提醒/index.html">
 <meta property="og:site_name" content="metang&#39;s blog">
-<meta property="og:description" content="nike官网专属定制补货提醒，每十秒钟一次监控是否补货，有补货则使用PotPlayer播放报警mp3">
+<meta property="og:description" content="nike官网专属定制补货提醒，每十秒钟一次监控是否补货，有补货则使用PotPlayer播放报警mp3或者发送邮件。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-05-01T07:16:03.629Z">
+<meta property="og:updated_time" content="2020-05-30T12:56:20.017Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="nike by you补货提醒">
-<meta name="twitter:description" content="nike官网专属定制补货提醒，每十秒钟一次监控是否补货，有补货则使用PotPlayer播放报警mp3">
+<meta name="twitter:description" content="nike官网专属定制补货提醒，每十秒钟一次监控是否补货，有补货则使用PotPlayer播放报警mp3或者发送邮件。">
 
 
 
@@ -408,7 +408,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  760
+                  866
                 </span>
               
 
@@ -433,28 +433,20 @@
       
 
       
-        <p>nike官网专属定制补货提醒，每十秒钟一次监控是否补货，有补货则使用PotPlayer播放报警mp3</p>
+        <p>nike官网专属定制补货提醒，每十秒钟一次监控是否补货，有补货则使用PotPlayer播放报警mp3或者发送邮件。</p>
 <a id="more"></a>
+<h1 id="nike-by-you-check"><a href="#nike-by-you-check" class="headerlink" title="nike_by_you_check"></a>nike_by_you_check</h1><p>nike官网专属定制补货提醒，使用的是python3，完整代码在<a href="https://github.com/metang326/nike_by_you_check/blob/master/get.py" target="_blank" rel="external">https://github.com/metang326/nike_by_you_check/blob/master/get.py</a></p>
 <p>代码中蹲守款式为air-force-1-low女款<br><a href="https://www.nike.com/cn/u/custom-nike-air-force-1-by-you-10000831/936687443" target="_blank" rel="external">https://www.nike.com/cn/u/custom-nike-air-force-1-by-you-10000831/936687443</a></p>
-<p>在开发者模式下，network标签下搜索“售罄”发现是通过：<a href="https://api.nike.com/customization/builder_availability/v1?filter=countryCode(CN)&amp;filter=locale(zh_CN)&amp;filter=pathName(af1LowEssSP20)&amp;channelId=public" target="_blank" rel="external">https://api.nike.com/customization/builder_availability/v1?filter=countryCode(CN)&amp;filter=locale(zh_CN)&amp;filter=pathName(af1LowEssSP20)&amp;channelId=public</a>  这个api返回的。</p>
-<p><strong>Request Header内容为：</strong></p>
-<blockquote>
-<p>Accept: application/json, text/plain, <em>/</em><br>nike-api-caller-id: com.nike:commerce.idpdp.mobile<br>Origin: <a href="https://www.nike.com" target="_blank" rel="external">https://www.nike.com</a><br>Referer: <a href="https://www.nike.com/cn/u/custom-nike-air-force-1-by-you-10000831/1583806413614" target="_blank" rel="external">https://www.nike.com/cn/u/custom-nike-air-force-1-by-you-10000831/1583806413614</a><br>User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Mobile Safari/537.36</p>
-</blockquote>
-<p><strong>Response Header为：</strong></p>
-<blockquote>
-<p>access-control-allow-credentials: true<br>access-control-allow-headers: nike-api-caller-id<br>access-control-allow-origin: *<br>access-control-expose-headers: Date,WWW-Authenticate<br>akamai-age-ms: 1588255687755<br>cache-control: private, max-age=0<br>content-encoding: gzip<br>content-length: 457<br>content-type: application/json;charset=UTF-8<br>date: Thu, 30 Apr 2020 14:08:07 GMT<br>expires: Thu, 30 Apr 2020 14:08:07 GMT<br>status: 200<br>vary: Accept-Encoding<br>x-b3-traceid: 99c94a9bcb7e449f<br>x-edgeconnect-midmile-rtt: 233<br>x-edgeconnect-origin-mex-latency: 23</p>
-</blockquote>
-<p><strong>Response内容为：</strong></p>
-<blockquote>
-<p>{“objects”:[{“styleColor”:”AQ3778-994”,”shortMessage”:”已售罄”,”longMessage”:”该款定制运动鞋为每日限量发布，目前暂不提供。敬请留意最新供货情况。谢谢！”,”leadtimeUpperBoundInDays”:-1,”sizes”:{“11”:{“size”:”11”,”quantity”:0},”9.5”:{“size”:”9.5”,”quantity”:0},”12”:{“size”:”12”,”quantity”:0},”11.5”:{“size”:”11.5”,”quantity”:0},”10.5”:{“size”:”10.5”,”quantity”:0},”5”:{“size”:”5”,”quantity”:0},”6”:{“size”:”6”,”quantity”:0},”7”:{“size”:”7”,”quantity”:0},”8”:{“size”:”8”,”quantity”:0},”9”:{“size”:”9”,”quantity”:0},”5.5”:{“size”:”5.5”,”quantity”:0},”6.5”:{“size”:”6.5”,”quantity”:0},”7.5”:{“size”:”7.5”,”quantity”:0},”10”:{“size”:”10”,”quantity”:0},”8.5”:{“size”:”8.5”,”quantity”:0}},”isAvailable”:false},{“styleColor”:”CT7875-994”,”shortMessage”:”已售罄”,”longMessage”:”该款定制运动鞋为每日限量发布，目前暂不提供。敬请留意最新供货情况。谢谢！”,”leadtimeUpperBoundInDays”:-1,”sizes”:{“11”:{“size”:”11”,”quantity”:0},”9.5”:{“size”:”9.5”,”quantity”:0},”12”:{“size”:”12”,”quantity”:0},”13”:{“size”:”13”,”quantity”:0},”14”:{“size”:”14”,”quantity”:0},”15”:{“size”:”15”,”quantity”:0},”16”:{“size”:”16”,”quantity”:0},”17”:{“size”:”17”,”quantity”:0},”18”:{“size”:”18”,”quantity”:0},”11.5”:{“size”:”11.5”,”quantity”:0},”10.5”:{“size”:”10.5”,”quantity”:0},”6”:{“size”:”6”,”quantity”:0},”7”:{“size”:”7”,”quantity”:0},”8”:{“size”:”8”,”quantity”:0},”9”:{“size”:”9”,”quantity”:0},”6.5”:{“size”:”6.5”,”quantity”:0},”7.5”:{“size”:”7.5”,”quantity”:0},”12.5”:{“size”:”12.5”,”quantity”:0},”8.5”:{“size”:”8.5”,”quantity”:0},”10”:{“size”:”10”,”quantity”:0}},”isAvailable”:false}],”errors”:[]}</p>
-</blockquote>
-<p><strong>在get请求里必须加上nike-api-caller-id:com.nike:commerce.idpdp.mobile才能得到返回结果，如果不加则返回：</strong></p>
-<blockquote>
-<p>{<br>  “error_id”: “66507306-e5f9-4c8e-a62e-111d9f4e9520”,<br>  “errors”: [<br>      {<br>          “code”: “CLIENT_UNAUTHORIZED”,<br>          “message”: “Client nike-api-caller-id header is not authorized.”<br>      }<br>  ]<br>}</p>
-</blockquote>
+<p>在开发者模式下，network标签下搜索“售罄”发现是通过：<a href="https://api.nike.com/customization/builder_availability/v1?filter=countryCode(CN)&amp;filter=locale(zh_CN)&amp;filter=pathName(af1LowEssSP20)&amp;channelId=public" target="_blank" rel="external">https://api.nike.com/customization/builder_availability/v1?filter=countryCode(CN)&amp;filter=locale(zh_CN)&amp;filter=pathName(af1LowEssSP20)&amp;channelId=public</a>  这个api返回的：</p>
+<p>Request Header内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Accept: application/json, text/plain, */*</div><div class="line">nike-api-caller-id: com.nike:commerce.idpdp.mobile</div><div class="line">Origin: https://www.nike.com</div><div class="line">Referer: https://www.nike.com/cn/u/custom-nike-air-force-1-by-you-10000831/1583806413614</div><div class="line">User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Mobile Safari/537.36</div></pre></td></tr></table></figure>
+<p>Response Header为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">access-control-allow-credentials: true</div><div class="line">access-control-allow-headers: nike-api-caller-id</div><div class="line">access-control-allow-origin: *</div><div class="line">access-control-expose-headers: Date,WWW-Authenticate</div><div class="line">akamai-age-ms: 1588255687755</div><div class="line">cache-control: private, max-age=0</div><div class="line">content-encoding: gzip</div><div class="line">content-length: 457</div><div class="line">content-type: application/json;charset=UTF-8</div><div class="line">date: Thu, 30 Apr 2020 14:08:07 GMT</div><div class="line">expires: Thu, 30 Apr 2020 14:08:07 GMT</div><div class="line">status: 200</div><div class="line">vary: Accept-Encoding</div><div class="line">x-b3-traceid: 99c94a9bcb7e449f</div><div class="line">x-edgeconnect-midmile-rtt: 233</div><div class="line">x-edgeconnect-origin-mex-latency: 23</div></pre></td></tr></table></figure></p>
+<p>Response内容为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;&quot;objects&quot;:[&#123;&quot;styleColor&quot;:&quot;AQ3778-994&quot;,&quot;shortMessage&quot;:&quot;已售罄&quot;,&quot;longMessage&quot;:&quot;该款定制运动鞋为每日限量发布，目前暂不提供。敬请留意最新供货情况。谢谢！&quot;,&quot;leadtimeUpperBoundInDays&quot;:-1,&quot;sizes&quot;:&#123;&quot;11&quot;:&#123;&quot;size&quot;:&quot;11&quot;,&quot;quantity&quot;:0&#125;,&quot;9.5&quot;:&#123;&quot;size&quot;:&quot;9.5&quot;,&quot;quantity&quot;:0&#125;,&quot;12&quot;:&#123;&quot;size&quot;:&quot;12&quot;,&quot;quantity&quot;:0&#125;,&quot;11.5&quot;:&#123;&quot;size&quot;:&quot;11.5&quot;,&quot;quantity&quot;:0&#125;,&quot;10.5&quot;:&#123;&quot;size&quot;:&quot;10.5&quot;,&quot;quantity&quot;:0&#125;,&quot;5&quot;:&#123;&quot;size&quot;:&quot;5&quot;,&quot;quantity&quot;:0&#125;,&quot;6&quot;:&#123;&quot;size&quot;:&quot;6&quot;,&quot;quantity&quot;:0&#125;,&quot;7&quot;:&#123;&quot;size&quot;:&quot;7&quot;,&quot;quantity&quot;:0&#125;,&quot;8&quot;:&#123;&quot;size&quot;:&quot;8&quot;,&quot;quantity&quot;:0&#125;,&quot;9&quot;:&#123;&quot;size&quot;:&quot;9&quot;,&quot;quantity&quot;:0&#125;,&quot;5.5&quot;:&#123;&quot;size&quot;:&quot;5.5&quot;,&quot;quantity&quot;:0&#125;,&quot;6.5&quot;:&#123;&quot;size&quot;:&quot;6.5&quot;,&quot;quantity&quot;:0&#125;,&quot;7.5&quot;:&#123;&quot;size&quot;:&quot;7.5&quot;,&quot;quantity&quot;:0&#125;,&quot;10&quot;:&#123;&quot;size&quot;:&quot;10&quot;,&quot;quantity&quot;:0&#125;,&quot;8.5&quot;:&#123;&quot;size&quot;:&quot;8.5&quot;,&quot;quantity&quot;:0&#125;&#125;,&quot;isAvailable&quot;:false&#125;,&#123;&quot;styleColor&quot;:&quot;CT7875-994&quot;,&quot;shortMessage&quot;:&quot;已售罄&quot;,&quot;longMessage&quot;:&quot;该款定制运动鞋为每日限量发布，目前暂不提供。敬请留意最新供货情况。谢谢！&quot;,&quot;leadtimeUpperBoundInDays&quot;:-1,&quot;sizes&quot;:&#123;&quot;11&quot;:&#123;&quot;size&quot;:&quot;11&quot;,&quot;quantity&quot;:0&#125;,&quot;9.5&quot;:&#123;&quot;size&quot;:&quot;9.5&quot;,&quot;quantity&quot;:0&#125;,&quot;12&quot;:&#123;&quot;size&quot;:&quot;12&quot;,&quot;quantity&quot;:0&#125;,&quot;13&quot;:&#123;&quot;size&quot;:&quot;13&quot;,&quot;quantity&quot;:0&#125;,&quot;14&quot;:&#123;&quot;size&quot;:&quot;14&quot;,&quot;quantity&quot;:0&#125;,&quot;15&quot;:&#123;&quot;size&quot;:&quot;15&quot;,&quot;quantity&quot;:0&#125;,&quot;16&quot;:&#123;&quot;size&quot;:&quot;16&quot;,&quot;quantity&quot;:0&#125;,&quot;17&quot;:&#123;&quot;size&quot;:&quot;17&quot;,&quot;quantity&quot;:0&#125;,&quot;18&quot;:&#123;&quot;size&quot;:&quot;18&quot;,&quot;quantity&quot;:0&#125;,&quot;11.5&quot;:&#123;&quot;size&quot;:&quot;11.5&quot;,&quot;quantity&quot;:0&#125;,&quot;10.5&quot;:&#123;&quot;size&quot;:&quot;10.5&quot;,&quot;quantity&quot;:0&#125;,&quot;6&quot;:&#123;&quot;size&quot;:&quot;6&quot;,&quot;quantity&quot;:0&#125;,&quot;7&quot;:&#123;&quot;size&quot;:&quot;7&quot;,&quot;quantity&quot;:0&#125;,&quot;8&quot;:&#123;&quot;size&quot;:&quot;8&quot;,&quot;quantity&quot;:0&#125;,&quot;9&quot;:&#123;&quot;size&quot;:&quot;9&quot;,&quot;quantity&quot;:0&#125;,&quot;6.5&quot;:&#123;&quot;size&quot;:&quot;6.5&quot;,&quot;quantity&quot;:0&#125;,&quot;7.5&quot;:&#123;&quot;size&quot;:&quot;7.5&quot;,&quot;quantity&quot;:0&#125;,&quot;12.5&quot;:&#123;&quot;size&quot;:&quot;12.5&quot;,&quot;quantity&quot;:0&#125;,&quot;8.5&quot;:&#123;&quot;size&quot;:&quot;8.5&quot;,&quot;quantity&quot;:0&#125;,&quot;10&quot;:&#123;&quot;size&quot;:&quot;10&quot;,&quot;quantity&quot;:0&#125;&#125;,&quot;isAvailable&quot;:false&#125;],&quot;errors&quot;:[]&#125;</div></pre></td></tr></table></figure></p>
+<p>在get请求里必须加上nike-api-caller-id:com.nike:commerce.idpdp.mobile才能得到返回结果，如果不加则返回：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;error_id&quot;: &quot;66507306-e5f9-4c8e-a62e-111d9f4e9520&quot;,</div><div class="line">    &quot;errors&quot;: [</div><div class="line">        &#123;</div><div class="line">            &quot;code&quot;: &quot;CLIENT_UNAUTHORIZED&quot;,</div><div class="line">            &quot;message&quot;: &quot;Client nike-api-caller-id header is not authorized.&quot;</div><div class="line">        &#125;</div><div class="line">    ]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>每十秒钟一次监控是否补货，有补货则使用PotPlayer播放报警mp3</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"><span class="comment"># -*- coding:utf-8 -*-</span></div><div class="line"><span class="keyword">import</span> requests</div><div class="line"><span class="keyword">import</span> datetime</div><div class="line"><span class="keyword">import</span> time</div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">check</span><span class="params">()</span>:</span></div><div class="line">    print(datetime.datetime.now().strftime(<span class="string">'%Y-%m-%d %H:%M:%S'</span>))</div><div class="line">    url=<span class="string">'https://api.nike.com/customization/builder_availability/v1?filter=countryCode(CN)&amp;filter=locale(zh_CN)&amp;filter=pathName(af1LowEssSP20)&amp;channelId=public'</span></div><div class="line">    headers = &#123;<span class="string">'nike-api-caller-id'</span>: <span class="string">'com.nike:commerce.idpdp.mobile'</span>&#125;</div><div class="line">    res =requests.get(url=url, headers = headers)</div><div class="line">    res_json = res.json()</div><div class="line">    <span class="keyword">try</span>:</div><div class="line">        <span class="keyword">if</span> <span class="string">"objects"</span> <span class="keyword">in</span> res_json:</div><div class="line">            info=res_json[<span class="string">"objects"</span>][<span class="number">0</span>]</div><div class="line">            <span class="keyword">if</span> info[<span class="string">"shortMessage"</span>].find(<span class="string">"售罄"</span>)!=<span class="number">-1</span>:</div><div class="line">                print(<span class="string">"卖完了"</span>)</div><div class="line">            <span class="keyword">else</span>:</div><div class="line">                sizes_table=info[<span class="string">"sizes"</span>]</div><div class="line">                quantity= int(sizes_table[<span class="string">"5.5"</span>][<span class="string">"quantity"</span>])</div><div class="line">                print(<span class="string">"35.5数量："</span>,quantity)</div><div class="line">                <span class="keyword">if</span> quantity!=<span class="number">0</span>:</div><div class="line">                    <span class="keyword">import</span> subprocess</div><div class="line">                    subprocess.call(<span class="string">"D:\PotPlayer\PotPlayerMini.exe D:\PotPlayer\/alarm.mp3"</span>)</div><div class="line">    <span class="keyword">except</span> Exception:</div><div class="line">        print(<span class="string">"error!"</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">while</span>(<span class="number">1</span>):</div><div class="line">    check()</div><div class="line">    time.sleep(<span class="number">10</span>)</div></pre></td></tr></table></figure>
+<p><strong>2020/5/30更新</strong></p>
+<p>试了一下通过python发送邮件的方法，也很简单，申请一个新邮箱，在【设置】页面的POP3/SMTP/IMAP标签，给它开启IMAP/SMTP服务，邮箱系统会给一个密码，把它填入下面的password即可。smtp_server是发件邮箱的地址，如果是163或者qq邮箱是不同的，在邮箱系统的页面上会标注的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/env python</div><div class="line"># -*- coding:utf-8 -*-</div><div class="line">import requests</div><div class="line">import datetime</div><div class="line">import time</div><div class="line">import smtplib</div><div class="line">from email.mime.text import MIMEText</div><div class="line">from email.header import Header</div><div class="line"></div><div class="line"></div><div class="line">def alarm_email():</div><div class="line">    from_addr = &apos;发件邮箱@163.com&apos;</div><div class="line">    password = &apos;邮箱系统开启IMAP/SMTP服务后提供的密码&apos;</div><div class="line">    to_addr = &apos;收件邮箱@qq.com&apos;</div><div class="line">    smtp_server = &apos;smtp.163.com&apos;</div><div class="line">    msg = MIMEText(&apos;正文&apos;, &apos;plain&apos;, &apos;utf-8&apos;)</div><div class="line">    msg[&apos;From&apos;] = Header(from_addr)</div><div class="line">    msg[&apos;To&apos;] = Header(to_addr)</div><div class="line">    msg[&apos;Subject&apos;] = Header(&apos;标题&apos;)</div><div class="line">    server = smtplib.SMTP_SSL()</div><div class="line">    server.connect(smtp_server, 465)</div><div class="line">    server.login(from_addr, password)</div><div class="line">    server.sendmail(from_addr, to_addr, msg.as_string())</div><div class="line">    server.quit()</div><div class="line">    print(&apos;已发送邮件&apos;)</div></pre></td></tr></table></figure></p>
+
       
     </div>
     
@@ -523,8 +515,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/04/16/[docker]配置Kafka环境/" rel="next" title="docker配置Kafka环境">
-                <i class="fa fa-chevron-left"></i> docker配置Kafka环境
+              <a href="/2020/02/03/[linux]linux增加crontab定时任务/" rel="next" title="linux增加crontab定时任务">
+                <i class="fa fa-chevron-left"></i> linux增加crontab定时任务
               </a>
             
           </div>
@@ -533,8 +525,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2020/05/01/[日志分析]基于开源URL数据字符串特征的恶意性检测/" rel="prev" title="基于开源URL数据字符串特征的恶意性检测，本科毕业设计">
-                基于开源URL数据字符串特征的恶意性检测，本科毕业设计 <i class="fa fa-chevron-right"></i>
+              <a href="/2020/04/16/[docker]配置Kafka环境/" rel="prev" title="docker配置Kafka环境">
+                docker配置Kafka环境 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -593,8 +585,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -613,7 +614,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">43</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -674,6 +675,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#nike-by-you-check"><span class="nav-number">1.</span> <span class="nav-text">nike_by_you_check</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

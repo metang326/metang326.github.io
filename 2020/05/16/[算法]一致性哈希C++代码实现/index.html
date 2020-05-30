@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="metang&#39;s blog">
 <meta property="og:description" content="复习算法的过程中看到了对一致性哈希的讲解，发现GitHub上很多代码实现的功能都不全（比如新增节点、删除节点时没考虑数据的迁移），于是自己代码实现了一下，总体思路参考左程云的书。使用了虚拟节点，并且在新增实际节点或者删除实际节点时，会对数据进行迁移。整个思路理解起来其实不难，但在自己实现的时候发现要考虑的细节还挺多的，很多是之前看书时没有想过的。代码见https://github.com/meta">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-05-16T10:57:56.643Z">
+<meta property="og:updated_time" content="2020-05-16T11:06:29.805Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="一致性哈希代码实现">
 <meta name="twitter:description" content="复习算法的过程中看到了对一致性哈希的讲解，发现GitHub上很多代码实现的功能都不全（比如新增节点、删除节点时没考虑数据的迁移），于是自己代码实现了一下，总体思路参考左程云的书。使用了虚拟节点，并且在新增实际节点或者删除实际节点时，会对数据进行迁移。整个思路理解起来其实不难，但在自己实现的时候发现要考虑的细节还挺多的，很多是之前看书时没有想过的。代码见https://github.com/meta">
@@ -408,7 +408,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2,305
+                  2,301
                 </span>
               
 
@@ -435,38 +435,28 @@
       
         <p>复习算法的过程中看到了对一致性哈希的讲解，发现GitHub上很多代码实现的功能都不全（比如新增节点、删除节点时没考虑数据的迁移），于是自己代码实现了一下，总体思路参考左程云的书。使用了虚拟节点，并且在新增实际节点或者删除实际节点时，会对数据进行迁移。整个思路理解起来其实不难，但在自己实现的时候发现要考虑的细节还挺多的，很多是之前看书时没有想过的。代码见<a href="https://github.com/metang326/consistent_hashing_cpp" target="_blank" rel="external">https://github.com/metang326/consistent_hashing_cpp</a><br><a id="more"></a></p>
 <h1 id="一致性哈希原理"><a href="#一致性哈希原理" class="headerlink" title="一致性哈希原理"></a>一致性哈希原理</h1><ul>
-<li><p>映射空间可抽象为一个环，长度为$2^{32}$，范围为[0, $2^{32}-1$]，每个服务器节点根据自己的哈希值被映射到这个环上；</p>
+<li><p>映射空间可抽象为一个环，长度为2^32，范围为[0, 2^32-1]，每个服务器节点根据自己的哈希值被映射到这个环上；</p>
 </li>
 <li><p>判断一条数据属于哪个服务器节点的方法：根据数据的哈希值，去哈希环找到第一个大于等于数据哈希值的机器（可以理解为离它最近）。如果数据的哈希值大于当前最大的机器哈希值，那么就把这个数据放在位置最靠前（哈希值最小）的机器上，因为是一个环；</p>
 </li>
-<li><p>为了解决实际机器过少导致的数据倾斜问题（例如目前一共3个机器，机器A、B的哈希值分别为1和2，而另一个机器C的哈希值为 $2^{32}-1$，那么大部分的数据都会被分给机器C），引入了虚拟节点概念，虚拟节点相当于真实节点的分身，一个真实节点可以有很多个虚拟节点，当数据被分配给这些虚拟节点时，本质上是分给这个真实节点的。由于数量变多了，数据分布的均衡性会有所提高；</p>
+<li><p>为了解决实际机器过少导致的数据倾斜问题（例如目前一共3个机器，机器A、B的哈希值分别为1和2，而另一个机器C的哈希值为 2^32-1，那么大部分的数据都会被分给机器C），引入了虚拟节点概念，虚拟节点相当于真实节点的分身，一个真实节点可以有很多个虚拟节点，当数据被分配给这些虚拟节点时，本质上是分给这个真实节点的。由于数量变多了，数据分布的均衡性会有所提高；</p>
 </li>
-<li>新增节点时：例如原本的节点哈希值列表为[1,100,500,1000]，新增节点800后，在501~799范围内的数据原本是分给哈希值为1000的节点的，现在要把这部分数据迁移到节点800；</li>
-<li>删除节点：例如原本的节点哈希值列表为[1,100,500,800，1000]，删除节点500后，原本范围是101~500的数据要迁移到节点800.</li>
+<li><p>新增节点时：例如原本的节点哈希值列表为[1,100,500,1000]，新增节点800后，在501~799范围内的数据原本是分给哈希值为1000的节点的，现在要把这部分数据迁移到节点800；</p>
+</li>
+<li><p>删除节点：例如原本的节点哈希值列表为[1,100,500,800，1000]，删除节点500后，原本范围是101~500的数据要迁移到节点800.</p>
+</li>
 </ul>
 <h1 id="代码实现过程的一些思考"><a href="#代码实现过程的一些思考" class="headerlink" title="代码实现过程的一些思考"></a>代码实现过程的一些思考</h1><p>理解原理其实不难，但实现的时候需要考虑的东西就有很多了，比如要怎么处理虚拟节点和实际节点的对应关系、新增或者删除节点后的数据要怎么处理。</p>
 <blockquote>
 <p>下面直接说数据存放在某个虚拟节点，其实是存在这个虚拟节点对应的实际节点上的，为了描述方便才这样说的。虚拟节点本身其实并不是实际存在的，只是为了让数据分布的更加均匀而设置的。</p>
 </blockquote>
-<ol>
-<li><strong>哈希值怎么得到</strong></li>
-</ol>
-<p>使用了 Murmurhash算法，它是一种非加密型哈希函数，适用于一般的哈希检索操作。高运算性能，低碰撞率，由Austin Appleby创建于2008年，现已应用到Hadoop、libstdc++、nginx、libmemcached等开源系统。2011年Appleby被Google雇佣，随后Google推出其变种的CityHash算法。代码里直接复用了MurmurHash2的实现。</p>
+<h2 id="哈希值怎么得到"><a href="#哈希值怎么得到" class="headerlink" title="哈希值怎么得到"></a>哈希值怎么得到</h2><p>使用了 Murmurhash算法，它是一种非加密型哈希函数，适用于一般的哈希检索操作。高运算性能，低碰撞率，由Austin Appleby创建于2008年，现已应用到Hadoop、libstdc++、nginx、libmemcached等开源系统。2011年Appleby被Google雇佣，随后Google推出其变种的CityHash算法。代码里直接复用了MurmurHash2的实现。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">unsigned int my_getMurMurHash(const void *key, int len)</div></pre></td></tr></table></figure>
-<ol>
-<li><strong>如何找到第一个大于等于当前数据哈希值的节点</strong></li>
-</ol>
-<p>在哈希类中存储一个有序的虚拟节点哈希值列表this-&gt;sorted_node_hash_list，在这个列表中使用二分查找，返回值为节点在列表中的位置，从而方便在添加、删除节点时，复用这个函数然后找到当前位置后面的节点。</p>
+<h2 id="如何找到第一个大于等于当前数据哈希值的节点"><a href="#如何找到第一个大于等于当前数据哈希值的节点" class="headerlink" title="如何找到第一个大于等于当前数据哈希值的节点"></a>如何找到第一个大于等于当前数据哈希值的节点</h2><p>在哈希类中存储一个有序的虚拟节点哈希值列表this-&gt;sorted_node_hash_list，在这个列表中使用二分查找，返回值为节点在列表中的位置，从而方便在添加、删除节点时，复用这个函数然后找到当前位置后面的节点。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">unsigned int consistent_hash::find_nearest_node(unsigned int hash_value)</div></pre></td></tr></table></figure>
-<ol>
-<li><strong>新增一个实际节点</strong></li>
-</ol>
-<p>看了Github上一些别人实现的一致性哈希，大多都没考虑新增节点时数据的迁移问题。在新增一个实际节点后，会为它生成一些虚拟节点，每个虚拟节点有一个自己的哈希值，会对应到哈希环中的一个位置，插入新虚拟节点后可能会需要从后面位置的虚拟节点上“抢”一些数据。抢夺的数据可能与当前的虚拟节点是属于同一个实际节点的，例如：原本的虚拟节点列表为[1,100,500，1500]，在新增实际节点A时，先生成了一个虚拟节点1000，那么它会从1500节点上“抢”走范围在501~1000的数据；然后节点A又生成了一个哈希值为800的虚拟节点，那么就会从节点1000上“抢”走范围在501~800的数据。</p>
+<h2 id="新增一个实际节点"><a href="#新增一个实际节点" class="headerlink" title="新增一个实际节点"></a>新增一个实际节点</h2><p>看了Github上一些别人实现的一致性哈希，大多都没考虑新增节点时数据的迁移问题。在新增一个实际节点后，会为它生成一些虚拟节点，每个虚拟节点有一个自己的哈希值，会对应到哈希环中的一个位置，插入新虚拟节点后可能会需要从后面位置的虚拟节点上“抢”一些数据。抢夺的数据可能与当前的虚拟节点是属于同一个实际节点的，例如：原本的虚拟节点列表为[1,100,500，1500]，在新增实际节点A时，先生成了一个虚拟节点1000，那么它会从1500节点上“抢”走范围在501~1000的数据；然后节点A又生成了一个哈希值为800的虚拟节点，那么就会从节点1000上“抢”走范围在501~800的数据。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">void consistent_hash::add_real_node(string ip, unsigned int virtual_node_num)</div></pre></td></tr></table></figure>
-<ol>
-<li><strong>删除一个实际节点</strong></li>
-</ol>
-<p>删除一个实际节点时，属于它的虚拟节点也要删除。如果在删除过程中，某个虚拟节点有存放数据，那么就要从当前虚拟节点的位置向后遍历，找到第一个不属于要被删除实际节点的虚拟节点。例如目前哈希值为1000、属于A实际节点的虚拟节点要被删掉了，1500节点也属于A，不能把数据迁移到这里；2000节点属于B，因此选择把1000节点上的数据迁移到2000节点。</p>
+<h2 id="删除一个实际节点"><a href="#删除一个实际节点" class="headerlink" title="删除一个实际节点"></a>删除一个实际节点</h2><p>删除一个实际节点时，属于它的虚拟节点也要删除。如果在删除过程中，某个虚拟节点有存放数据，那么就要从当前虚拟节点的位置向后遍历，找到第一个不属于要被删除实际节点的虚拟节点。例如目前哈希值为1000、属于A实际节点的虚拟节点要被删掉了，1500节点也属于A，不能把数据迁移到这里；2000节点属于B，因此选择把1000节点上的数据迁移到2000节点。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">void consistent_hash::drop_real_node(string ip)</div></pre></td></tr></table></figure>
 <h1 id="代码运行结果"><a href="#代码运行结果" class="headerlink" title="代码运行结果"></a>代码运行结果</h1><p>重点测试了新增节点、删除节点后数据的迁移。完整代码见<a href="https://github.com/metang326/consistent_hashing_cpp" target="_blank" rel="external">https://github.com/metang326/consistent_hashing_cpp</a></p>
 <p><strong>测试步骤：</strong></p>
@@ -562,6 +552,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2020/05/30/[爬虫]Apple_Back-to-School_check/" rel="prev" title="Apple暑期返校送Beats耳机活动监控">
+                Apple暑期返校送Beats耳机活动监控 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -647,7 +641,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">43</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -718,7 +712,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一致性哈希原理"><span class="nav-number">1.</span> <span class="nav-text">一致性哈希原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码实现过程的一些思考"><span class="nav-number">2.</span> <span class="nav-text">代码实现过程的一些思考</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码运行结果"><span class="nav-number">3.</span> <span class="nav-text">代码运行结果</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一致性哈希原理"><span class="nav-number">1.</span> <span class="nav-text">一致性哈希原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码实现过程的一些思考"><span class="nav-number">2.</span> <span class="nav-text">代码实现过程的一些思考</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#哈希值怎么得到"><span class="nav-number">2.1.</span> <span class="nav-text">哈希值怎么得到</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何找到第一个大于等于当前数据哈希值的节点"><span class="nav-number">2.2.</span> <span class="nav-text">如何找到第一个大于等于当前数据哈希值的节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新增一个实际节点"><span class="nav-number">2.3.</span> <span class="nav-text">新增一个实际节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除一个实际节点"><span class="nav-number">2.4.</span> <span class="nav-text">删除一个实际节点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码运行结果"><span class="nav-number">3.</span> <span class="nav-text">代码运行结果</span></a></li></ol></div>
             
 
           </div>
