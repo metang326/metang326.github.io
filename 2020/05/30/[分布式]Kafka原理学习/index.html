@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #199475; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #0B6E48, 0 0 5px     #0B6E48; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #044D22;    /*上边框颜色*/
+        border-left-color: #044D22;    /*左边框颜色*/
+    }
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/trojan_32px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/trojan_16px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Kafka,分布式," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Kafka是一种中间件，基于Zookeeper。中间件是在操作系统、网络和数据库之上，应用软件的下层，总的作用是为处于自己上层的应用软件提供运行与开发的环境。对应到生活中的例子，有点类似于我们想把某个东西给朋友时，通过快递员送过去。消息队列中间件是分布式系统中重要的组件，主要解决应用耦合，异步消息，流量削锋等问题。Kafka是一种高吞吐量的分布式消息队列，是一个分布式的、分区的、可靠的分布式日志存">
+<meta name="keywords" content="Kafka,分布式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kafka原理学习">
+<meta property="og:url" content="https://metang326.coding.me/2020/05/30/[分布式]Kafka原理学习/index.html">
+<meta property="og:site_name" content="metang&#39;s blog">
+<meta property="og:description" content="Kafka是一种中间件，基于Zookeeper。中间件是在操作系统、网络和数据库之上，应用软件的下层，总的作用是为处于自己上层的应用软件提供运行与开发的环境。对应到生活中的例子，有点类似于我们想把某个东西给朋友时，通过快递员送过去。消息队列中间件是分布式系统中重要的组件，主要解决应用耦合，异步消息，流量削锋等问题。Kafka是一种高吞吐量的分布式消息队列，是一个分布式的、分区的、可靠的分布式日志存">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-05-31T09:23:14.105Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kafka原理学习">
+<meta name="twitter:description" content="Kafka是一种中间件，基于Zookeeper。中间件是在操作系统、网络和数据库之上，应用软件的下层，总的作用是为处于自己上层的应用软件提供运行与开发的环境。对应到生活中的例子，有点类似于我们想把某个东西给朋友时，通过快递员送过去。消息队列中间件是分布式系统中重要的组件，主要解决应用耦合，异步消息，流量削锋等问题。Kafka是一种高吞吐量的分布式消息队列，是一个分布式的、分区的、可靠的分布式日志存">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'TZVHEBFK02',
+      apiKey: '1ab48ccb78c0b1c98cf0e7935807338f',
+      indexName: 'my_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"输入关键字进行搜索","hits_empty":"找不到关于  ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://metang326.coding.me/2020/05/30/[分布式]Kafka原理学习/"/>
+
+
+
+
+
+  <title>Kafka原理学习 | metang's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/metang326"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">metang's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In case I don't see ya', good afternoon, good evening and goodnight.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://metang326.coding.me/2020/05/30/[分布式]Kafka原理学习/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="metang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="metang's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Kafka原理学习</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-30T00:00:00+08:00">
+                2020-05-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 阅读数
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,725
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Kafka是一种中间件，基于Zookeeper。中间件是在操作系统、网络和数据库之上，应用软件的下层，总的作用是为处于自己上层的应用软件提供运行与开发的环境。对应到生活中的例子，有点类似于我们想把某个东西给朋友时，通过快递员送过去。消息队列中间件是分布式系统中重要的组件，主要解决<strong>应用耦合，异步消息，流量削锋</strong>等问题。Kafka是一种高吞吐量的<strong>分布式</strong>消息队列，是一个分布式的、分区的、可靠的分布式日志存储服务。</p>
+<a id="more"></a>
+<h3 id="消息队列的两种模式"><a href="#消息队列的两种模式" class="headerlink" title="消息队列的两种模式"></a>消息队列的两种模式</h3><ol>
+<li>点对点模式（一对一）：消费者主动拉取数据，收到消息后，消息会清除；缺点是消费者需要实时监控生产者。</li>
+<li>发布/订阅模式（一对多）：生产数据后，会推送给所有的订阅者。</li>
+</ol>
+<h3 id="Kafka好处"><a href="#Kafka好处" class="headerlink" title="Kafka好处"></a>Kafka好处</h3><ul>
+<li><strong>可靠性</strong>： Kafka是分布式，分区，复制和容错的。</li>
+<li><strong>可扩展性</strong> ： Kafka消息传递系统轻松缩放，无需停机。</li>
+<li><strong>耐用性</strong> ：Kafka使用分布式提交日志，这意味着消息会尽可能快地保留在磁盘上，因此它是持久的。</li>
+<li><strong>性能</strong>：Kafka对于发布和订阅消息都具有高吞吐量。 即使存储了许多TB的消息，它也保持稳定的性能。</li>
+</ul>
+<h3 id="Kafka的使用场景"><a href="#Kafka的使用场景" class="headerlink" title="Kafka的使用场景"></a>Kafka的使用场景</h3><ul>
+<li>日志收集：一个公司可以用Kafka可以收集各种服务的log，通过kafka以统一接口服务的方式开放给各种consumer，例如hadoop、Hbase、Solr等。</li>
+<li>消息系统：解耦和生产者和消费者、缓存消息等。</li>
+<li>用户活动跟踪：Kafka经常被用来记录web用户或者app用户的各种活动，如浏览网页、搜索、点击等活动，这些活动信息被各个服务器发布到kafka的topic中，然后订阅者通过订阅这些topic来做实时的监控分析，或者装载到hadoop、数据仓库中做离线分析和挖掘。</li>
+<li>运营指标：Kafka也经常用来记录运营监控数据。包括收集各种分布式应用的数据，生产各种操作的集中反馈，比如报警和报告。</li>
+</ul>
+<h3 id="Kafka-中的术语"><a href="#Kafka-中的术语" class="headerlink" title="Kafka 中的术语"></a>Kafka 中的术语</h3><ul>
+<li><p>broker：Kafka节点，用于存储消息，一个Kafka节点就是一个broker，多个broker可以组成一个Kafka集群</p>
+</li>
+<li><p>topic：kafka给消息提供的分类方式。broker用来存储不同topic的消息数据。</p>
+</li>
+<li><p>Partition：topic物理上的分组，一个topic可以分为多个partition，每个partition是一个有序的队列。</p>
+</li>
+<li><p>Segment：partition物理上由多个segment组成，每个Segment存着message信息。</p>
+</li>
+<li><p>producer：往broker中某个topic里面生产数据。 </p>
+</li>
+<li><p>consumer：从broker中某个topic获取数据。1个消费者可以消费多个Topic。</p>
+</li>
+<li><p>Consumer Group：一个Consumer Group包含多个consumer, 这个是预先在配置文件中配置好的。各个consumer（consumer 线程）可以组成一个组（Consumer group ），partition中的每个message只能被组（Consumer group ） 中的一个consumer（consumer 线程 ）消费，如果一个message可以被多个consumer（consumer 线程 ） 消费的话，那么这些consumer必须在不同的组。</p>
+</li>
+<li><p>ISR:In-Sync Replicas 副本同步队列，由leader维护。消息会先存在leader节点，然后其余副本节点从leader节点复制数据，当leader节点挂掉的时候，会从ISR中找到和leader相似度最高的节点来取代它；如果一个follower比一个leader落后太多，或者超过一定时间未发起数据复制请求，则leader将其从ISR中移除。</p>
+<blockquote>
+<p>每个Partition有一个leader与多个follower，producer往某个Partition中写入数据是，只会往leader中写入数据，然后数据才会被复制进其他的Replica中。</p>
+<p><strong>数据是由leader push过去还是有follower pull过来？ </strong>pull<br>kafka是由follower周期性或者尝试去pull(拉)过来(其实这个过程与consumer消费过程非常相似)，写是都往leader上写，但是读并不是任意follower上读都行，读也只在leader上读，follower只是数据的一个备份，保证leader被挂掉后顶上来，并不往外提供服务。</p>
+<p> <strong>follower如何与leader同步？</strong>ISR机制</p>
+<p>完全同步复制要求All Alive Follower都复制完，这条消息才会被认为commit，这种复制方式极大的影响了吞吐率。</p>
+<p>异步复制方式下，Follower异步的从Leader复制数据，数据只要被Leader写入log就被认为已经commit，这种情况下，如果leader挂掉，会丢失数据。</p>
+<p>kafka不是完全同步，也不是完全异步，是一种ISR机制： </p>
+<ol>
+<li>leader会维护一个与其基本保持同步的Replica列表，该列表称为ISR(in-sync Replica)，每个Partition都会有一个ISR，而且是由leader动态维护 </li>
+<li>如果一个follower比一个leader落后太多，或者超过一定时间未发起数据复制请求，则leader将其重ISR中移除 </li>
+<li>当ISR中所有Replica都向Leader发送ACK时，leader才commit</li>
+</ol>
+<p><strong>如果leader挂掉了会发生什么？</strong></p>
+<p>如果leader挂掉了，从它的follower中选举一个作为leader，并把挂掉的leader从ISR中移除，继续处理数据。一段时间后该leader重新启动了，它知道它之前的数据到哪里了，尝试获取它挂掉后leader处理的数据，获取完成后它就加入了ISR。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="Topic中的partition分区（Kafka这么快的原因之一）"><a href="#Topic中的partition分区（Kafka这么快的原因之一）" class="headerlink" title="Topic中的partition分区（Kafka这么快的原因之一）"></a>Topic中的partition分区（Kafka这么快的原因之一）</h3><p>在Kafka文件存储中，同一个topic下有多个不同partition，每个partition为一个目录，partiton命名规则为topic名称+有序序号，第一个partiton序号从0开始，序号最大值为partitions数量减1。<br>消息发送时都被发送到一个topic，其本质就是一个目录，而topic由是由一些Partition组成。</p>
+<p>Partition的好处是把topic进一步划分，在生产者产生数据时可以指定把数据发送到topic的指定Partition中，这样可以更加高效的读取数据，并且也可以存放更多的数据（因为存储的压力被分散了）。</p>
+<p>Partition是一个Queue的结构，每个Partition中的消息都是有序的，生产的消息被不断追加到Partition上，其中的每一个消息都被赋予了一个唯一的offset值。</p>
+<p>Kafka只维护在partition中的offset值，因为这个offsite标识着这个partition的message消费到哪条了。Consumer每消费一个消息，offset就会加1。其实消息的状态完全是由Consumer控制的，Consumer可以跟踪和重设这个offset值，这样的话Consumer就可以读取任意位置的消息。</p>
+<p><strong>同一group内，一个partition只能被一个消费者消费（一个消费者可以同时消费多个partition）</strong>，因此，如果设置的partition的数量小于consumer的数量，就会有消费者消费不到数据。所以，推荐partition的数量一定要大于同时运行的consumer的数量。</p>
+<p>Kafka集群会保存所有的消息，不管消息有没有被消费；<strong>我们可以设定消息的过期时间，只有过期的数据才会被自动清除以释放磁盘空间。</strong></p>
+<h3 id="生产者写消息的过程"><a href="#生产者写消息的过程" class="headerlink" title="生产者写消息的过程"></a>生产者写消息的过程</h3><p>在 Kafka 中，生产者写入消息、消费者读取消息的操作都是与 leader 副本进行交互的，从 而实现的是一种<strong>主写主读</strong>的生产消费模型。</p>
+<p>生产者采用push的模式，把消息发布到broker，每条消息都会被append到partition中，是顺序写磁盘，效率比随机写内存要高。每个分区自己的内部是有序的，但分区之间的顺序是不一定的，每条消息存入哪个一partition，可能是被指定的、哈希的、或者是轮询的。</p>
+<h3 id="消息发送的ACK机制"><a href="#消息发送的ACK机制" class="headerlink" title="消息发送的ACK机制"></a>消息发送的ACK机制</h3><p><strong>ACK=1（默认）</strong></p>
+<p>数据发送到Kafka后，经过leader成功接收消息的的确认，就算是发送成功了。在这种情况下，如果leader宕机了，则会丢失数据。</p>
+<p><strong>ACK=0</strong></p>
+<p>生产者将数据发送出去就不管了，不去等待任何返回。这种情况下数据传输效率最高，但是数据可靠性确是最低的。</p>
+<p><strong>ACK=-1</strong></p>
+<p>producer需要等待ISR中的所有follower都确认接收到数据后才算一次发送完成，可靠性最高。当ISR中所有Replica都向Leader发送ACK时，leader才commit，这时候producer才能认为一个请求中的消息都commit了。</p>
+<h3 id="零拷贝技术（Kafka这么快的原因之一）"><a href="#零拷贝技术（Kafka这么快的原因之一）" class="headerlink" title="零拷贝技术（Kafka这么快的原因之一）"></a>零拷贝技术（Kafka这么快的原因之一）</h3><p>通常情况下，Kafka的消息会有多个订阅者，生产者发布的消息会被不同的消费者多次消费，为了优化这个流程，Kafka使用了“零拷贝技术”。有了DMA后，就可以实现绝对的零拷贝了，因为网卡是直接去访问系统主内存的，减少了用户态与内核态的切换，让拷贝的次数降到最低，所以效率更高。</p>
+<p><strong>传统的文件拷贝</strong></p>
+<p>传统的文件拷贝通常需要从用户态去转到核心态，经过核心态的read buffer，然后再返回到用户态的应用层buffer，然后再从用户态的应用层buffer把数据拷贝到核心态的socket buffer，然后发送到网卡。需要多次的用户态和核心态之间的切换，而且还要把数据复制多次，最终才打到网卡。</p>
+<h3 id="顺序写入（Kafka这么快的原因之一）"><a href="#顺序写入（Kafka这么快的原因之一）" class="headerlink" title="顺序写入（Kafka这么快的原因之一）"></a>顺序写入（Kafka这么快的原因之一）</h3><p>每一个Partition其实都是一个文件 ，收到消息后Kafka会把数据插入到文件末尾。这种方法有一个缺陷—— 没有办法删除数据 ，<strong>所以Kafka是不会删除读取过的旧数据的，它会把所有的数据都保留下来</strong>，每个消费者（Consumer）对每个Topic都有一个offset用来表示读取到了第几条数据 。</p>
+<p>如果一直不删除硬盘肯定会被撑满，所以<strong>Kakfa提供了两种策略来删除数据</strong>。一是基于时间，二是基于partition文件大小。每一个partition目录下的文件被平均切割成大小相等（默认一个文件是500兆，可以手动去设置）的数据文件，每一个数据文件都被称为一个段（segment file），但每个段消息数量不一定相等，这种特性能够使得老的segment可以被快速清除。</p>
+<h3 id="批量发送和数据压缩（Kafka这么快的原因之一）"><a href="#批量发送和数据压缩（Kafka这么快的原因之一）" class="headerlink" title="批量发送和数据压缩（Kafka这么快的原因之一）"></a>批量发送和数据压缩（Kafka这么快的原因之一）</h3><p>kafka可以设置批量发送数据，当生产者产生数据达到一定数量，或者没有达到数量，但是达到一定时间间隔，就会一次将数据发送给kafka的broker，因为是批量的原因，减少了网络交互次数，节省很多时间。如果宽带有压力，还可以将批量数据进行压缩处理。</p>
+
+      
+    </div>
+    
+    
+    
+    
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+  
+</div>
+    
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="metang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/aipay.jpg" alt="metang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kafka/" rel="tag"><i class="fa fa-tag"></i> Kafka</a>
+          
+            <a href="/tags/分布式/" rel="tag"><i class="fa fa-tag"></i> 分布式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/05/16/[算法]一致性哈希C++代码实现/" rel="next" title="一致性哈希代码实现">
+                <i class="fa fa-chevron-left"></i> 一致性哈希代码实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/05/30/[爬虫]Apple_Back-to-School_check/" rel="prev" title="Apple暑期返校送Beats耳机活动监控">
+                Apple暑期返校送Beats耳机活动监控 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.JPG"
+                alt="metang" />
+            
+              <p class="site-author-name" itemprop="name">metang</p>
+              <p class="site-description motion-element" itemprop="description">from Nuaa</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">44</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">39</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/metang326" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="534747943@qq.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#消息队列的两种模式"><span class="nav-number">1.</span> <span class="nav-text">消息队列的两种模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka好处"><span class="nav-number">2.</span> <span class="nav-text">Kafka好处</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka的使用场景"><span class="nav-number">3.</span> <span class="nav-text">Kafka的使用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka-中的术语"><span class="nav-number">4.</span> <span class="nav-text">Kafka 中的术语</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Topic中的partition分区（Kafka这么快的原因之一）"><span class="nav-number">5.</span> <span class="nav-text">Topic中的partition分区（Kafka这么快的原因之一）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生产者写消息的过程"><span class="nav-number">6.</span> <span class="nav-text">生产者写消息的过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息发送的ACK机制"><span class="nav-number">7.</span> <span class="nav-text">消息发送的ACK机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#零拷贝技术（Kafka这么快的原因之一）"><span class="nav-number">8.</span> <span class="nav-text">零拷贝技术（Kafka这么快的原因之一）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#顺序写入（Kafka这么快的原因之一）"><span class="nav-number">9.</span> <span class="nav-text">顺序写入（Kafka这么快的原因之一）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#批量发送和数据压缩（Kafka这么快的原因之一）"><span class="nav-number">10.</span> <span class="nav-text">批量发送和数据压缩（Kafka这么快的原因之一）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">metang</span>
+
+  
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>

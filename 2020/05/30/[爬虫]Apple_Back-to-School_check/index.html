@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="metang&#39;s blog">
 <meta property="og:description" content="最近考虑换电脑，一般来说7月的时候苹果会推出教育优惠买MacBook送Beats耳机的活动，为了第一时间发现活动，挑到颜色好看的耳机，写了一个小脚本定时监控教育商店的主页 https://www.apple.com.cn/cn-k12/shop看看有没有更新了关键词“耳机”或者“Beats” ，发现活动开始后通过邮件的方式提醒。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-05-30T12:56:54.071Z">
+<meta property="og:updated_time" content="2020-05-30T13:19:13.603Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Apple暑期返校送Beats耳机活动监控">
 <meta name="twitter:description" content="最近考虑换电脑，一般来说7月的时候苹果会推出教育优惠买MacBook送Beats耳机的活动，为了第一时间发现活动，挑到颜色好看的耳机，写了一个小脚本定时监控教育商店的主页 https://www.apple.com.cn/cn-k12/shop看看有没有更新了关键词“耳机”或者“Beats” ，发现活动开始后通过邮件的方式提醒。">
@@ -408,7 +408,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  481
+                  569
                 </span>
               
 
@@ -440,8 +440,14 @@
 <p>步骤：申请一个新邮箱，在【设置】页面的POP3/SMTP/IMAP标签，给它开启IMAP/SMTP服务，邮箱系统会给一个密码，把它填入下面的password即可。smtp_server是发件邮箱的地址，如果是163或者qq邮箱是不同的，在邮箱系统的页面上会标注的。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/env python</div><div class="line"># -*- coding:utf-8 -*-</div><div class="line">import requests</div><div class="line">import datetime</div><div class="line">import time</div><div class="line">import smtplib</div><div class="line">from email.mime.text import MIMEText</div><div class="line">from email.header import Header</div><div class="line"></div><div class="line"></div><div class="line">def alarm_email():</div><div class="line">    from_addr = &apos;发件邮箱@163.com&apos;</div><div class="line">    password = &apos;邮箱系统开启IMAP/SMTP服务后提供的密码&apos;</div><div class="line">    to_addr = &apos;收件邮箱@qq.com&apos;</div><div class="line">    smtp_server = &apos;smtp.163.com&apos;</div><div class="line">    msg = MIMEText(&apos;正文&apos;, &apos;plain&apos;, &apos;utf-8&apos;)</div><div class="line">    msg[&apos;From&apos;] = Header(from_addr)</div><div class="line">    msg[&apos;To&apos;] = Header(to_addr)</div><div class="line">    msg[&apos;Subject&apos;] = Header(&apos;标题&apos;)</div><div class="line">    server = smtplib.SMTP_SSL()</div><div class="line">    server.connect(smtp_server, 465)</div><div class="line">    server.login(from_addr, password)</div><div class="line">    server.sendmail(from_addr, to_addr, msg.as_string())</div><div class="line">    server.quit()</div><div class="line">    print(&apos;已发送邮件&apos;)</div></pre></td></tr></table></figure>
 <p>完整的监控代码在<a href="https://github.com/metang326/Apple_Back-to-School_check/blob/master/check.py" target="_blank" rel="external">https://github.com/metang326/Apple_Back-to-School_check/blob/master/check.py</a></p>
-<p>计划把这个脚本设置成系统的定时任务，每天定时执行几次。linux增加crontab定时任务的方法博客里有写：</p>
+<p>然后把这个脚本设置成系统的定时任务，每天定时执行几次。linux增加crontab定时任务的方法博客里有写：</p>
 <p><a href="https://metang326.github.io/2020/02/03/[linux]linux%E5%A2%9E%E5%8A%A0crontab%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" target="_blank" rel="external">https://metang326.github.io/2020/02/03/[linux]linux%E5%A2%9E%E5%8A%A0crontab%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/</a></p>
+<p><strong>我是设置了每小时check一次</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">sudo vim /etc/crontab</div><div class="line"></div><div class="line">增加下面这行：</div><div class="line">12 */1  * * *   root    python3 /home/ivic/tmy_repos/Apple_Back-to-School_check/check.py</div><div class="line"></div><div class="line">然后重启服务</div><div class="line">sudo /etc/init.d/cron restart</div><div class="line">[ ok ] Restarting cron (via systemctl): cron.service.</div></pre></td></tr></table></figure>
+<p>可以先通过在代码手动增加一下，进行测试，然后发现准时收到了提醒邮件，Done！</p>
+<blockquote>
+<p>text += “Beats耳机”</p>
+</blockquote>
 
       
     </div>
@@ -511,8 +517,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/05/16/[算法]一致性哈希C++代码实现/" rel="next" title="一致性哈希代码实现">
-                <i class="fa fa-chevron-left"></i> 一致性哈希代码实现
+              <a href="/2020/05/30/[分布式]Kafka原理学习/" rel="next" title="Kafka原理学习">
+                <i class="fa fa-chevron-left"></i> Kafka原理学习
               </a>
             
           </div>
@@ -606,7 +612,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">43</span>
+                  <span class="site-state-item-count">44</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -617,7 +623,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -628,7 +634,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">39</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
