@@ -98,11 +98,11 @@
 <meta name="keywords" content="爬虫">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Apple暑期返校送Beats耳机活动监控">
-<meta property="og:url" content="https://metang326.coding.me/2020/05/30/[爬虫]Apple_Back-to-School_check/index.html">
+<meta property="og:url" content="https://metang326.github.io/2020/05/30/[爬虫]Apple_Back-to-School_check/index.html">
 <meta property="og:site_name" content="metang&#39;s blog">
 <meta property="og:description" content="最近考虑换电脑，一般来说7月的时候苹果会推出教育优惠买MacBook送Beats耳机的活动，为了第一时间发现活动，挑到颜色好看的耳机，写了一个小脚本定时监控教育商店的主页 https://www.apple.com.cn/cn-k12/shop看看有没有更新了关键词“耳机”或者“Beats” ，发现活动开始后通过邮件的方式提醒。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-05-30T13:19:13.603Z">
+<meta property="og:updated_time" content="2020-06-04T06:59:24.191Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Apple暑期返校送Beats耳机活动监控">
 <meta name="twitter:description" content="最近考虑换电脑，一般来说7月的时候苹果会推出教育优惠买MacBook送Beats耳机的活动，为了第一时间发现活动，挑到颜色好看的耳机，写了一个小脚本定时监控教育商店的主页 https://www.apple.com.cn/cn-k12/shop看看有没有更新了关键词“耳机”或者“Beats” ，发现活动开始后通过邮件的方式提醒。">
@@ -135,7 +135,7 @@
 
 
 
-  <link rel="canonical" href="https://metang326.coding.me/2020/05/30/[爬虫]Apple_Back-to-School_check/"/>
+  <link rel="canonical" href="https://metang326.github.io/2020/05/30/[爬虫]Apple_Back-to-School_check/"/>
 
 
 
@@ -318,7 +318,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://metang326.coding.me/2020/05/30/[爬虫]Apple_Back-to-School_check/">
+    <link itemprop="mainEntityOfPage" href="https://metang326.github.io/2020/05/30/[爬虫]Apple_Back-to-School_check/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="metang">
@@ -408,7 +408,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  569
+                  791
                 </span>
               
 
@@ -435,16 +435,40 @@
       
         <p>最近考虑换电脑，一般来说7月的时候苹果会推出教育优惠买MacBook送Beats耳机的活动，为了第一时间发现活动，挑到颜色好看的耳机，写了一个小脚本定时监控教育商店的主页 <a href="https://www.apple.com.cn/cn-k12/shop" target="_blank" rel="external">https://www.apple.com.cn/cn-k12/shop</a><br>看看有没有更新了关键词“耳机”或者“Beats” ，发现活动开始后通过邮件的方式提醒。</p>
 <a id="more"></a>
-<h1 id="Apple-Back-to-School-check"><a href="#Apple-Back-to-School-check" class="headerlink" title="Apple_Back-to-School_check"></a>Apple_Back-to-School_check</h1><p>Apple暑期返校送Beats耳机活动监控，发现活动开始后通过邮件的方式提醒，完整代码在<a href="https://github.com/metang326/Apple_Back-to-School_check/blob/master/check.py" target="_blank" rel="external">https://github.com/metang326/Apple_Back-to-School_check/blob/master/check.py</a></p>
-<p>相比于之前写Nike定制监控的脚本 <a href="https://github.com/metang326/nike_by_you_check" target="_blank" rel="external">https://github.com/metang326/nike_by_you_check</a><br>这次尝试了一下python发送邮件提醒，居然非常简单，用的库也是自带的（我使用的是python3.7）</p>
-<p>步骤：申请一个新邮箱，在【设置】页面的POP3/SMTP/IMAP标签，给它开启IMAP/SMTP服务，邮箱系统会给一个密码，把它填入下面的password即可。smtp_server是发件邮箱的地址，如果是163或者qq邮箱是不同的，在邮箱系统的页面上会标注的。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/env python</div><div class="line"># -*- coding:utf-8 -*-</div><div class="line">import requests</div><div class="line">import datetime</div><div class="line">import time</div><div class="line">import smtplib</div><div class="line">from email.mime.text import MIMEText</div><div class="line">from email.header import Header</div><div class="line"></div><div class="line"></div><div class="line">def alarm_email():</div><div class="line">    from_addr = &apos;发件邮箱@163.com&apos;</div><div class="line">    password = &apos;邮箱系统开启IMAP/SMTP服务后提供的密码&apos;</div><div class="line">    to_addr = &apos;收件邮箱@qq.com&apos;</div><div class="line">    smtp_server = &apos;smtp.163.com&apos;</div><div class="line">    msg = MIMEText(&apos;正文&apos;, &apos;plain&apos;, &apos;utf-8&apos;)</div><div class="line">    msg[&apos;From&apos;] = Header(from_addr)</div><div class="line">    msg[&apos;To&apos;] = Header(to_addr)</div><div class="line">    msg[&apos;Subject&apos;] = Header(&apos;标题&apos;)</div><div class="line">    server = smtplib.SMTP_SSL()</div><div class="line">    server.connect(smtp_server, 465)</div><div class="line">    server.login(from_addr, password)</div><div class="line">    server.sendmail(from_addr, to_addr, msg.as_string())</div><div class="line">    server.quit()</div><div class="line">    print(&apos;已发送邮件&apos;)</div></pre></td></tr></table></figure>
-<p>完整的监控代码在<a href="https://github.com/metang326/Apple_Back-to-School_check/blob/master/check.py" target="_blank" rel="external">https://github.com/metang326/Apple_Back-to-School_check/blob/master/check.py</a></p>
-<p>然后把这个脚本设置成系统的定时任务，每天定时执行几次。linux增加crontab定时任务的方法博客里有写：</p>
-<p><a href="https://metang326.github.io/2020/02/03/[linux]linux%E5%A2%9E%E5%8A%A0crontab%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" target="_blank" rel="external">https://metang326.github.io/2020/02/03/[linux]linux%E5%A2%9E%E5%8A%A0crontab%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/</a></p>
-<p><strong>我是设置了每小时check一次</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">sudo vim /etc/crontab</div><div class="line"></div><div class="line">增加下面这行：</div><div class="line">12 */1  * * *   root    python3 /home/ivic/tmy_repos/Apple_Back-to-School_check/check.py</div><div class="line"></div><div class="line">然后重启服务</div><div class="line">sudo /etc/init.d/cron restart</div><div class="line">[ ok ] Restarting cron (via systemctl): cron.service.</div></pre></td></tr></table></figure>
-<p>可以先通过在代码手动增加一下，进行测试，然后发现准时收到了提醒邮件，Done！</p>
+<h1 id="Apple-Back-to-School-check"><a href="#Apple-Back-to-School-check" class="headerlink" title="Apple_Back-to-School_check"></a>Apple_Back-to-School_check</h1><p>Apple暑期返校送Beats耳机活动监控，发现活动开始后通过邮件的方式提醒。</p>
+<p>相比于之前写Nike定制监控的脚本 <a href="https://github.com/metang326/nike_by_you_check" target="_blank" rel="external">https://github.com/metang326/nike_by_you_check</a> 这次尝试了一下python发送邮件提醒，居然非常简单，用的库也是自带的（我使用的是python3.7）</p>
+<h2 id="使用流程"><a href="#使用流程" class="headerlink" title="使用流程"></a>使用流程</h2><ol>
+<li>git clone代码到本地</li>
+<li>把代码中的邮箱与密码换成自己的</li>
+<li>把执行脚本的语句添加到Linux的定时任务</li>
+</ol>
+<h2 id="代码流程"><a href="#代码流程" class="headerlink" title="代码流程"></a>代码流程</h2><ul>
+<li>抓取教育商店的主页 <a href="https://www.apple.com.cn/cn-k12/shop" target="_blank" rel="external">https://www.apple.com.cn/cn-k12/shop</a> </li>
+<li>看看有没有更新了关键词“耳机”或者“Beats”<ul>
+<li>如果发现这个活动开始了，发邮件通知自己；</li>
+<li>如果没有开始，则每天八点的时候邮件自己一次，通知“活动还没有开始”，确保监控是正常运行的</li>
+</ul>
+</li>
+</ul>
+<h2 id="code"><a href="#code" class="headerlink" title="code"></a>code</h2><p><a href="https://github.com/metang326/Apple_Back-to-School_check/blob/master/check.py" target="_blank" rel="external">https://github.com/metang326/Apple_Back-to-School_check/blob/master/check.py</a></p>
+<h2 id="如何给自己发送邮件"><a href="#如何给自己发送邮件" class="headerlink" title="如何给自己发送邮件"></a>如何给自己发送邮件</h2><p>步骤：申请一个新邮箱，在【设置】页面的POP3/SMTP/IMAP标签，给它开启IMAP/SMTP服务，邮箱系统会给一个密码，把它填入下面的password即可，其他的收件邮箱、发件邮箱等等换成自己的，正文和标题也可以自己随便定义。smtp_server是发件邮箱的地址，如果是163或者qq邮箱是不同的，在邮箱系统的页面上会标注的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/env python</div><div class="line"># -*- coding:utf-8 -*-</div><div class="line">import requests</div><div class="line">import datetime</div><div class="line">import time</div><div class="line">import smtplib</div><div class="line">from email.mime.text import MIMEText</div><div class="line">from email.header import Header</div><div class="line"></div><div class="line"></div><div class="line">def alarm_email():</div><div class="line">    from_addr = &apos;发件邮箱@163.com&apos;</div><div class="line">    password = &apos;邮箱系统开启IMAP/SMTP服务后提供的密码&apos;</div><div class="line">    to_addr = &apos;收件邮箱@qq.com&apos;</div><div class="line">    smtp_server = &apos;smtp.163.com&apos;</div><div class="line">    msg = MIMEText(&apos;正文&apos;, &apos;plain&apos;, &apos;utf-8&apos;)</div><div class="line">    msg[&apos;From&apos;] = Header(from_addr)</div><div class="line">    msg[&apos;To&apos;] = Header(to_addr)</div><div class="line">    msg[&apos;Subject&apos;] = Header(&apos;标题&apos;)</div><div class="line">    server = smtplib.SMTP_SSL()</div><div class="line">    server.connect(smtp_server, 465)</div><div class="line">    server.login(from_addr, password)</div><div class="line">    server.sendmail(from_addr, to_addr, msg.as_string())</div><div class="line">    server.quit()</div><div class="line">    print(&apos;已发送邮件&apos;)</div></pre></td></tr></table></figure></p>
+<h2 id="如何设置定时任务"><a href="#如何设置定时任务" class="headerlink" title="如何设置定时任务"></a>如何设置定时任务</h2><p>把这个脚本设置成系统的定时任务，每天定时执行几次。linux增加crontab定时任务的方法博客里有写：</p>
+<p><a href="https://metang326.github.io/2020/02/03/[linux]linux%E5%A2%9E%E5%8A%A0crontab%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">https://metang326.github.io/2020/02/03/[linux]linux%E5%A2%9E%E5%8A%A0crontab%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/</a></p>
+<p>我是设置了每小时check一次</p>
+<blockquote>
+<p>sudo vim /etc/crontab</p>
+</blockquote>
+<p>增加下面这行：</p>
+<blockquote>
+<p>12 <em>/1  </em> <em> </em>   root    python3 /home/ivic/tmy_repos/Apple_Back-to-School_check/check.py</p>
+</blockquote>
+<p>然后重启服务</p>
+<blockquote>
+<p>sudo /etc/init.d/cron restart</p>
+<p>[ ok ] Restarting cron (via systemctl): cron.service.</p>
+</blockquote>
+<p>这样就是每小时的12分这个时刻，执行一下检测脚本，如果发现官网里出现了关键词就发送邮件进行通知；否则的话就直接结束。</p>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>可以先通过在代码手动增加一下关键词，进行测试，然后发现准时收到了提醒邮件，Done！</p>
 <blockquote>
 <p>text += “Beats耳机”</p>
 </blockquote>
@@ -526,6 +550,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/06/07/[cpp]C++实现线程池/" rel="prev" title="C++实现线程池">
+                C++实现线程池 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -612,7 +640,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">44</span>
+                  <span class="site-state-item-count">45</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -623,7 +651,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -634,7 +662,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">39</span>
+                  <span class="site-state-item-count">40</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -683,7 +711,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Apple-Back-to-School-check"><span class="nav-number">1.</span> <span class="nav-text">Apple_Back-to-School_check</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Apple-Back-to-School-check"><span class="nav-number">1.</span> <span class="nav-text">Apple_Back-to-School_check</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用流程"><span class="nav-number">1.1.</span> <span class="nav-text">使用流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码流程"><span class="nav-number">1.2.</span> <span class="nav-text">代码流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#code"><span class="nav-number">1.3.</span> <span class="nav-text">code</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何给自己发送邮件"><span class="nav-number">1.4.</span> <span class="nav-text">如何给自己发送邮件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何设置定时任务"><span class="nav-number">1.5.</span> <span class="nav-text">如何设置定时任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试"><span class="nav-number">1.6.</span> <span class="nav-text">测试</span></a></li></ol></li></ol></div>
             
 
           </div>

@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #199475; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #0B6E48, 0 0 5px     #0B6E48; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #044D22;    /*上边框颜色*/
+        border-left-color: #044D22;    /*左边框颜色*/
+    }
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/trojan_32px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/trojan_16px_573178_easyicon.net.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="cpp," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="线程池（thread pool）是一种线程使用模式。线程过多或者频繁创建和销毁线程会带来调度开销，进而影响缓存局部性和整体性能。而线程池维护着多个线程，等待着管理器分配可并发执行的任务。这避免了在处理短时间任务时创建与销毁线程的代价，以及保证了线程的可复用性。线程池不仅能够保证内核的充分利用，还能防止过分调度。">
+<meta name="keywords" content="cpp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++实现线程池">
+<meta property="og:url" content="https://metang326.github.io/2020/06/07/[cpp]C++实现线程池/index.html">
+<meta property="og:site_name" content="metang&#39;s blog">
+<meta property="og:description" content="线程池（thread pool）是一种线程使用模式。线程过多或者频繁创建和销毁线程会带来调度开销，进而影响缓存局部性和整体性能。而线程池维护着多个线程，等待着管理器分配可并发执行的任务。这避免了在处理短时间任务时创建与销毁线程的代价，以及保证了线程的可复用性。线程池不仅能够保证内核的充分利用，还能防止过分调度。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-06-04T06:59:03.727Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C++实现线程池">
+<meta name="twitter:description" content="线程池（thread pool）是一种线程使用模式。线程过多或者频繁创建和销毁线程会带来调度开销，进而影响缓存局部性和整体性能。而线程池维护着多个线程，等待着管理器分配可并发执行的任务。这避免了在处理短时间任务时创建与销毁线程的代价，以及保证了线程的可复用性。线程池不仅能够保证内核的充分利用，还能防止过分调度。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'TZVHEBFK02',
+      apiKey: '1ab48ccb78c0b1c98cf0e7935807338f',
+      indexName: 'my_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"输入关键字进行搜索","hits_empty":"找不到关于  ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://metang326.github.io/2020/06/07/[cpp]C++实现线程池/"/>
+
+
+
+
+
+  <title>C++实现线程池 | metang's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/metang326"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">metang's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In case I don't see ya', good afternoon, good evening and goodnight.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://metang326.github.io/2020/06/07/[cpp]C++实现线程池/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="metang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="metang's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">C++实现线程池</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-07T00:00:00+08:00">
+                2020-06-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpp/" itemprop="url" rel="index">
+                    <span itemprop="name">cpp</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 阅读数
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,207
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>线程池（thread pool）是一种线程使用模式。线程过多或者频繁创建和销毁线程会带来调度开销，进而影响缓存局部性和整体性能。而线程池维护着多个线程，等待着管理器分配可并发执行的任务。这避免了在处理短时间任务时创建与销毁线程的代价，以及保证了线程的可复用性。线程池不仅能够保证内核的充分利用，还能防止过分调度。</p>
+<a id="more"></a>
+<h2 id="线程池原理"><a href="#线程池原理" class="headerlink" title="线程池原理"></a>线程池原理</h2><p>预先创建好指定数量的线程，这些线程的身份相当于是消费者；任务队列中的任务相当于生产者。每当有任务被加入队列时，线程们就会去竞争任务，每次只有一个线程能够得到任务；得到任务的线程会执行该任务，执行完毕后继续去竞争新的任务。</p>
+<h2 id="线程池的好处"><a href="#线程池的好处" class="headerlink" title="线程池的好处"></a>线程池的好处</h2><ul>
+<li><p>避免了在高并发情况下,不断开辟线程造成的进程资源消耗</p>
+<blockquote>
+<p>假设一个服务器完成一项任务所需时间为：T1 创建线程时间，T2 在线程中执行任务的时间，T3 销毁线程时间。 如果：T1 + T3 远大于 T2，则可以采用线程池，以提高服务器性能。</p>
+</blockquote>
+</li>
+<li><p>保证多个任务可以并发地执行</p>
+<blockquote>
+<p>例如，一个任务队列有n个任务，可以通过线程池的调度分配到m个线程上去并发执行。</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="一个线程池基本组成"><a href="#一个线程池基本组成" class="headerlink" title="一个线程池基本组成"></a>一个线程池基本组成</h2><ol>
+<li><p>线程池管理器（ThreadPool）：用于创建并管理线程池，包括：创建线程池，销毁线程池，添加新任务； </p>
+</li>
+<li><p>工作线程（PoolWorker）：线程池中的线程，在没有任务时处于等待状态，可以循环地执行任务； </p>
+</li>
+<li><p>任务接口（Task）：每个任务必须实现的接口，以供工作线程调度任务的执行，它主要规定了任务的入口，任务执行完后的收尾工作，任务的执行状态等； </p>
+</li>
+<li><p>任务队列（taskQueue）：用于存放没有处理的任务，提供一种缓冲机制。</p>
+</li>
+</ol>
+<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><p><strong>代码地址：</strong></p>
+<p><a href="https://github.com/metang326/c11_threadpool" target="_blank" rel="external">https://github.com/metang326/c11_threadpool</a></p>
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><ol>
+<li><p>初始化线程池实例，新生成指定数量的线程，加入线程数组；由于此时没有任务加入，任务队列为空，因此所有的线程陷入睡眠</p>
+</li>
+<li><p>添加任务队列，每添加一个任务就唤醒一个线程，被唤醒线程从任务队列中取出任务并执行</p>
+</li>
+<li><p>任务队列已满时，需要等待之前的任务执行完毕，队列不再满时才能加入新任务</p>
+</li>
+<li><p>删除线程池时，is_working置为false，并且唤醒所有睡眠中的线程，使用join</p>
+</li>
+</ol>
+<h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><p><strong>Linux命令行：</strong></p>
+<blockquote>
+<p>g++  main.cpp -otest -pthread;./test</p>
+</blockquote>
+<p><strong>测试函数：线程池中有10个线程，任务队列最长为100个任务，总共下发了5000个任务。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">int main(int argc, char *argv[]) &#123;</div><div class="line">    ThreadPool *thread_pool = new ThreadPool(10, 100);</div><div class="line">    for (int i = 0; i &lt; 5000; i++) &#123;</div><div class="line">        thread_pool-&gt;add_task([=] &#123; return print(i); &#125;);</div><div class="line">    &#125;</div><div class="line">    this_thread::sleep_for(chrono::milliseconds(2000));</div><div class="line">    delete thread_pool;</div><div class="line">    return 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>输出结果：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">------------delete pool--------------</div><div class="line">[-] join thread 140290998769408, finished task_num =331</div><div class="line">[-] join thread 140290990376704, finished task_num =555</div><div class="line">[-] join thread 140290981984000, finished task_num =535</div><div class="line">[-] join thread 140290973591296, finished task_num =583</div><div class="line">[-] join thread 140290965198592, finished task_num =624</div><div class="line">[-] join thread 140290956805888, finished task_num =350</div><div class="line">[-] join thread 140290948413184, finished task_num =596</div><div class="line">[-] join thread 140290940020480, finished task_num =495</div><div class="line">[-] join thread 140290931627776, finished task_num =473</div><div class="line">[-] join thread 140290923235072, finished task_num =458</div><div class="line">[✔] delete ThreadPool finished!</div></pre></td></tr></table></figure>
+<h2 id="编码过程的思考"><a href="#编码过程的思考" class="headerlink" title="编码过程的思考"></a>编码过程的思考</h2><h3 id="1-退出时无法join线程，问题排查"><a href="#1-退出时无法join线程，问题排查" class="headerlink" title="1. 退出时无法join线程，问题排查"></a>1. 退出时无法join线程，问题排查</h3><p><strong>正确情况：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">work</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">while</span> (is_working) &#123;</div><div class="line">            unique_lock&lt;mutex&gt; lk(task_mutex);</div><div class="line">            <span class="keyword">while</span> (is_working <span class="keyword">and</span> tasks.empty()) &#123;</div><div class="line">                cond.wait(lk);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">if</span> (tasks.size() == <span class="number">0</span>) &#123;</div><div class="line">                <span class="keyword">continue</span>;</div><div class="line">            &#125;</div><div class="line">            Task cur_task;</div><div class="line">            cur_task = tasks.front();</div><div class="line">            tasks.pop();</div><div class="line">            <span class="keyword">int</span> task_id=cur_task();</div><div class="line">            cond.notify_one();</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p><strong>会造成退出时，join线程失败的情况：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">work</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">while</span> (is_working) &#123;</div><div class="line">            unique_lock&lt;mutex&gt; lk(task_mutex);</div><div class="line">            <span class="keyword">while</span> (tasks.empty()) &#123;</div><div class="line">                cond.wait(lk);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">if</span> (tasks.size() == <span class="number">0</span>) &#123;</div><div class="line">                <span class="keyword">continue</span>;</div><div class="line">            &#125;</div><div class="line">            Task cur_task;</div><div class="line">            cur_task = tasks.front();</div><div class="line">            tasks.pop();</div><div class="line">            <span class="keyword">int</span> task_id=cur_task();</div><div class="line">            cond.notify_one();</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>上面的代码中，进入wait的条件一开始我没有设置为：<strong>while (this-&gt;is_working and tasks.empty())，</strong>而是直接<strong>while (tasks.empty())</strong>。因为当时的直觉是，这是进入了while循环后的代码，那么一定是满足了<strong>is_working=true</strong>。</p>
+<p><strong>但实际的情况是：</strong></p>
+<ul>
+<li>当任务全部执行结束，此时tasks.empty()=true，所以线程们会陷入sleep，等到有新的任务加入时才被唤醒。</li>
+<li>当我们关闭线程池的时候，会把is_working=false，并且发出cond.notify_all();来把所有的睡眠状态线程都唤醒，唤醒后的线程才可以join。</li>
+<li>然而，当之前陷入睡眠的线程虽然因为notify_all()被唤醒了，但还是会因为tasks.empty()=true再次陷入睡眠，这时已经不会再有人来唤醒它们了，因此导致所有的线程都无法被join。</li>
+<li>这些无法被唤醒的线程，还是处于<strong>之前的is_working=true的睡眠过程中</strong>，所以无法进入is_working=false的那次循环。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">thread 140153839867648 is sleeping</div><div class="line">thread 140153823082240 is sleeping</div><div class="line">thread 140153797904128 is sleeping</div><div class="line">thread 140153831474944 is sleeping</div><div class="line">thread 140153814689536 is sleeping</div><div class="line">thread 140153781118720 is sleeping</div><div class="line">thread 140153856653056 is sleeping</div><div class="line">thread 140153789511424 is sleeping</div><div class="line">thread 140153806296832 is sleeping</div><div class="line">thread 140153848260352 is sleeping</div><div class="line">thread 140153823082240 is sleeping</div><div class="line">thread 140153839867648 is sleeping</div><div class="line">------------delete pool--------------</div><div class="line">[-] join thread 140153856653056, finished task_num =11</div></pre></td></tr></table></figure>
+<p><strong>不能以平时写单线程代码的思维来写多线程的代码</strong></p>
+<p>比如下面这里任务队列为空的判断，虽然进入上一层while循环的条件是is_working=true，但在wait导致陷入睡眠的过程中，is_working有可能已经变成了false，那么我们退出当前while循环的条件是：is_working=false,this-&gt;tasks.empty()可能为true。如果this-&gt;tasks.empty()=true，那么直接执行下面的执行任务代码是会出错的。以此还是需要对任务队列是否为空的判断。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">            while (this-&gt;is_working and this-&gt;tasks.empty()) &#123;</div><div class="line">                this-&gt;cond.wait(lk);</div><div class="line">            &#125;</div><div class="line">//            if (this-&gt;tasks.empty()) &#123;</div><div class="line">//                continue;</div><div class="line">//            &#125;</div></pre></td></tr></table></figure>
+<h3 id="2-任务内容简单且数量少的情况，所有的任务都被第一个创建的线程抢夺了。"><a href="#2-任务内容简单且数量少的情况，所有的任务都被第一个创建的线程抢夺了。" class="headerlink" title="2. 任务内容简单且数量少的情况，所有的任务都被第一个创建的线程抢夺了。"></a>2. 任务内容简单且数量少的情况，所有的任务都被第一个创建的线程抢夺了。</h3><p>当任务仅为输出一行字符时，执行任务的开销会远小于线程被唤醒的开销。第一个线程最先被唤醒，在它循环的过程中，任务充足，不会陷入睡眠状态，所以在尝试运行几次例子之后，基本上都是由第一个线程抢占了所有的任务。</p>
+<p><strong>任务：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> task_id)</span> </span>&#123;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"[-] task "</span> &lt;&lt; task_id &lt;&lt; <span class="string">" working in thread "</span> &lt;&lt; this_thread::get_id() &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">work</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">while</span> (<span class="keyword">this</span>-&gt;is_working) &#123;</div><div class="line"><span class="comment">//            this_thread::sleep_for(chrono::milliseconds(1));</span></div><div class="line">            unique_lock&lt;mutex&gt; lk(task_mutex);</div><div class="line">            <span class="keyword">while</span> (<span class="keyword">this</span>-&gt;is_working <span class="keyword">and</span> tasks.empty()) &#123;</div><div class="line">                cond.wait(lk);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">if</span> (tasks.size() == <span class="number">0</span>) &#123;</div><div class="line">                <span class="keyword">continue</span>;</div><div class="line">            &#125;</div><div class="line">            Task cur_task;</div><div class="line">            cur_task = tasks.front();</div><div class="line">            tasks.pop();</div><div class="line">            cur_task();</div><div class="line">            cond.notify_one();</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p><strong>{ 线程数量3，最大任务队列6，总任务量9 }  对应输出：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">tangmy@dell-mgt<span class="number">-01</span>:~/tmy_repos/threadpool$ g++  main.cpp -otest -pthread;./test </div><div class="line">[✔] create ThreadPool finished!</div><div class="line">[-] task <span class="number">0</span> working in thread <span class="number">140421144192768</span></div><div class="line">[-] task <span class="number">1</span> working in thread <span class="number">140421144192768</span></div><div class="line">[-] task <span class="number">2</span> working in thread <span class="number">140421144192768</span></div><div class="line">[-] task <span class="number">3</span> working in thread <span class="number">140421144192768</span></div><div class="line">[-] task <span class="number">4</span> working in thread <span class="number">140421144192768</span></div><div class="line">[-] task <span class="number">5</span> working in thread <span class="number">140421144192768</span></div><div class="line">[-] task <span class="number">6</span> working in thread <span class="number">140421144192768</span></div><div class="line">[-] task <span class="number">7</span> working in thread <span class="number">140421144192768</span></div><div class="line">[-] task <span class="number">8</span> working in thread <span class="number">140421144192768</span></div><div class="line">------------<span class="keyword">delete</span> pool--------------</div><div class="line">[-] join thread <span class="number">140421144192768</span></div><div class="line">[-] join thread <span class="number">140421135800064</span></div><div class="line">[-] join thread <span class="number">140421127407360</span></div><div class="line">[✔] <span class="keyword">delete</span> ThreadPool finished!</div></pre></td></tr></table></figure>
+<h3 id="3-在work-增加一毫秒的sleep能够维持均匀的线程调度"><a href="#3-在work-增加一毫秒的sleep能够维持均匀的线程调度" class="headerlink" title="3. 在work()增加一毫秒的sleep能够维持均匀的线程调度"></a>3. 在work()增加一毫秒的sleep能够维持均匀的线程调度</h3><blockquote>
+<p>在work函数增加  this_thread::sleep_for(chrono::milliseconds(1));  </p>
+<p>这种情况，在第1个线程结束了任务后，会进入一个sleep，在它sleep的过程中，就可以由第2个线程来抢新任务，然后进入sleep,…..</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">work</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">while</span> (<span class="keyword">this</span>-&gt;is_working) &#123;</div><div class="line">        this_thread::sleep_for(chrono::milliseconds(<span class="number">1</span>));</div><div class="line">        unique_lock&lt;mutex&gt; lk(task_mutex);</div><div class="line">        <span class="keyword">while</span> (<span class="keyword">this</span>-&gt;is_working <span class="keyword">and</span> tasks.empty()) &#123;</div><div class="line">            cond.wait(lk);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (tasks.size() == <span class="number">0</span>) &#123;</div><div class="line">            <span class="keyword">continue</span>;</div><div class="line">        &#125;</div><div class="line">        Task cur_task;</div><div class="line">        cur_task = tasks.front();</div><div class="line">        tasks.pop();</div><div class="line">        cur_task();</div><div class="line">        cond.notify_one();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>{ 线程数量3，最大任务队列6，总任务量9 }  输出：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">tangmy@dell-mgt<span class="number">-01</span>:~/tmy_repos/threadpool$ g++  main.cpp -otest -pthread;./test </div><div class="line">[✔] create ThreadPool finished!</div><div class="line">[-] task <span class="number">0</span> working in thread <span class="number">140195294820096</span></div><div class="line">[-] task <span class="number">1</span> working in thread <span class="number">140195278034688</span></div><div class="line">[-] task <span class="number">2</span> working in thread <span class="number">140195286427392</span></div><div class="line">[-] task <span class="number">3</span> working in thread <span class="number">140195294820096</span></div><div class="line">[-] task <span class="number">4</span> working in thread <span class="number">140195286427392</span></div><div class="line">[-] task <span class="number">5</span> working in thread <span class="number">140195278034688</span></div><div class="line">[-] task <span class="number">6</span> working in thread <span class="number">140195294820096</span></div><div class="line">[-] task <span class="number">7</span> working in thread <span class="number">140195286427392</span></div><div class="line">[-] task <span class="number">8</span> working in thread <span class="number">140195294820096</span></div><div class="line">------------<span class="keyword">delete</span> pool--------------</div><div class="line">[-] join thread <span class="number">140195294820096</span></div><div class="line">[-] join thread <span class="number">140195286427392</span></div><div class="line">[-] join thread <span class="number">140195278034688</span></div><div class="line">[✔] <span class="keyword">delete</span> ThreadPool finished!</div></pre></td></tr></table></figure>
+<blockquote>
+<p>当把每个线程需要执行的任务计算量增大的时候，也能实现相对均衡的线程任务分配：</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> task_id)</span> </span>&#123;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"[-] task "</span> &lt;&lt; task_id &lt;&lt; <span class="string">" working in thread "</span> &lt;&lt; this_thread::get_id() &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    <span class="keyword">long</span> <span class="keyword">long</span> res=<span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">1000000000</span>;i++)&#123;</div><div class="line">        res++;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>{ 线程数量3，最大任务队列6，总任务量9 }  输出：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">tangmy@dell-mgt<span class="number">-01</span>:~/tmy_repos/threadpool$ g++  main.cpp -otest -pthread;./test </div><div class="line">[✔] create ThreadPool finished!</div><div class="line">[-] task <span class="number">0</span> working in thread <span class="number">140681668404992</span></div><div class="line">[-] task <span class="number">1</span> working in thread <span class="number">140681651619584</span></div><div class="line">[-] task <span class="number">2</span> working in thread <span class="number">140681668404992</span></div><div class="line">[-] task <span class="number">3</span> working in thread <span class="number">140681651619584</span></div><div class="line">[-] task <span class="number">4</span> working in thread <span class="number">140681668404992</span></div><div class="line">[-] task <span class="number">5</span> working in thread <span class="number">140681668404992</span></div><div class="line">[-] task <span class="number">6</span> working in thread <span class="number">140681660012288</span></div><div class="line">------------<span class="keyword">delete</span> pool--------------</div><div class="line">[-] join thread <span class="number">140681668404992</span></div><div class="line">[-] task <span class="number">7</span> working in thread <span class="number">140681651619584</span></div><div class="line">[-] task <span class="number">8</span> working in thread <span class="number">140681668404992</span></div><div class="line">[-] join thread <span class="number">140681660012288</span></div><div class="line">[-] join thread <span class="number">140681651619584</span></div><div class="line">[✔] <span class="keyword">delete</span> ThreadPool finished!</div></pre></td></tr></table></figure>
+<h3 id="4-任务队列与总数较大时均衡性更好"><a href="#4-任务队列与总数较大时均衡性更好" class="headerlink" title="4. 任务队列与总数较大时均衡性更好"></a>4. 任务队列与总数较大时均衡性更好</h3><p><strong>{ 线程数量10，最大任务队列100，总任务量10000 } 输出：</strong>  </p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">------------<span class="keyword">delete</span> pool--------------</div><div class="line">[-] join thread <span class="number">139730486896384</span>, finished task_num =<span class="number">961</span></div><div class="line">[-] join thread <span class="number">139730478503680</span>, finished task_num =<span class="number">1026</span></div><div class="line">[-] join thread <span class="number">139730470110976</span>, finished task_num =<span class="number">948</span></div><div class="line">[-] join thread <span class="number">139730461718272</span>, finished task_num =<span class="number">1012</span></div><div class="line">[-] join thread <span class="number">139730453325568</span>, finished task_num =<span class="number">1024</span></div><div class="line">[-] join thread <span class="number">139730444932864</span>, finished task_num =<span class="number">951</span></div><div class="line">[-] join thread <span class="number">139730436540160</span>, finished task_num =<span class="number">984</span></div><div class="line">[-] join thread <span class="number">139730428147456</span>, finished task_num =<span class="number">1027</span></div><div class="line">[-] join thread <span class="number">139730419754752</span>, finished task_num =<span class="number">1050</span></div><div class="line">[-] join thread <span class="number">139730411362048</span>, finished task_num =<span class="number">1017</span></div><div class="line">[✔] <span class="keyword">delete</span> ThreadPool finished!</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+    
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+  
+</div>
+    
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="metang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/aipay.jpg" alt="metang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/cpp/" rel="tag"><i class="fa fa-tag"></i> cpp</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/05/30/[爬虫]Apple_Back-to-School_check/" rel="next" title="Apple暑期返校送Beats耳机活动监控">
+                <i class="fa fa-chevron-left"></i> Apple暑期返校送Beats耳机活动监控
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.JPG"
+                alt="metang" />
+            
+              <p class="site-author-name" itemprop="name">metang</p>
+              <p class="site-description motion-element" itemprop="description">from Nuaa</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/metang326" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="534747943@qq.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#线程池原理"><span class="nav-number">1.</span> <span class="nav-text">线程池原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程池的好处"><span class="nav-number">2.</span> <span class="nav-text">线程池的好处</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一个线程池基本组成"><span class="nav-number">3.</span> <span class="nav-text">一个线程池基本组成</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码实现"><span class="nav-number"></span> <span class="nav-text">代码实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#流程"><span class="nav-number">1.</span> <span class="nav-text">流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用方法"><span class="nav-number">2.</span> <span class="nav-text">使用方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编码过程的思考"><span class="nav-number">3.</span> <span class="nav-text">编码过程的思考</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-退出时无法join线程，问题排查"><span class="nav-number">3.1.</span> <span class="nav-text">1. 退出时无法join线程，问题排查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-任务内容简单且数量少的情况，所有的任务都被第一个创建的线程抢夺了。"><span class="nav-number">3.2.</span> <span class="nav-text">2. 任务内容简单且数量少的情况，所有的任务都被第一个创建的线程抢夺了。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-在work-增加一毫秒的sleep能够维持均匀的线程调度"><span class="nav-number">3.3.</span> <span class="nav-text">3. 在work()增加一毫秒的sleep能够维持均匀的线程调度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-任务队列与总数较大时均衡性更好"><span class="nav-number">3.4.</span> <span class="nav-text">4. 任务队列与总数较大时均衡性更好</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">metang</span>
+
+  
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>
