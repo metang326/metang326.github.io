@@ -83,7 +83,7 @@
 
 
 
-  <meta name="keywords" content="CTF,密码学,凯撒加密,栅栏加密," />
+  <meta name="keywords" content="算法," />
 
 
 
@@ -94,18 +94,18 @@
 
 
 
-<meta name="description" content="题目小白发现了一段很6的字符：NlEyQd{seft}">
-<meta name="keywords" content="CTF,密码学,凯撒加密,栅栏加密">
+<meta name="description" content="你将获得 K 个鸡蛋，并可以使用一栋从 1 到 N  共有 N 层楼的建筑。每个蛋的功能都是一样的，如果一个蛋碎了，你就不能再把它掉下去。你知道存在楼层 F ，满足 0 &amp;lt;= F &amp;lt;= N 任何从高于 F 的楼层落下的鸡蛋都会碎，从 F 楼层或比它低的楼层落下的鸡蛋都不会破。每次移动，你可以取一个鸡蛋（如果你有完整的鸡蛋）并把它从任一楼层 X 扔下（满足 1 &amp;lt;= X &amp;lt;=">
+<meta name="keywords" content="算法">
 <meta property="og:type" content="article">
-<meta property="og:title" content="困在栅栏里的凯撒">
-<meta property="og:url" content="https://metang326.github.io/2017/11/11/[CTF]困在栅栏里的凯撒/index.html">
+<meta property="og:title" content="扔鸡蛋问题的dp解法">
+<meta property="og:url" content="https://metang326.github.io/2020/06/03/[算法]扔鸡蛋问题的dp解法/index.html">
 <meta property="og:site_name" content="metang&#39;s blog">
-<meta property="og:description" content="题目小白发现了一段很6的字符：NlEyQd{seft}">
+<meta property="og:description" content="你将获得 K 个鸡蛋，并可以使用一栋从 1 到 N  共有 N 层楼的建筑。每个蛋的功能都是一样的，如果一个蛋碎了，你就不能再把它掉下去。你知道存在楼层 F ，满足 0 &amp;lt;= F &amp;lt;= N 任何从高于 F 的楼层落下的鸡蛋都会碎，从 F 楼层或比它低的楼层落下的鸡蛋都不会破。每次移动，你可以取一个鸡蛋（如果你有完整的鸡蛋）并把它从任一楼层 X 扔下（满足 1 &amp;lt;= X &amp;lt;=">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-11-11T11:04:57.135Z">
+<meta property="og:updated_time" content="2020-06-08T14:05:15.075Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="困在栅栏里的凯撒">
-<meta name="twitter:description" content="题目小白发现了一段很6的字符：NlEyQd{seft}">
+<meta name="twitter:title" content="扔鸡蛋问题的dp解法">
+<meta name="twitter:description" content="你将获得 K 个鸡蛋，并可以使用一栋从 1 到 N  共有 N 层楼的建筑。每个蛋的功能都是一样的，如果一个蛋碎了，你就不能再把它掉下去。你知道存在楼层 F ，满足 0 &amp;lt;= F &amp;lt;= N 任何从高于 F 的楼层落下的鸡蛋都会碎，从 F 楼层或比它低的楼层落下的鸡蛋都不会破。每次移动，你可以取一个鸡蛋（如果你有完整的鸡蛋）并把它从任一楼层 X 扔下（满足 1 &amp;lt;= X &amp;lt;=">
 
 
 
@@ -135,13 +135,13 @@
 
 
 
-  <link rel="canonical" href="https://metang326.github.io/2017/11/11/[CTF]困在栅栏里的凯撒/"/>
+  <link rel="canonical" href="https://metang326.github.io/2020/06/03/[算法]扔鸡蛋问题的dp解法/"/>
 
 
 
 
 
-  <title>困在栅栏里的凯撒 | metang's blog</title>
+  <title>扔鸡蛋问题的dp解法 | metang's blog</title>
   
 
 
@@ -318,7 +318,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://metang326.github.io/2017/11/11/[CTF]困在栅栏里的凯撒/">
+    <link itemprop="mainEntityOfPage" href="https://metang326.github.io/2020/06/03/[算法]扔鸡蛋问题的dp解法/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="metang">
@@ -335,7 +335,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">困在栅栏里的凯撒</h1>
+          <h1 class="post-title" itemprop="name headline">扔鸡蛋问题的dp解法</h1>
         
 
         <div class="post-meta">
@@ -347,8 +347,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-11T00:00:00+08:00">
-                2017-11-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-03T00:00:00+08:00">
+                2020-06-03
               </time>
             
 
@@ -370,19 +370,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/实验吧CTF题解/" itemprop="url" rel="index">
-                    <span itemprop="name">实验吧CTF题解</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/实验吧CTF题解/密码学/" itemprop="url" rel="index">
-                    <span itemprop="name">密码学</span>
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -419,7 +408,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  119
+                  1,232
                 </span>
               
 
@@ -444,15 +433,41 @@
       
 
       
-        <h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>小白发现了一段很6的字符：NlEyQd{seft}</p>
+        <p>你将获得 K 个鸡蛋，并可以使用一栋从 1 到 N  共有 N 层楼的建筑。<br>每个蛋的功能都是一样的，如果一个蛋碎了，你就不能再把它掉下去。<br>你知道存在楼层 F ，满足 0 &lt;= F &lt;= N 任何从高于 F 的楼层落下的鸡蛋都会碎，从 F 楼层或比它低的楼层落下的鸡蛋都不会破。<br>每次移动，你可以取一个鸡蛋（如果你有完整的鸡蛋）并把它从任一楼层 X 扔下（满足 1 &lt;= X &lt;= N）。<br>你的目标是确切地知道 F 的值是多少。<br>在最坏的情况下，你确定 F 的值的最小移动次数是多少？</p>
+<p>来源：力扣（LeetCode）<br>链接：<a href="https://leetcode-cn.com/problems/super-egg-drop" target="_blank" rel="external">https://leetcode-cn.com/problems/super-egg-drop</a></p>
 <a id="more"></a>
-<h2 id="题目链接"><a href="#题目链接" class="headerlink" title="题目链接"></a>题目链接</h2><p><a href="http://www.shiyanbar.com/ctf/1867" target="_blank" rel="external">http://www.shiyanbar.com/ctf/1867</a></p>
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>对NlEyQd{seft}进行栅栏加密后得到 NEQ{etlydsf}</p>
-<p>（每组字数为2的情况下，栅栏解密的结果为 ：N{lsEeyfQtd}  栅栏加密结果为： NEQ{etlydsf} ）</p>
-<p>在线栅栏加密解密网址：<a href="http://www.qqxiuzi.cn/bianma/zhalanmima.php" target="_blank" rel="external">http://www.qqxiuzi.cn/bianma/zhalanmima.php</a></p>
-<p>猜测NEQ会和CTF对应</p>
-<p>再对NEQ{etlydsf}进行凯撒解密得到结果</p>
-<p>凯撒解密网址：<a href="http://planetcalc.com/1434/" target="_blank" rel="external">http://planetcalc.com/1434/</a></p>
+<p>题目比较难理解的点在于<strong>“最坏情况”</strong>是什么意思</p>
+<h2 id="dp方法1"><a href="#dp方法1" class="headerlink" title="dp方法1"></a>dp方法1</h2><p>设dp[ i,j]表示在：目前试过的最高层为i，剩余鸡蛋数量为j的情况下，确定F的最小移动次数。</p>
+<p>想要计算出dp[i,j]，那就得在第i层扔鸡蛋了（1次移动），根据鸡蛋的情况分为两种：</p>
+<ul>
+<li>鸡蛋在第i层碎了，那么说明F&lt;=i，i以上的层数不用考虑了，剩下j-1个鸡蛋。因此剩余需要考虑的最小移动次数=dp[i-1,j-1]</li>
+<li>鸡蛋在第i层没有碎，说明F&gt;=i，i以下的层数不用考虑了，剩下还是j个鸡蛋，网上的楼层有n-i层，把当前的第i层看作平地，那么上面的n-i层所需要的最小移动次数=dp[n-i, j]</li>
+</ul>
+<p>这两种情况在扔鸡蛋的行为发生之后，只会出现一种，到底出现哪一种？由于题目说在“最坏情况”，所以我们选择的是移动次数更多的一种情况。</p>
+<p>这个“选择”其实还是有点难理解的，因为在客观事实上，鸡蛋到底在哪一层刚刚好会碎掉，这明明是在我们进行实验之前就已经确定好的，不会因为我们的扔鸡蛋行为而改变才对。但题目的意思是，如果鸡蛋在第i层碎了，我们后续确定F的代价次数更多，那这个鸡蛋在第i层就是碎的；反之，如果它不碎给我们留下的待确定次数更多，那它就不碎。有一点“薛定谔的鸡蛋”的感觉，这个鸡蛋既可以碎，也可以不碎，它虽然原本和我们的扔鸡蛋行为是无关的，但在题目要求下，“是否碎”是由哪种情况会更麻烦来决定的。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;vector&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> k,n;</div><div class="line">    <span class="built_in">cin</span>&gt;&gt;k&gt;&gt;n;</div><div class="line">    <span class="keyword">int</span> dp[n+<span class="number">1</span>][k+<span class="number">1</span>];</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;=n;i++)&#123;</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">1</span>;j&lt;=k;j++)&#123;</div><div class="line">            dp[i][j]=i;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;=n;i++)&#123;</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">2</span>;j&lt;=k;j++)&#123;</div><div class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> x=<span class="number">1</span>;x&lt;=i<span class="number">-1</span>;x++)&#123;</div><div class="line">                dp[i][j]=min(dp[i][j],<span class="number">1</span>+max(dp[x<span class="number">-1</span>][j<span class="number">-1</span>],dp[i-x][j]));</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">cout</span>&lt;&lt;dp[n][k]&lt;&lt;<span class="built_in">endl</span>;</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="dp方法2"><a href="#dp方法2" class="headerlink" title="dp方法2"></a>dp方法2</h2><p>设dp[k,m]表示k个鸡蛋，移动m次最多可以确定多少层楼。</p>
+<blockquote>
+<p>例如dp[a,b]=c表示的意思是：有a个鸡蛋，最多可以移动b次，这个状态下，最坏情况下最多能确切测试一栋 c 层的楼。</p>
+</blockquote>
+<p>因为我们的目的是确定n层楼，所以最终要计算的框架就是：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">superEggDrop</span><span class="params">(<span class="keyword">int</span> K, <span class="keyword">int</span> N)</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">int</span> m = <span class="number">0</span>;</div><div class="line">    <span class="keyword">while</span> (dp[K][m] &lt; N) &#123;</div><div class="line">        m++;</div><div class="line">        <span class="comment">// 状态转移...</span></div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> m;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>那么当我们在k个鸡蛋，允许最多扔m次的状态下，选择在第X层扔鸡蛋的时候，就有两种情况：</p>
+<ul>
+<li><p>鸡蛋碎了，我们少了一颗鸡蛋，用掉了一步，通过“鸡蛋碎了”这一结果我们可以确定它上面的N-X层肯定也会碎掉，F&lt;=X，下面这部分的层数是dp[k-1,m-1]</p>
+</li>
+<li><p>鸡蛋没碎，鸡蛋的数量没有变，用掉了一步，通过“鸡蛋没碎”这一结果我们可以确定它下面的X-1层也不会碎掉，X&lt;F，上面这部分的层数是dp[k,m-1]</p>
+</li>
+</ul>
+<p>但不论我们在哪一层楼扔鸡蛋，不论我们现在是否扔鸡蛋了，在k个鸡蛋，最多m次的这个状态下，能测算的楼层数已经确定了，就是“上面那部分”+“下面那部分”+1（扔鸡蛋的那层）<br>也就是：</p>
+<blockquote>
+<p>dp[k,m]=1+dp[k-1,m-1]+dp[k,m-1]</p>
+</blockquote>
+<p>并且由于m是一直在增加的，所以其实不需要二维数组来存储，一维就够了：</p>
+<blockquote>
+<p>dp[k]=1+dp[k-1]+dp[k]</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">int</span> <span class="title">superEggDrop</span><span class="params">(<span class="keyword">int</span> K, <span class="keyword">int</span> N)</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> dp[K+<span class="number">1</span>];</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;=K;i++)&#123;</div><div class="line">            dp[i]=<span class="number">0</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">int</span> m=<span class="number">0</span>;</div><div class="line">        <span class="keyword">while</span>(dp[K]&lt;N)&#123;</div><div class="line">            m++;</div><div class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=K;j&gt;<span class="number">0</span>;j--)&#123;</div><div class="line">                dp[j]=dp[j<span class="number">-1</span>]+dp[j]+<span class="number">1</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> m;</div><div class="line">    &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
 
       
     </div>
@@ -509,13 +524,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/CTF/" rel="tag"><i class="fa fa-tag"></i> CTF</a>
-          
-            <a href="/tags/密码学/" rel="tag"><i class="fa fa-tag"></i> 密码学</a>
-          
-            <a href="/tags/凯撒加密/" rel="tag"><i class="fa fa-tag"></i> 凯撒加密</a>
-          
-            <a href="/tags/栅栏加密/" rel="tag"><i class="fa fa-tag"></i> 栅栏加密</a>
+            <a href="/tags/算法/" rel="tag"><i class="fa fa-tag"></i> 算法</a>
           
         </div>
       
@@ -528,8 +537,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/11/11/[CTF]神秘字母/" rel="next" title="神秘字母">
-                <i class="fa fa-chevron-left"></i> 神秘字母
+              <a href="/2020/05/30/[分布式]Kafka原理学习/" rel="next" title="Kafka原理学习">
+                <i class="fa fa-chevron-left"></i> Kafka原理学习
               </a>
             
           </div>
@@ -538,8 +547,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/11/13/[hexo搭建博客]hexo next主题配置algolia搜索功能/" rel="prev" title="hexo next主题配置algolia搜索功能">
-                hexo next主题配置algolia搜索功能 <i class="fa fa-chevron-right"></i>
+              <a href="/2020/06/07/[cpp]C++实现线程池/" rel="prev" title="C++实现线程池">
+                C++实现线程池 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -698,7 +707,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目"><span class="nav-number">1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#题目链接"><span class="nav-number">2.</span> <span class="nav-text">题目链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#题解"><span class="nav-number">3.</span> <span class="nav-text">题解</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#dp方法1"><span class="nav-number">1.</span> <span class="nav-text">dp方法1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dp方法2"><span class="nav-number">2.</span> <span class="nav-text">dp方法2</span></a></li></ol></div>
             
 
           </div>
